@@ -1,2 +1,2 @@
 # MPK
-Website Majelis Perwakilan Kelas SMANSMAAL
+Website Majelis Perwakilan Kelas SMA
