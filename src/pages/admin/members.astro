@@ -1,0 +1,19 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ReactMemberTable from '../../components/ReactMemberTable.tsx';
+
+// Hybrid mode - SSR at edge
+export const prerender = false;
+---
+
+<AdminLayout title="Kelola Pengurus MPK SMANSAMAL">
+  <div class="space-y-8">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-wider">CMS Pengurus MPK</h2>
+      <p class="text-xs text-slate-600 font-medium mt-1">Kelola data organogram, jabatan, komisi, dan foto profil pengurus tanpa menyentuh kode.</p>
+    </div>
+
+    {/* Load hydrated Member CRUD component */}
+    <ReactMemberTable client:load />
+  </div>
+</AdminLayout>

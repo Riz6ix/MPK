@@ -1,0 +1,1047 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ReactAspirasiForm from '../components/ReactAspirasiForm.tsx';
+import { supabase } from '../lib/supabase';
+
+export const prerender = false; // Enable live SSR to sync instantly with Supabase CMS on every page hit
+
+// Set lightweight Edge caching headers to optimize CDN delivery
+Astro.response.headers.set(
+  'Cache-Control', 
+  'public, max-age=0, s-maxage=45, stale-while-revalidate=300'
+);
+
+// Fetch positions to get active sort hierarchy
+let positions: any[] = [];
+try {
+  const { data, error } = await supabase
+    .from('positions')
+    .select('*')
+    .order('order_index', { ascending: true });
+  if (!error && data) {
+    positions = data;
+  }
+} catch (err) {
+  console.error("Gagal mengambil data jabatan:", err);
+}
+
+// Fetch members from Supabase
+let members: any[] = [];
+try {
+  const { data, error } = await supabase
+    .from('members')
+    .select('*');
+  
+  if (!error && data) {
+    members = data;
+  }
+} catch (err) {
+  console.error("Gagal mengambil data pengurus:", err);
+}
+
+// Fallback seeding in memory if database is empty so the site looks stunning on first load
+if (members.length === 0) {
+  members = [
+    { id: '1', name: 'Tri Dewi Utami', position: 'Ketua MPK', class: 'XII-F1', commission: 'Inti', avatar_url: null, order_index: 0, gender: 'Perempuan' },
+    { id: '2', name: 'Muhamad Saripudin', position: 'Wakil Ketua', class: 'XII-F5', commission: 'Inti', avatar_url: null, order_index: 1, gender: 'Laki-laki' },
+    { id: '3', name: 'Siti Nurasyiah', position: 'Sekretaris I', class: 'XI-F1', commission: 'Inti', avatar_url: null, order_index: 2, gender: 'Perempuan' },
+    { id: '4', name: 'Erissa Valencia Putri', position: 'Sekretaris II', class: 'XI-F7', commission: 'Inti', avatar_url: null, order_index: 3, gender: 'Perempuan' },
+    { id: '5', name: 'Tiara Dewi Anjani', position: 'Bendahara', class: 'XII-F9', commission: 'Inti', avatar_url: null, order_index: 4, gender: 'Perempuan' },
+    { id: '6', name: 'Rizky Setiawan', position: 'Developer', class: 'XII-F5', commission: 'Inti', avatar_url: null, order_index: 5, gender: 'Laki-laki' },
+    { id: '7', name: 'Lesti', position: 'Koordinator Komisi A', class: 'XI-F1', commission: 'A', avatar_url: null, order_index: 0, gender: 'Perempuan' },
+    { id: '8', name: 'Charissa Aini', position: 'Anggota Komisi A', class: 'XI-F5', commission: 'A', avatar_url: null, order_index: 1, gender: 'Perempuan' },
+    { id: '9', name: 'Muhamad Saep', position: 'Koordinator Komisi B', class: 'XII-F3', commission: 'B', avatar_url: null, order_index: 0, gender: 'Laki-laki' },
+    { id: '10', name: 'Muhamad Rizky Nur Giffari', position: 'Koordinator Komisi C', class: 'XII-F8', commission: 'C', avatar_url: null, order_index: 0, gender: 'Laki-laki' },
+    { id: '11', name: 'Saparudin', position: 'Koordinator Komisi D', class: 'XII-F1', commission: 'D', avatar_url: null, order_index: 0, gender: 'Laki-laki' },
+    { id: '12', name: 'Diva Khalifatul Hasanah', position: 'Koordinator Komisi E', class: 'XI-F1', commission: 'E', avatar_url: null, order_index: 0, gender: 'Perempuan' },
+    { id: '13', name: 'Bagus Adi Darmawan', position: 'Koordinator Komisi F', class: 'XII-F7', commission: 'F', avatar_url: null, order_index: 0, gender: 'Laki-laki' }
+  ];
+}
+
+// Sort members by position's order_index if positions are available, else fallback to standard sorting
+if (positions.length > 0) {
+  members.sort((a, b) => {
+    const posA = positions.find(p => p.title === a.position);
+    const posB = positions.find(p => p.title === b.position);
+    
+    const indexA = posA ? posA.order_index : 999;
+    const indexB = posB ? posB.order_index : 999;
+    
+    return indexA - indexB;
+  });
+} else {
+  members.sort((a, b) => a.order_index - b.order_index);
+}
+
+// Fetch recent aspirations from Supabase
+let recentAspirations: any[] = [];
+try {
+  const { data, error } = await supabase
+    .from('aspirations')
+    .select('name, class, content, status, response, created_at')
+    .order('created_at', { ascending: false })
+    .limit(12);
+  
+  if (!error && data) {
+    recentAspirations = data;
+  }
+} catch (err) {
+  console.error("Gagal mengambil data aspirasi:", err);
+}
+
+const getStatusStyles = (status: string) => {
+  switch (status) {
+    case 'Selesai':
+      return {
+        bg: 'bg-emerald-50 border-emerald-300/70 text-emerald-800',
+        emoji: '🌲'
+      };
+    case 'Sedang Ditinjau':
+      return {
+        bg: 'bg-amber-50 border-amber-300/70 text-amber-800',
+        emoji: '🔍'
+      };
+    case 'Anomali':
+      return {
+        bg: 'bg-purple-50 border-purple-300/70 text-purple-800',
+        emoji: '🪐'
+      };
+    case 'Pending Anggaran':
+      return {
+        bg: 'bg-yellow-50 border-yellow-300/70 text-yellow-800',
+        emoji: '💸'
+      };
+    case 'Birokrasi':
+      return {
+        bg: 'bg-orange-50 border-orange-300/70 text-orange-800',
+        emoji: '📝'
+      };
+    default:
+      return {
+        bg: 'bg-slate-50 border-slate-300 text-slate-700',
+        emoji: '📭'
+      };
+  }
+};
+
+// Seed fallbacks if database has none (empty for live DB sync)
+if (recentAspirations.length === 0) {
+  recentAspirations = [];
+}
+
+const anonymizeName = (name: string, className: string) => {
+  const lower = name.toLowerCase();
+  if (lower === 'anonim' || lower.includes('siswa')) {
+    return name;
+  }
+  return `Siswa Kelas ${className}`;
+};
+
+// Grouping (Filter only Active Members for main organogram)
+const activeMembers = members.filter(m => m.status === 'Aktif' || !m.status);
+const coreMembers = activeMembers.filter(m => m.commission === 'Inti');
+const commissionA = activeMembers.filter(m => m.commission === 'A');
+const commissionB = activeMembers.filter(m => m.commission === 'B');
+const commissionC = activeMembers.filter(m => m.commission === 'C');
+const commissionD = activeMembers.filter(m => m.commission === 'D');
+const commissionE = activeMembers.filter(m => m.commission === 'E');
+const commissionF = activeMembers.filter(m => m.commission === 'F');
+
+const commissions = [
+  { id: 'A', title: 'Komisi A', desc: 'Mengawasi kerja OSIS seksi bidang 1 sampai 4. Menyusun aturan dasar organisasi (AD/ART).', list: commissionA },
+  { id: 'B', title: 'Komisi B', desc: 'Mengawasi kerja OSIS seksi bidang 5 sampai 7. Menyusun AD/ART organisasi.', list: commissionB },
+  { id: 'C', title: 'Komisi C', desc: 'Mengawasi seluruh program kerja OSIS dan menjadi tim evaluasi kinerja umum.', list: commissionC },
+  { id: 'D', title: 'Komisi D', desc: 'Berperan sebagai tim penampung dan penyalur aspirasi warga sekolah.', list: commissionD },
+  { id: 'E', title: 'Komisi E', desc: 'Mengelola media digital publikasi dan penyebaran informasi kegiatan sekolah.', list: commissionE },
+  { id: 'F', title: 'Komisi F', desc: 'Melakukan pengawasan internal dan evaluasi objektif program kerja MPK.', list: commissionF }
+];
+
+// Fetch Alumni (Purna Bakti) from dedicated alumni table with generation join
+let alumniMembers: any[] = [];
+try {
+  const { data: alumniData, error: alumniError } = await supabase
+    .from('alumni')
+    .select('*, generations(name, active_year, graduation_year)')
+    .order('name', { ascending: true });
+  if (!alumniError && alumniData) {
+    alumniMembers = alumniData;
+  }
+} catch (err) {
+  console.error('Gagal mengambil data alumni:', err);
+}
+
+// Group alumni by generation name
+const demisionerByGen: Record<string, any[]> = {};
+alumniMembers.forEach(m => {
+  const gen = m.generations?.name || 'Angkatan I';
+  if (!demisionerByGen[gen]) demisionerByGen[gen] = [];
+  demisionerByGen[gen].push(m);
+});
+
+// Sort generations descending (newest first)
+const sortedGenerations = Object.keys(demisionerByGen).sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' }));
+---
+
+<Layout>
+  <!-- HERO SECTION -->
+  <section id="hero" class="relative min-h-[88vh] flex items-center justify-center py-16 sm:py-24 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-cream-100 to-cream-200">
+    <!-- Soft warm circular glows (animate drift) -->
+    <div class="absolute top-10 left-10 w-80 h-80 bg-cream-500/8 rounded-full blur-3xl animate-drift" style="animation-duration:9s"></div>
+    <div class="absolute bottom-10 right-10 w-96 h-96 bg-cream-300/30 rounded-full blur-3xl animate-drift" style="animation-duration:12s;animation-delay:-4s"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold-100/20 rounded-full blur-3xl animate-drift" style="animation-duration:15s;animation-delay:-2s"></div>
+
+    <div class="max-w-4xl mx-auto text-center space-y-8 z-10">
+      <div class="animate-fade-up" style="animation-delay:0.1s">
+        <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-cream-200 border border-cream-400/50 text-[9px] font-bold text-slate-600 uppercase tracking-wider mb-6 font-pixel">
+          <img src="/images/mc/oak_leaves.png" class="w-4 h-4 pixelated shrink-0" alt="Leaves" />
+          Majelis Perwakilan Kelas
+        </span>
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-charcoal-900 leading-tight uppercase">
+          Suara Anda,<br/>
+          <span class="bg-gradient-to-r from-cream-500 via-yellow-700 to-amber-800 bg-clip-text text-transparent">Masa Depan Kita</span>
+        </h1>
+      </div>
+      
+      <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed font-light animate-fade-up" style="animation-delay:0.3s">
+        Majelis Perwakilan Kelas SMAN 1 Malingping hadir sebagai pengawal aspirasi siswa, pengawas objektif kinerja OSIS, dan katalisator demokrasi demi menciptakan ekosistem sekolah yang harmonis, transparan, dan inklusif.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 animate-fade-up" style="animation-delay:0.5s">
+        <a href="#aspirasi" class="w-full sm:w-auto px-8 py-4 rounded-full text-white font-bold text-sm shadow-lg cursor-pointer btn-shimmer">
+          🌱 Sampaikan Aspirasi Sekarang
+        </a>
+        <a href="#about" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white border border-cream-400 text-slate-700 font-bold text-sm hover:bg-cream-200 hover:text-slate-900 transition duration-200 shadow-sm cursor-pointer">
+          Pelajari Peran Kami ↓
+        </a>
+      </div>
+    </div>
+
+    <!-- Decorative bottom fade -->
+    <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-cream-100 to-transparent pointer-events-none"></div>
+  </section>
+
+  <!-- ABOUT / VISI MISI -->
+  <section id="about" class="py-16 sm:py-24 px-4 sm:px-6 bg-cream-100 border-t border-cream-300/40 relative overflow-hidden">
+    <!-- Cozy Ambient Glow Orbs -->
+    <div class="absolute -top-32 -left-32 w-80 h-80 bg-cream-300/35 rounded-full filter blur-3xl opacity-60 pointer-events-none z-0"></div>
+    <div class="absolute -bottom-32 -right-32 w-80 h-80 bg-gold-500/10 rounded-full filter blur-3xl opacity-50 pointer-events-none z-0"></div>
+
+    <div class="max-w-6xl mx-auto space-y-16 relative z-10">
+      <div class="text-center max-w-xl mx-auto reveal">
+        <h2 class="text-2xl sm:text-3xl font-black text-charcoal-900 uppercase tracking-wider">Tentang Kami</h2>
+        <div class="w-10 h-1 bg-cream-500 mx-auto mt-3 rounded-full"></div>
+      </div>
+ 
+      <!-- Cozy Inner Wrapper: Groups Visi-Misi and More Info closely and consistently -->
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Visi Card -->
+          <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl shadow-sm space-y-4 card-lift reveal group" style="transition-delay: 0ms">
+            <div class="flex items-center space-x-4">
+              <div class="p-2.5 bg-cream-200 rounded-xl shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+                <img 
+                  src="/images/mc/compass.png" 
+                  class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
+                  alt="Visi"
+                />
+              </div>
+              <h3 class="text-lg font-bold text-charcoal-900 uppercase tracking-wide">Visi</h3>
+            </div>
+            <p class="text-sm text-slate-600 leading-relaxed font-light">
+              Mewujudkan MPK SMAN 1 Malingping sebagai organisasi yang visioner, adaptif, dan profesional dalam menjalankan peran strategisnya sebagai pengawal aspirasi siswa, pengawas OSIS, serta sebagai mitra kolaboratif yang aktif membangun budaya sekolah yang demokratis, partisipatif, dan berintegritas.
+            </p>
+          </div>
+ 
+        <!-- Misi Card -->
+        <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl shadow-sm space-y-4 card-lift reveal group" style="transition-delay: 150ms">
+          <div class="flex items-center space-x-4">
+            <div class="p-2.5 bg-cream-200 rounded-xl shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <img 
+                src="/images/mc/writable_book.png" 
+                class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
+                alt="Misi"
+              />
+            </div>
+            <h3 class="text-lg font-bold text-charcoal-900 uppercase tracking-wide">Misi</h3>
+          </div>
+          <ul class="space-y-3.5 text-xs sm:text-sm text-slate-600 font-light">
+            <li class="flex items-start space-x-3">
+              <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
+              <span>Membangun sinergi yang solid dan komunikatif antara MPK, OSIS, serta pihak sekolah dalam menciptakan lingkungan organisasi yang harmonis.</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
+              <span>Mengawasi pelaksanaan program kerja OSIS secara aktif dan objektif agar tetap selaras dengan rencana dan tujuan bersama.</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
+              <span>Mengoptimalkan peran MPK sebagai lembaga legislatif siswa yang bertanggung jawab, aspiratif, serta representatif.</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
+              <span>Mendorong penguatan karakter anggota MPK melalui pengembangan profesionalisme, integritas, dan etika organisasi.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Landasan Hukum & Informasi Tambahan Accordion (More Info) -->
+      <div class="reveal">
+        <details class="group bg-white/80 hover:bg-white/90 backdrop-blur-sm border border-cream-300/60 open:border-cream-500/50 rounded-2xl shadow-sm open:shadow-md transition-all duration-300 [&_summary::-webkit-details-marker]:hidden">
+          <summary class="flex items-center justify-between p-6 cursor-pointer select-none hover:text-cream-500 transition-colors duration-300">
+            <div class="flex items-center gap-3">
+              <img src="/images/mc/trialomen.png" class="w-6 h-6 pixelated shrink-0" alt="Omen" />
+              <span class="text-xs sm:text-sm font-black text-charcoal-900 uppercase tracking-wide group-open:text-cream-600">Informasi Tambahan, Landasan Hukum, & Kode Etik MPK</span>
+            </div>
+            <span class="transition-transform duration-300 group-open:rotate-180 text-cream-500 text-lg shrink-0">
+              <i class="ph-bold ph-caret-down"></i>
+            </span>
+          </summary>
+          <div class="px-6 pb-6 border-t border-cream-200/60 pt-6 space-y-8 text-slate-600 font-light text-xs sm:text-sm animate-fade-up" style="animation-duration: 0.5s">
+            
+            <!-- Grid 1: Landasan Hukum vs Tiga Fungsi Legislatif -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 leading-relaxed">
+              <div class="space-y-4">
+                <h4 class="text-xs font-black uppercase tracking-wider text-charcoal-900 font-mono flex items-center gap-1.5 border-b border-cream-200 pb-2">
+                  <i class="ph-duotone ph-book-bookmark text-amber-500 text-sm"></i> Landasan Hukum Konstitusional Kesiswaan
+                </h4>
+                <p>
+                  Eksistensi Majelis Perwakilan Kelas (MPK) dan OSIS di bawah tata kelola sekolah menengah dijamin oleh payung hukum formal kenegaraan Republik Indonesia:
+                </p>
+                <ul class="space-y-3.5 list-none">
+                  <li class="flex items-start gap-2">
+                    <span class="text-cream-500 shrink-0 font-bold font-mono">01.</span>
+                    <span><strong>Permendiknas No. 39 Tahun 2008 (Pasal 4)</strong>: Menegaskan bahwa pembinaan kesiswaan diselenggarakan melalui organisasi kesiswaan. Di mana OSIS merupakan wadah resmi internal sekolah, dan MPK bertindak sebagai lembaga perwakilan legislatif kelas (parlemen siswa) yang mengawasi kinerja OSIS serta menampung aspirasi murid secara independen.</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-cream-500 shrink-0 font-bold font-mono">02.</span>
+                    <span><strong>Undang-Undang No. 20 Tahun 2003 tentang Sisdiknas (Pasal 3)</strong>: Menjamin hak seluruh peserta didik untuk mengembangkan diri secara demokratis, mandiri, kreatif, toleran, dan bertanggung jawab melalui wadah organisasi kepemimpinan kepengurusan siswa.</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-cream-500 shrink-0 font-bold font-mono">03.</span>
+                    <span><strong>Keputusan Dirjen Dikdasmen No. 226/C/Kep/0/1992</strong>: Mengatur petunjuk pelaksanaan pembinaan kesiswaan secara sistemik, menjadi fondasi utama penyusunan Aturan Dasar dan Aturan Rumah Tangga (AD/ART) organisasi kesiswaan di tingkat satuan pendidikan.</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div class="space-y-4">
+                <h4 class="text-xs font-black uppercase tracking-wider text-charcoal-900 font-mono flex items-center gap-1.5 border-b border-cream-200 pb-2">
+                  <i class="ph-duotone ph-scales text-cream-500 text-sm"></i> Tiga Pilar Fungsi Utama Legislatif Siswa (MPK)
+                </h4>
+                <p>
+                  Mengadopsi prinsip ketatanegaraan yang demokratis dan transparan, MPK SMAN 1 Malingping memegang 3 fungsi utama demi mewujudkan tata kelola organisasi siswa yang kredibel:
+                </p>
+                <ul class="space-y-4 list-none">
+                  <li class="flex items-start gap-3 group/pilar">
+                    <span class="p-2 bg-amber-50 text-amber-600 rounded-xl text-xs shrink-0 select-none flex items-center justify-center border border-amber-100 group-hover/pilar:bg-amber-100 transition-colors duration-200"><i class="ph-duotone ph-file-text text-base"></i></span>
+                    <div>
+                      <strong>Fungsi Legislasi (Aturan & AD/ART)</strong>: Merumuskan, merevisi, menyelaraskan, dan menetapkan konstitusi Aturan Dasar and Aturan Rumah Tangga (AD/ART) serta Anggaran Dasar OSIS/MPK SMAN 1 Malingping agar relevan dengan kebutuhan murid.
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-3 group/pilar">
+                    <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs shrink-0 select-none flex items-center justify-center border border-emerald-100 group-hover/pilar:bg-emerald-100 transition-colors duration-200"><i class="ph-duotone ph-eye text-base"></i></span>
+                    <div>
+                      <strong>Fungsi Pengawasan (Oversight Kinerja)</strong>: Mengevaluasi jalannya program kerja pengurus OSIS secara objektif dan berkala, menyelenggarakan Sidang Pleno Tengah Semester, serta Sidang Laporan Pertanggungjawaban (LPJ) Akhir Masa Jabatan.
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-3 group/pilar">
+                    <span class="p-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs shrink-0 select-none flex items-center justify-center border border-indigo-100 group-hover/pilar:bg-indigo-100 transition-colors duration-200"><i class="ph-duotone ph-megaphone text-base"></i></span>
+                    <div>
+                      <strong>Fungsi Advokasi (Penyaluran Suara)</strong>: Menyerap, menampung, menyaring, merumuskan, dan menyalurkan aspirasi, kritik, dan rekomendasi perubahan dari para siswa secara langsung ke jajaran pimpinan sekolah (Wakasek Kesiswaan & Kepala Sekolah).
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Grid 2: Hak Demokrasi Siswa SMANSAMAL & SOP Kerja (Inisiatif Proaktif) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 leading-relaxed pt-6 border-t border-cream-200/50">
+              <div class="space-y-4">
+                <h4 class="text-xs font-black uppercase tracking-wider text-charcoal-900 font-mono flex items-center gap-1.5 border-b border-cream-200 pb-2">
+                  <i class="ph-duotone ph-shield-checkered text-emerald-600 text-sm"></i> Piagam Hak Konstitusi Demokrasi Murid SMANSAMAL
+                </h4>
+                <p>
+                  Demi terciptanya ekosistem sekolah yang transparan dan aman bagi setiap murid, MPK menjamin hak kedaulatan aspirasi siswa melalui piagam komitmen berikut:
+                </p>
+                <ul class="space-y-3.5 list-none">
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-600 shrink-0 font-bold font-mono flex items-center mt-1"><i class="ph-bold ph-check text-xs"></i></span>
+                    <span><strong>Hak Kebebasan Bersuara</strong>: Setiap murid SMAN 1 Malingping tanpa terkecuali berhak menyampaikan kritik konstruktif, keluhan kegagalan fasilitas, atau ide program kerja tanpa rasa takut akan intimidasi atau tekanan akademis.</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-600 shrink-0 font-bold font-mono flex items-center mt-1"><i class="ph-bold ph-check text-xs"></i></span>
+                    <span><strong>Hak Proteksi Anonimitas Mutlak</strong>: Kami mengadopsi enkripsi satu arah berbasis Salt-Hash IP. Identitas asli murid yang memilih opsi anonim terlindungi secara matematis dari pelacakan eksternal.</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-600 shrink-0 font-bold font-mono flex items-center mt-1"><i class="ph-bold ph-check text-xs"></i></span>
+                    <span><strong>Hak Akuntabilitas Advokasi</strong>: Murid berhak memantau, mendesak, dan menerima status perkembangan aspirasi yang telah mereka serahkan sampai selesai diproses di CMS MPK.</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-600 shrink-0 font-bold font-mono flex items-center mt-1"><i class="ph-bold ph-check text-xs"></i></span>
+                    <span><strong>Hak Transparansi Anggaran</strong>: Sebagai peninjau legislatif, MPK membuka laporan alokasi dana kegiatan OSIS agar bebas dari pemborosan anggaran yang tidak relevan bagi kenyamanan siswa.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Kode Etik & SOP Kerja Pengurus MPK (Conduct & SOP) -->
+              <div class="space-y-4">
+                <h4 class="text-xs font-black uppercase tracking-wider text-charcoal-900 font-mono flex items-center gap-1.5 border-b border-cream-200 pb-2">
+                  <i class="ph-duotone ph-notebook text-cream-500 text-sm"></i> SOP & Standar Kode Etik Kerja Pengurus MPK
+                </h4>
+                <p>
+                  Seluruh jajaran pengurus MPK SMAN 1 Malingping wajib menaati standar etika kerja profesional demi menjaga objektivitas dan kredibilitas organisasi:
+                </p>
+                <ul class="space-y-3.5 list-none text-xs">
+                  <li class="flex items-start gap-3 group/sop">
+                    <span class="p-2 bg-amber-50 text-amber-600 rounded-xl text-xs shrink-0 select-none flex items-center justify-center border border-amber-100 group-hover/sop:bg-amber-100 transition-colors duration-200"><i class="ph-duotone ph-target text-base"></i></span>
+                    <div>
+                      <strong>Objektivitas & Kendali Kinerja</strong>: Pengurus memisahkan secara tegas antara dinamika eksternal organisasi (opini bebas, sentimen pribadi, keterbatasan anggaran sekolah) dengan fokus aksi internal pengurus (kualitas pengawasan, respon advokasi, integritas moral). Energi organisasi hanya difokuskan penuh pada aspek-aspek yang berada di bawah kendali aksi langsung pengurus.
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-3 group/sop">
+                    <span class="p-2 bg-sky-50 text-sky-600 rounded-xl text-xs shrink-0 select-none flex items-center justify-center border border-sky-100 group-hover/sop:bg-sky-100 transition-colors duration-200"><i class="ph-duotone ph-trend-up text-base"></i></span>
+                    <div>
+                      <strong>Resiliensi Operasional & Evaluasi Konstruktif</strong>: Memandang setiap hambatan birokrasi, benturan koordinasi antar-organisasi, atau penundaan solusi dari luar bukan sebagai kegagalan untuk dikeluhkan, melainkan sebagai data evaluasi objektif dan peluang perbaikan operasional di masa depan.
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-3 group/sop">
+                    <span class="p-2 bg-purple-50 text-purple-600 rounded-xl text-xs shrink-0 select-none flex items-center justify-center border border-purple-100 group-hover/sop:bg-purple-100 transition-colors duration-200"><i class="ph-duotone ph-shield-star text-base"></i></span>
+                    <div>
+                      <strong>Empat Nilai Integritas Utama</strong>: Menyelenggarakan tugas kenegaraan siswa berdasarkan empat nilai utama: Kebijaksanaan (objektif memilah validitas laporan), Ketegasan (berani meluruskan ketidaksesuaian proker OSIS), Keadilan (tidak memihak golongan tertentu), dan Kesederhanaan (menolak kesombongan jabatan organisasi).
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Upgraded Section: Alur Penanganan Aspirasi Siswa (Premium Cozy Layout) -->
+            <div class="bg-cream-100/60 border border-cream-300/40 p-5 sm:p-8 rounded-2xl space-y-6">
+              <div class="text-center sm:text-left space-y-1.5">
+                <h4 class="text-xs font-black uppercase tracking-wider text-charcoal-900 font-mono flex items-center justify-center sm:justify-start gap-2">
+                  <i class="ph-duotone ph-arrows-counter-clockwise text-cream-500 text-sm"></i> Alur Kerja Siklus Penanganan Aspirasi Siswa
+                </h4>
+                <p class="text-[11px] text-slate-500 font-sans font-light">
+                  Tahapan operasional representasi parlemen siswa dalam menjamin aspirasi warga sekolah diproses secara akuntabel dari pengiriman hingga penyelesaian:
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+                <!-- Connection Line for Desktop -->
+                <div class="hidden md:block absolute top-[44px] left-[12%] right-[12%] h-[1.5px] bg-gradient-to-r from-cream-300/70 via-cream-500/80 to-cream-300/70 z-0"></div>
+
+                <!-- Step 1 -->
+                <div class="relative z-10 bg-white/90 backdrop-blur-md p-6 border border-cream-200/80 rounded-2xl shadow-sm hover:shadow-md hover:shadow-indigo-200/40 hover:border-indigo-400 transition-all duration-300 flex flex-col justify-between h-full group">
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <div class="w-10 h-10 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-base shadow-inner group-hover:bg-indigo-100/80 group-hover:border-indigo-500 transition-all duration-300">
+                        <i class="ph-duotone ph-envelope-simple-open text-indigo-600 text-lg"></i>
+                      </div>
+                      <span class="text-[10px] font-black font-mono text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">Langkah 01</span>
+                    </div>
+                    <div class="space-y-1.5">
+                      <h5 class="text-xs font-black text-charcoal-900 uppercase tracking-wide">Pengiriman Aspirasi</h5>
+                      <p class="text-[10.5px] text-slate-500 font-sans font-light leading-relaxed">
+                        Siswa melayangkan keluhan fasilitas, masukan kurikulum, atau evaluasi proker OSIS secara aman dan rahasia melalui portal Kotak Aspirasi.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-cream-100 flex items-center justify-between text-[9px] font-mono">
+                    <span class="text-slate-400 font-medium">Siklus Awal</span>
+                    <span class="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-black tracking-wide">Diterima Sistem</span>
+                  </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative z-10 bg-white/90 backdrop-blur-md p-6 border border-cream-200/80 rounded-2xl shadow-sm hover:shadow-md hover:shadow-amber-200/40 hover:border-amber-400 transition-all duration-300 flex flex-col justify-between h-full group">
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <div class="w-10 h-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-base shadow-inner group-hover:bg-amber-100/80 group-hover:border-amber-500 transition-all duration-300">
+                        <i class="ph-duotone ph-magnifying-glass text-amber-600 text-lg"></i>
+                      </div>
+                      <span class="text-[10px] font-black font-mono text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">Langkah 02</span>
+                    </div>
+                    <div class="space-y-1.5">
+                      <h5 class="text-xs font-black text-charcoal-900 uppercase tracking-wide">Verifikasi & Telaah</h5>
+                      <p class="text-[10.5px] text-slate-500 font-sans font-light leading-relaxed">
+                        Komisi D MPK menelaah berkas secara objektif, menyaring laporan spam/hoaks, lalu memetakan ke komisi sektoral terkait.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-cream-100 flex items-center justify-between text-[9px] font-mono">
+                    <span class="text-slate-400 font-medium">Validasi Berkas</span>
+                    <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded font-black tracking-wide">Dalam Klasifikasi</span>
+                  </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative z-10 bg-white/90 backdrop-blur-md p-6 border border-cream-200/80 rounded-2xl shadow-sm hover:shadow-md hover:shadow-sky-200/40 hover:border-sky-400 transition-all duration-300 flex flex-col justify-between h-full group">
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <div class="w-10 h-10 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-base shadow-inner group-hover:bg-sky-100/80 group-hover:border-sky-500 transition-all duration-300">
+                        <i class="ph-duotone ph-users-three text-sky-600 text-lg"></i>
+                      </div>
+                      <span class="text-[10px] font-black font-mono text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">Langkah 03</span>
+                    </div>
+                    <div class="space-y-1.5">
+                      <h5 class="text-xs font-black text-charcoal-900 uppercase tracking-wide">Advokasi & Mediasi</h5>
+                      <p class="text-[10.5px] text-slate-500 font-sans font-light leading-relaxed">
+                        MPK mengadakan rapat koordinasi bersama pengurus OSIS (eksekutif) atau audiensi formal mendalam bersama Wakasek Kesiswaan.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-cream-100 flex items-center justify-between text-[9px] font-mono">
+                    <span class="text-slate-400 font-medium">Mediasi Sekolah</span>
+                    <span class="text-sky-600 bg-sky-50 px-2 py-0.5 rounded font-black tracking-wide">Proses Advokasi</span>
+                  </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="relative z-10 bg-white/90 backdrop-blur-md p-6 border border-cream-200/80 rounded-2xl shadow-sm hover:shadow-md hover:shadow-emerald-200/40 hover:border-emerald-400 transition-all duration-300 flex flex-col justify-between h-full group">
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <div class="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-base shadow-inner group-hover:bg-emerald-100/80 group-hover:border-emerald-500 transition-all duration-300">
+                        <i class="ph-duotone ph-check-square text-emerald-600 text-lg"></i>
+                      </div>
+                      <span class="text-[10px] font-black font-mono text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">Langkah 04</span>
+                    </div>
+                    <div class="space-y-1.5">
+                      <h5 class="text-xs font-black text-charcoal-900 uppercase tracking-wide">Resolusi & Transparansi</h5>
+                      <p class="text-[10.5px] text-slate-500 font-sans font-light leading-relaxed">
+                        Eksekusi solusi dilakukan pihak berwenang. MPK memperbarui CMS secara real-time dan merilis status tuntas di Papan Aspirasi.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-cream-100 flex items-center justify-between text-[9px] font-mono">
+                    <span class="text-slate-400 font-medium">Siklus Final</span>
+                    <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-black tracking-wide">Tuntas Terbit</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+      </div> <!-- End Cozy Inner Wrapper -->
+    </div>
+  </section>
+ 
+  <!-- PROGRAM KERJA -->
+  <section id="proker" class="py-16 sm:py-24 px-4 sm:px-6 bg-cream-200/50 border-t border-cream-300/40 relative overflow-hidden">
+    <!-- Cozy Ambient Glow Orbs -->
+    <div class="absolute -top-32 -right-32 w-80 h-80 bg-cream-300/45 rounded-full filter blur-3xl opacity-60 pointer-events-none z-0"></div>
+    <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-gold-500/10 rounded-full filter blur-3xl opacity-50 pointer-events-none z-0"></div>
+
+    <div class="max-w-6xl mx-auto space-y-16 relative z-10">
+      <div class="text-center max-w-xl mx-auto reveal">
+        <h2 class="text-2xl sm:text-3xl font-black text-charcoal-900 uppercase tracking-wider">Program Kerja Utama</h2>
+        <div class="w-10 h-1 bg-cream-500 mx-auto mt-3 rounded-full"></div>
+      </div>
+ 
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl space-y-4 shadow-sm card-lift reveal group" style="transition-delay: 0ms">
+          <div class="p-2.5 bg-cream-100 rounded-xl w-fit transition-transform duration-300 group-hover:scale-110">
+            <img 
+              src="/images/mc/oak_sapling.png" 
+              class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
+              alt="Forum"
+            />
+          </div>
+          <h3 class="text-base font-bold text-charcoal-900 uppercase tracking-wide">Forum Aspirasi</h3>
+          <p class="text-xs text-slate-500 leading-relaxed font-light">
+            Menyelenggarakan forum terbuka dan penampungan aspirasi tertulis secara berkala untuk menyerap keluhan, saran, dan ide progresif dari seluruh murid.
+          </p>
+        </div>
+ 
+        <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl space-y-4 shadow-sm card-lift reveal group" style="transition-delay: 150ms">
+          <div class="p-2.5 bg-cream-100 rounded-xl w-fit transition-transform duration-300 group-hover:scale-110">
+            <img 
+              src="/images/mc/shield.png" 
+              class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
+              alt="Wakil"
+            />
+          </div>
+          <h3 class="text-base font-bold text-charcoal-900 uppercase tracking-wide">Wakil Siswa</h3>
+          <p class="text-xs text-slate-500 leading-relaxed font-light">
+            Bertindak sebagai pengawas independen program kerja OSIS, mengawal jalannya sidang evaluasi tengah dan akhir periode dengan asas objektivitas tinggi.
+          </p>
+        </div>
+ 
+        <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl space-y-4 shadow-sm card-lift reveal group" style="transition-delay: 300ms">
+          <div class="p-2.5 bg-cream-100 rounded-xl w-fit transition-transform duration-300 group-hover:scale-110">
+            <img 
+              src="/images/mc/map.png" 
+              class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
+              alt="Legislatif"
+            />
+          </div>
+          <h3 class="text-base font-bold text-charcoal-900 uppercase tracking-wide">Penggerak Legislatif</h3>
+          <p class="text-xs text-slate-500 leading-relaxed font-light">
+            Menyampaikan informasi kebijakan sekolah secara transparan, mendorong kedisiplinan koordinasi organisasi, serta merumuskan pembaharuan AD/ART.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ORGANOGRAM -->
+  <section id="organogram" class="py-16 sm:py-24 px-4 sm:px-6 bg-cream-100 border-t border-cream-300/40 relative overflow-hidden">
+    <!-- Cozy Ambient Glow Orbs -->
+    <div class="absolute -top-32 -left-32 w-80 h-80 bg-cream-300/35 rounded-full filter blur-3xl opacity-60 pointer-events-none z-0"></div>
+    <div class="absolute -bottom-32 -right-32 w-80 h-80 bg-gold-500/10 rounded-full filter blur-3xl opacity-50 pointer-events-none z-0"></div>
+
+    <div class="max-w-7xl mx-auto space-y-16 relative z-10">
+      <div class="text-center max-w-xl mx-auto reveal">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream-200 border border-cream-400/40 text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-4 font-pixel">
+          <img src="/images/mc/sword.png" class="w-4 h-4 pixelated shrink-0" alt="Sword" />
+          Kepengurusan
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-black text-charcoal-900 uppercase tracking-wider">Struktur Organisasi</h2>
+        <p class="text-slate-500 text-xs mt-2 font-light">Majelis Perwakilan Kelas</p>
+        <div class="w-10 h-1 bg-cream-500 mx-auto mt-3 rounded-full"></div>
+      </div>
+
+      <!-- 1. Pengurus Inti -->
+      <div class="space-y-8">
+        <div class="flex items-center justify-center gap-2 reveal">
+          <div class="h-px w-12 bg-cream-400/60"></div>
+          <h3 class="text-sm font-black text-slate-600 uppercase tracking-widest">Pengurus Inti</h3>
+          <div class="h-px w-12 bg-cream-400/60"></div>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 justify-center">
+          {coreMembers.map((member, i) => {
+            // Minecraft-cozy: position-based ring color + icon badge
+            const isKetua    = member.position.toLowerCase().includes('ketua') && !member.position.toLowerCase().includes('wakil');
+            const isWakil    = member.position.toLowerCase().includes('wakil');
+            const isSekre    = member.position.toLowerCase().includes('sekretaris');
+            const isBend     = member.position.toLowerCase().includes('bendahara');
+            const isDev      = member.position.toLowerCase().includes('developer');
+
+            // Ring color per role
+            const ringClass = isKetua ? 'ring-amber-400/70 border-amber-400' :
+                              isWakil ? 'ring-blue-300/60 border-blue-300' :
+                              isSekre ? 'ring-emerald-300/50 border-emerald-300' :
+                              isBend  ? 'ring-violet-300/50 border-violet-300' :
+                              isDev   ? 'ring-red-300/50 border-red-300' :
+                                        'ring-cream-300/40 border-cream-400';
+
+            // Badge emoji
+            const badge = isKetua ? '👑' :
+                          isWakil ? '🛡️' :
+                          isSekre ? '📜' :
+                          isBend  ? '💎' :
+                          isDev   ? '⚡' : '🍃';
+
+            // Card bg tint
+            const cardBg = isKetua ? 'bg-gradient-to-b from-amber-50/80 to-white/80 backdrop-blur-sm' :
+                           isWakil ? 'bg-gradient-to-b from-blue-50/50 to-white/80 backdrop-blur-sm' :
+                                     'bg-white/80 backdrop-blur-sm';
+
+            return (
+              <div 
+                class={`${cardBg} border border-cream-300/60 rounded-2xl p-5 text-center shadow-sm card-lift reveal group relative`}
+                style={`transition-delay:${i * 80}ms`}
+              >
+                {/* Position badge — floats top-right like a Minecraft item label */}
+                <span class="absolute -top-2 -right-2 text-sm select-none" title={member.position}>
+                  {badge}
+                </span>
+
+                {/* Avatar with role-based ring */}
+                <div class="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto">
+                  <div class={`w-full h-full rounded-full overflow-hidden border-2 ${ringClass} ring-2 ring-offset-2 group-hover:ring-offset-4 transition-all duration-300`}>
+                    <img 
+                      src={member.avatar_url || "/images/Logo_MPK.jpeg"} 
+                      alt={member.name} 
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  {/* Pink / Blue Gender Dot badge */}
+                  <span class={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white shadow-md z-10 ${
+                    member.gender === 'Perempuan' ? 'bg-pink-400' : 'bg-blue-400'
+                  }`} title={member.gender || 'Laki-laki'}></span>
+                </div>
+
+                <h4 class="text-xs sm:text-sm font-bold text-charcoal-900 mt-4 line-clamp-1">{member.name}</h4>
+                
+                {/* Position tag with matching accent */}
+                <p class={`text-[10px] mt-1 font-semibold ${
+                  isKetua ? 'text-amber-700' :
+                  isWakil ? 'text-blue-600' :
+                  isSekre ? 'text-emerald-600' :
+                  isBend  ? 'text-violet-600' :
+                  isDev   ? 'text-red-600' :
+                            'text-slate-500'
+                }`}>{member.position}</p>
+
+                <span class="inline-block mt-2 px-2.5 py-0.5 bg-cream-200 text-slate-700 text-[9px] font-mono font-bold rounded-full tracking-wider">
+                  {member.class}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <!-- Divider with leaf ornament -->
+      <div class="flex items-center justify-center gap-4 reveal">
+        <div class="h-px flex-1 max-w-[120px] bg-gradient-to-r from-transparent to-cream-400/60"></div>
+        <span class="text-cream-400 text-lg select-none">⚖️</span>
+        <div class="h-px flex-1 max-w-[120px] bg-gradient-to-l from-transparent to-cream-400/60"></div>
+      </div>
+
+      <!-- 2. Komisi A-F -->
+      <div class="space-y-8">
+        <div class="flex items-center justify-center gap-2 reveal">
+          <div class="h-px w-12 bg-cream-400/60"></div>
+          <h3 class="text-sm font-black text-slate-600 uppercase tracking-widest">Komisi Legislatif</h3>
+          <div class="h-px w-12 bg-cream-400/60"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {commissions.map((comm, i) => {
+            // Minecraft-cozy: each commission gets a warm accent color
+            const accentMap = {
+              'A': { bg: 'from-sky-50/60',    text: 'text-sky-700',    badge: 'bg-sky-100 border-sky-200',    icon: '📋' },
+              'B': { bg: 'from-rose-50/60',    text: 'text-rose-700',   badge: 'bg-rose-100 border-rose-200',   icon: '📊' },
+              'C': { bg: 'from-violet-50/60',  text: 'text-violet-700', badge: 'bg-violet-100 border-violet-200', icon: '🔍' },
+              'D': { bg: 'from-amber-50/60',   text: 'text-amber-700',  badge: 'bg-amber-100 border-amber-200',  icon: '📢' },
+              'E': { bg: 'from-teal-50/60',    text: 'text-teal-700',   badge: 'bg-teal-100 border-teal-200',   icon: '📡' },
+              'F': { bg: 'from-orange-50/60',  text: 'text-orange-700', badge: 'bg-orange-100 border-orange-200', icon: '⚖️' },
+            };
+            const accent = accentMap[comm.id] || accentMap['A'];
+
+            return (
+              <div 
+                class={`bg-gradient-to-b ${accent.bg} to-white/80 backdrop-blur-sm border border-cream-300/60 p-6 rounded-2xl space-y-4 shadow-sm card-lift reveal`}
+                style={`transition-delay:${i * 80}ms`}
+              >
+                <div class="flex items-center justify-between border-b border-cream-200 pb-3">
+                  <div>
+                    <h4 class={`text-base font-bold ${accent.text}`}>
+                      <span class="mr-1.5">{accent.icon}</span>{comm.title}
+                    </h4>
+                    <p class="text-[10px] text-slate-400 mt-1 font-light leading-relaxed">{comm.desc}</p>
+                  </div>
+                  <span class={`shrink-0 w-8 h-8 rounded-lg ${accent.badge} border flex items-center justify-center text-xs font-black ${accent.text}`}>
+                    {comm.id}
+                  </span>
+                </div>
+
+                {comm.list.length === 0 ? (
+                  <p class="text-[11px] text-slate-400 italic py-2">Belum ada anggota terdaftar.</p>
+                ) : (
+                  <div class="space-y-2">
+                    {comm.list.map((m: any) => {
+                      const isKoord = m.position.toLowerCase().includes('koordinator');
+                      return (
+                        <div class="flex items-center space-x-3 bg-cream-50/70 border border-cream-200/80 p-2.5 rounded-xl hover:bg-cream-100 transition duration-200 group/member">
+                          <div class="relative shrink-0">
+                            <img 
+                              src={m.avatar_url || "/images/Logo_MPK.jpeg"} 
+                              alt={m.name} 
+                              class="w-9 h-9 rounded-full object-cover border border-cream-300"
+                            />
+                            {isKoord && (
+                              <span class="absolute -top-1 -right-1 text-[10px] select-none" title="Koordinator">⭐</span>
+                            )}
+                            {/* Pink / Blue Gender Dot badge */}
+                            <span class={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border border-white shadow-sm z-10 ${
+                              m.gender === 'Perempuan' ? 'bg-pink-400' : 'bg-blue-400'
+                            }`} title={m.gender || 'Laki-laki'}></span>
+                          </div>
+                          <div class="min-w-0">
+                            <div class="text-xs font-bold text-charcoal-900 truncate">{m.name}</div>
+                            <div class="text-[9px] text-slate-500 font-mono font-semibold">{m.position} · <span class="font-bold tracking-wider">{m.class}</span></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <!-- Cozy Alumni & Divider Wrapper -->
+      {sortedGenerations.length > 0 && (
+        <div class="space-y-6 reveal">
+          <!-- Divider with graduation ornament -->
+          <div class="flex items-center justify-center gap-4 pt-3">
+            <div class="h-px flex-1 max-w-[120px] bg-gradient-to-r from-transparent to-cream-400/60"></div>
+            <span class="text-cream-400 text-lg select-none">🎓</span>
+            <div class="h-px flex-1 max-w-[120px] bg-gradient-to-l from-transparent to-cream-400/60"></div>
+          </div>
+
+          <!-- 3. Direktori Purna Bakti Accordion -->
+          <details id="hall-of-prestige" class="group bg-gradient-to-r from-amber-50/20 via-white/80 to-cream-100/20 hover:from-amber-50/40 hover:to-white/95 backdrop-blur-sm border border-cream-300/60 open:border-amber-400/50 open:ring-4 open:ring-amber-400/10 rounded-2xl shadow-sm open:shadow-md transition-all duration-300 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between p-6 cursor-pointer select-none hover:text-amber-600 transition-colors duration-300">
+              <div class="flex items-center gap-3">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+                  <div class="flex items-center gap-2.5">
+                    <img src="/images/mc/dragon.png" class="w-6 h-6 pixelated shrink-0 group-hover:drop-shadow-[0_0_6px_rgba(245,158,11,0.6)] group-hover:scale-110 transition duration-300" alt="Dragon" />
+                    <span class="text-xs sm:text-sm font-black text-charcoal-900 uppercase tracking-wide group-open:text-amber-600">
+                      Hall of Prestige
+                    </span>
+                  </div>
+                  <span class="hidden sm:inline text-slate-300 select-none">|</span>
+                  <span class="text-[9px] sm:text-[10px] font-mono font-bold text-amber-700 bg-amber-100/50 border border-amber-300/30 px-2 py-0.5 rounded uppercase tracking-wider self-start sm:self-auto flex items-center gap-1">
+                    ✨ Honored Legacy — Jajaran Purna Bakti
+                  </span>
+                </div>
+              </div>
+              <span class="transition-transform duration-300 group-open:rotate-180 text-amber-500 text-lg shrink-0">
+                <i class="ph-bold ph-caret-down"></i>
+              </span>
+            </summary>
+            
+            <div class="px-6 pb-6 border-t border-cream-200/60 pt-6 space-y-8 animate-fade-up" style="animation-duration: 0.5s">
+              {sortedGenerations.map((gen) => {
+                const genMembers = demisionerByGen[gen];
+                return (
+                  <div class="space-y-4">
+                    <div class="space-y-2 pb-2.5 border-b border-cream-200/40">
+                      <div class="flex items-center gap-3 flex-wrap">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-amber-900 font-mono bg-gradient-to-r from-amber-100 to-cream-200 border border-amber-300/60 px-3 py-1 rounded-lg shadow-sm">
+                          {gen}
+                        </h4>
+                        {genMembers[0]?.generations?.graduation_year && (
+                          <span class="text-[9px] font-mono font-bold text-amber-800 bg-amber-100/40 border border-amber-300/30 px-2 py-0.5 rounded-full">
+                            🎓 Lulus {genMembers[0].generations.graduation_year}
+                          </span>
+                        )}
+                        {genMembers[0]?.generations?.active_year && (
+                          <span class="text-[9px] font-mono font-semibold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                            ⌛ Masa Khidmat {genMembers[0].generations.active_year}
+                          </span>
+                        )}
+                        <div class="h-px flex-1 bg-cream-300/30"></div>
+                        <span class="text-[10px] text-slate-400 font-mono font-bold">{genMembers.length} Honored Purna</span>
+                      </div>
+                      <span class="text-[9.5px] text-amber-700/70 italic font-mono block pl-1">
+                        "A distinguished cohort that laid the foundations of leadership with honor and integrity."
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {genMembers.map((m: any) => (
+                        <div class="flex items-center gap-3 bg-gradient-to-br from-white/95 to-cream-50/50 border border-cream-200 hover:border-amber-400/50 hover:shadow-[0_6px_16px_rgba(245,158,11,0.08)] p-3 rounded-xl opacity-90 hover:opacity-100 hover:from-amber-50/40 hover:to-white/95 transition duration-300 group/alumni shadow-sm">
+                          <div class="relative shrink-0">
+                            <img 
+                              src={m.avatar_url || "/images/Logo_MPK.jpeg"} 
+                              alt={m.name} 
+                              class="w-10 h-10 rounded-full object-cover border-2 border-cream-300 group-hover/alumni:border-amber-400 group-hover/alumni:scale-105 transition-all duration-300 filter grayscale-[15%] group-hover/alumni:grayscale-0"
+                            />
+                            {/* Pink / Blue Gender Dot badge */}
+                            <span class={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border border-white shadow-sm z-10 ${
+                              m.gender === 'Perempuan' ? 'bg-pink-400' : 'bg-blue-400'
+                            }`} title={m.gender || 'Laki-laki'}></span>
+                          </div>
+                          <div class="min-w-0 flex-1">
+                            <span class="text-[7px] font-mono font-black tracking-widest uppercase text-amber-600 bg-amber-100/40 border border-amber-300/20 px-1.5 py-0.5 rounded w-fit block mb-1">
+                              Honored Legacy
+                            </span>
+                            <div class="text-xs font-bold text-charcoal-900 leading-tight line-clamp-2 group-hover/alumni:text-amber-800 transition-colors duration-200">{m.name}</div>
+                            <div class="text-[10px] text-slate-500 font-mono font-semibold mt-0.5 line-clamp-1">
+                              {m.position}
+                            </div>
+                            <div class="text-[9px] text-slate-400 font-mono mt-0.5 flex items-center gap-1.5">
+                              <span>Kelas {m.class}</span>
+                              {m.generations?.graduation_year && (
+                                <>
+                                  <span class="opacity-40">&middot;</span>
+                                  <span class="text-cream-600 font-bold">{m.generations.graduation_year}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </details>
+        </div>
+      )}
+    </div>
+  </section>
+
+
+  <!-- PAPAN TRANSPARANSI ASPIRASI -->
+  <section id="transparansi" class="py-16 sm:py-24 px-4 sm:px-6 bg-cream-100 border-t border-cream-300/40 relative overflow-hidden">
+    <!-- Cozy Ambient Glow Orbs -->
+    <div class="absolute -top-32 -right-32 w-80 h-80 bg-cream-300/45 rounded-full filter blur-3xl opacity-60 pointer-events-none z-0"></div>
+    <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-gold-500/10 rounded-full filter blur-3xl opacity-50 pointer-events-none z-0"></div>
+
+    <div class="max-w-6xl mx-auto space-y-12 relative z-10">
+      <div class="text-center max-w-xl mx-auto reveal">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream-200 border border-cream-400/40 text-[9px] font-bold text-slate-500 uppercase tracking-wider font-pixel">
+          <img src="/images/mc/map.png" class="w-4 h-4 pixelated shrink-0" alt="Map" />
+          Transparansi Kerja
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-black text-charcoal-900 uppercase tracking-wider mt-2">Papan Aspirasi Siswa</h2>
+        <p class="text-slate-500 text-xs mt-2 font-light">Keluhan, masukan, dan laporan tindak lanjut secara terbuka dan aman.</p>
+        <div class="w-10 h-1 bg-cream-500 mx-auto mt-3 rounded-full"></div>
+      </div>
+
+      {recentAspirations.length === 0 ? (
+        <div class="max-w-md mx-auto py-12 text-center bg-white/70 backdrop-blur-sm border border-cream-300/60 rounded-2xl p-8 shadow-sm reveal">
+          <span class="text-4xl select-none block mb-3">📭</span>
+          <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Papan Aspirasi Masih Bersih</h4>
+          <p class="text-slate-500 text-xs mt-2 leading-relaxed font-light">Belum ada keluhan atau aspirasi resmi yang dikirimkan siswa. Jadilah yang pertama menyuarakan masukan Anda!</p>
+        </div>
+      ) : (
+        <div class="marquee-container flex flex-col gap-6 relative z-10 py-2">
+          {/* Row 1: Left scrolling track */}
+          <div class="marquee-track-left">
+            {[...recentAspirations, ...recentAspirations, ...recentAspirations].map((asp, i) => {
+              const styles = getStatusStyles(asp.status);
+
+              const date = new Date(asp.created_at).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short'
+              });
+
+              const cleanName = anonymizeName(asp.name, asp.class);
+              const swayClass = `bubble-sway-${(i % 3) + 1}`;
+
+              return (
+                <div 
+                  class={`w-[290px] sm:w-[330px] shrink-0 bg-white/90 backdrop-blur-sm border border-cream-300/70 p-5 rounded-2xl shadow-md flex flex-col justify-between space-y-4 hover:scale-[1.03] hover:shadow-lg hover:border-cream-500/50 transition-all duration-300 ${swayClass}`}
+                >
+                  <div class="space-y-3 text-left">
+                    <div class="flex items-center justify-between">
+                      <span class={`px-2.5 py-0.5 border text-[9px] font-mono font-bold rounded-full tracking-wider uppercase flex items-center gap-1 ${styles.bg}`}>
+                        <span>{styles.emoji}</span> {asp.status}
+                      </span>
+                      <span class="text-[9px] text-slate-400 font-mono">{date}</span>
+                    </div>
+                    <p class="text-xs text-slate-700 font-light leading-relaxed italic break-words whitespace-normal">
+                      "{asp.content}"
+                    </p>
+                    
+                    {asp.response && (
+                      <div class="mt-2 bg-[#FAF6F0] border border-dashed border-cream-400/80 rounded-xl p-2.5 text-left">
+                        <span class="text-[8.5px] font-mono font-bold text-cream-700 uppercase tracking-widest block mb-1">💬 Tanggapan Resmi MPK:</span>
+                        <p class="text-[10px] text-slate-600 font-serif leading-relaxed italic pr-1 whitespace-pre-wrap">"{asp.response}"</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div class="flex items-center justify-between pt-3 border-t border-cream-200/50 text-left">
+                    <div class="min-w-0">
+                      <div class="text-[11px] font-bold text-charcoal-900 truncate">{cleanName}</div>
+                      <div class="text-[9px] text-slate-400 font-mono tracking-wider">Kelas: {asp.class}</div>
+                    </div>
+                    <span class="text-sm select-none">🎈</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Row 2: Right scrolling track (Only shown when there are enough items) */}
+          {recentAspirations.length > 1 && (
+            <div class="marquee-track-right">
+              {[...recentAspirations, ...recentAspirations, ...recentAspirations].reverse().map((asp, i) => {
+                const styles = getStatusStyles(asp.status);
+
+                const date = new Date(asp.created_at).toLocaleDateString('id-ID', {
+                  day: '2-digit',
+                  month: 'short'
+                });
+
+                const cleanName = anonymizeName(asp.name, asp.class);
+                const swayClass = `bubble-sway-${(i % 3) + 1}`;
+
+                return (
+                  <div 
+                    class={`w-[290px] sm:w-[330px] shrink-0 bg-white/90 backdrop-blur-sm border border-cream-300/70 p-5 rounded-2xl shadow-md flex flex-col justify-between space-y-4 hover:scale-[1.03] hover:shadow-lg hover:border-cream-500/50 transition-all duration-300 ${swayClass}`}
+                  >
+                    <div class="space-y-3 text-left">
+                      <div class="flex items-center justify-between">
+                        <span class={`px-2.5 py-0.5 border text-[9px] font-mono font-bold rounded-full tracking-wider uppercase flex items-center gap-1 ${styles.bg}`}>
+                          <span>{styles.emoji}</span> {asp.status}
+                        </span>
+                        <span class="text-[9px] text-slate-400 font-mono">{date}</span>
+                      </div>
+                      <p class="text-xs text-slate-700 font-light leading-relaxed italic break-words whitespace-normal">
+                        "{asp.content}"
+                      </p>
+                      
+                      {asp.response && (
+                        <div class="mt-2 bg-[#FAF6F0] border border-dashed border-cream-400/80 rounded-xl p-2.5 text-left">
+                          <span class="text-[8.5px] font-mono font-bold text-cream-700 uppercase tracking-widest block mb-1">💬 Tanggapan Resmi MPK:</span>
+                          <p class="text-[10px] text-slate-600 font-serif leading-relaxed italic pr-1 whitespace-pre-wrap">"{asp.response}"</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div class="flex items-center justify-between pt-3 border-t border-cream-200/50 text-left">
+                      <div class="min-w-0">
+                        <div class="text-[11px] font-bold text-charcoal-900 truncate">{cleanName}</div>
+                        <div class="text-[9px] text-slate-400 font-mono tracking-wider">Kelas: {asp.class}</div>
+                      </div>
+                      <span class="text-sm select-none">🎈</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- ASPIRASI SECURE HYDRATED FORM -->
+  <section id="aspirasi" class="py-16 sm:py-24 px-4 sm:px-6 bg-cream-200/40 border-t border-cream-300/40 relative overflow-hidden reveal">
+    <!-- Cozy Ambient Glow Orbs -->
+    <div class="absolute -top-32 -left-32 w-80 h-80 bg-cream-300/35 rounded-full filter blur-3xl opacity-60 pointer-events-none z-0"></div>
+    <div class="absolute -bottom-32 -right-32 w-80 h-80 bg-gold-500/10 rounded-full filter blur-3xl opacity-50 pointer-events-none z-0"></div>
+
+    <div class="max-w-3xl mx-auto text-center space-y-4 mb-12 relative z-10">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream-200 border border-cream-400/40 text-[9px] font-bold text-slate-500 uppercase tracking-wider font-pixel">
+        📢 Suara Siswa
+      </span>
+      <h2 class="text-2xl sm:text-3xl font-black text-charcoal-900 uppercase tracking-wider flex items-center justify-center gap-2">
+        <img src="/images/mc/bell.png" class="w-6 h-6 pixelated inline-block" alt="Bell" />
+        Kotak Aspirasi
+      </h2>
+      <p class="text-slate-600 text-xs sm:text-sm max-w-lg mx-auto font-light leading-relaxed">
+        Punya keluhan fasilitas rusak, kritik kebijakan OSIS, atau ide program baru? Suarakan di sini secara aman. Identitas Anda terlindungi dan bisa dikirim secara anonim.
+      </p>
+      <div class="w-10 h-1 bg-cream-500 mx-auto mt-3 rounded-full"></div>
+    </div>
+    
+    <div class="w-full max-w-xl mx-auto relative z-10">
+      <ReactAspirasiForm client:load />
+    </div>
+  </section>
+
+  <script>
+    // Expand viewport smooth realignment for Informasi Tambahan details card
+    const infoDetails = document.querySelector('details');
+    infoDetails?.addEventListener('toggle', () => {
+      if (infoDetails.open) {
+        setTimeout(() => {
+          infoDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80); // brief delay to allow CSS height expansion
+      }
+    });
+
+    // Expand viewport smooth realignment for Hall of Prestige details card
+    const hallDetails = document.getElementById('hall-of-prestige') as HTMLDetailsElement | null;
+    hallDetails?.addEventListener('toggle', () => {
+      if (hallDetails.open) {
+        setTimeout(() => {
+          hallDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      }
+    });
+  </script>
+</Layout>

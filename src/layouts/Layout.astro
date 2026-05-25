@@ -1,0 +1,320 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = "Majelis Perwakilan Kelas SMAN 1 Malingping",
+  description = "Website Resmi Majelis Perwakilan Kelas SMAN 1 Malingping - Wadah Aspirasi, Transparansi, dan Kepemimpinan Legislatif Siswa."
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    
+    <link rel="icon" type="image/png" href="/images/Logo_MPK.jpeg" />
+    <link rel="shortcut icon" href="/images/Logo_MPK.jpeg" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+
+    <!-- Phosphor Icons Web Font -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  </head>
+  <body class="bg-cream-100 text-slate-800 font-['Poppins',sans-serif] antialiased overflow-x-hidden">
+
+    <!-- ░░░ Particle Canvas (Minecraft cozy dust motes) ░░░ -->
+    <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+    <!-- ░░░ DOM Leaf Layer (tumbling leaves) ░░░ -->
+    <div id="leaf-layer" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:30;overflow:hidden;"></div>
+
+    <!-- Navigation Bar -->
+    <nav id="main-nav" class="fixed top-0 left-0 w-full z-50 bg-cream-100/80 border-b border-cream-300/40 backdrop-blur-md transition-all duration-300">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+        <a href="#" class="text-lg font-black uppercase tracking-wider text-slate-900 flex items-center gap-2 group">
+          <img src="/images/Logo_MPK.jpeg" alt="Logo" class="w-8 h-8 rounded-full border border-cream-400 group-hover:scale-110 transition duration-300" />
+          <span><span class="text-cream-500">MPK</span> SMANSAMAL</span>
+        </a>
+        
+        <div class="hidden md:flex items-center space-x-8 text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <a href="#" class="hover:text-slate-900 transition relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-cream-500 after:transition-all hover:after:w-full">Beranda</a>
+          <a href="#about" class="hover:text-slate-900 transition relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-cream-500 after:transition-all hover:after:w-full">Tentang Kami</a>
+          <a href="#proker" class="hover:text-slate-900 transition relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-cream-500 after:transition-all hover:after:w-full">Program Kerja</a>
+          <a href="#organogram" class="hover:text-slate-900 transition relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-cream-500 after:transition-all hover:after:w-full">Organogram</a>
+          <a href="#transparansi" class="hover:text-slate-900 transition relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-cream-500 after:transition-all hover:after:w-full">Papan Aspirasi</a>
+          <a href="#aspirasi" class="px-5 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white shadow-md transition lowercase first-letter:uppercase btn-shimmer">Sampaikan Aspirasi</a>
+        </div>
+
+        <!-- Mobile Menu Icon (Smooth Hamburger Animation) -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-700 hover:text-slate-900 focus:outline-none flex flex-col justify-center items-center gap-1.5 w-10 h-10 relative z-50 cursor-pointer" aria-label="Toggle menu">
+          <span class="w-6 h-0.5 bg-slate-800 transition-all duration-300 transform origin-center"></span>
+          <span class="w-6 h-0.5 bg-slate-800 transition-all duration-300 transform origin-center"></span>
+          <span class="w-6 h-0.5 bg-slate-800 transition-all duration-300 transform origin-center"></span>
+        </button>
+      </div>
+
+      <!-- Mobile Drawer (Cozy Slide-Fade Transition) -->
+      <div 
+        id="mobile-menu-drawer" 
+        class="md:hidden absolute top-20 left-0 w-full bg-cream-100/95 border-b border-cream-300 p-6 space-y-4 text-center text-sm font-semibold backdrop-blur-md opacity-0 pointer-events-none -translate-y-4 transition-all duration-300 ease-out z-40"
+      >
+        <a href="#" class="block py-2 text-slate-700 hover:text-slate-900">Beranda</a>
+        <a href="#about" class="block py-2 text-slate-700 hover:text-slate-900">Tentang Kami</a>
+        <a href="#proker" class="block py-2 text-slate-700 hover:text-slate-900">Program Kerja</a>
+        <a href="#organogram" class="block py-2 text-slate-700 hover:text-slate-900">Organogram</a>
+        <a href="#transparansi" class="block py-2 text-slate-700 hover:text-slate-900">Papan Aspirasi</a>
+        <a href="#aspirasi" class="block py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-md">Sampaikan Aspirasi</a>
+      </div>
+    </nav>
+
+    <!-- Layout Content -->
+    <div class="pt-20 relative z-10">
+      <slot />
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative z-10 bg-cream-200 border-t border-cream-300/60 py-12 px-6">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0 text-center md:text-left">
+        <div class="space-y-2">
+          <div class="text-base font-black tracking-wider text-slate-900 flex items-center justify-center md:justify-start gap-2">
+            <img src="/images/Logo_MPK.jpeg" alt="Logo" class="w-6 h-6 rounded-full" />
+            <span><span class="text-cream-500">MPK</span> SMANSAMAL</span>
+          </div>
+          <p class="text-xs text-slate-500 max-w-sm leading-relaxed">
+            Majelis Perwakilan Kelas SMAN 1 Malingping. Wadah perjuangan siswa, pengawas OSIS, dan penggerak perubahan positif.
+          </p>
+        </div>
+        <!-- Social Links & Subtle Admin Panel trigger (Symmetric Cozy Overhaul) -->
+        <div class="flex items-center space-x-4 sm:space-x-6">
+          <a 
+            href="https://www.instagram.com/mpksmansamal" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-rose-500 hover:scale-105 transition duration-300 group/insta" 
+            title="Instagram"
+          >
+            <i class="ph-duotone ph-instagram-logo text-sm text-rose-400/80 group-hover/insta:text-rose-500 transition-colors duration-300"></i>
+            <span class="font-medium">Instagram</span>
+          </a>
+          
+          <span class="text-cream-400 select-none text-[10px]">•</span>
+
+          <a 
+            href="/login" 
+            class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-cream-500 hover:scale-105 transition duration-300 group/admin" 
+            title="Admin Panel"
+          >
+            <i class="ph-duotone ph-shield-star text-sm text-cream-500/80 group-hover/admin:text-cream-500 transition-colors duration-300"></i>
+            <span class="font-medium">Admin Panel</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="max-w-7xl mx-auto mt-8 pt-8 border-t border-cream-300/40 text-center text-[10px] text-slate-400 font-mono font-medium tracking-wide">
+        &copy; {new Date().getFullYear()} MPK SMAN 1 Malingping. Developed with sustainable dedication by Angkatan Primordial. All Rights Reserved.
+      </div>
+    </footer>
+
+    <script>
+      /* ── Sound Synthesizer Disabled for Sleek Academic UX ── */
+
+      /* ── Mobile Menu (Cozy Fade-Slide Transition) ───────────── */
+      const btn    = document.getElementById('mobile-menu-btn');
+      const drawer = document.getElementById('mobile-menu-drawer');
+      
+      const closeDrawer = () => {
+        btn?.classList.remove('menu-open');
+        if (drawer) {
+          drawer.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+          drawer.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+        }
+      };
+
+      const openDrawer = () => {
+        btn?.classList.add('menu-open');
+        if (drawer) {
+          drawer.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
+          drawer.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+        }
+      };
+
+      btn?.addEventListener('click', () => {
+        const isOpen = btn.classList.contains('menu-open');
+        if (isOpen) {
+          closeDrawer();
+        } else {
+          openDrawer();
+        }
+      });
+
+      drawer?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          closeDrawer();
+        });
+      });
+
+      /* ── Nav shadow on scroll ────────────────────────────────── */
+      const nav = document.getElementById('main-nav');
+      window.addEventListener('scroll', () => {
+        nav?.classList.toggle('shadow-md', window.scrollY > 20);
+      }, { passive: true });
+
+      /* ── Scroll-reveal (IntersectionObserver) ────────────────── */
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            (entry.target as HTMLElement).classList.add('revealed');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+      /* ── Canvas Particle System (Minecraft cozy dust motes) ──── */
+      (function initParticles() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const canvas = document.getElementById('particle-canvas') as HTMLCanvasElement | null;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        let W = canvas.width  = window.innerWidth;
+        let H = canvas.height = window.innerHeight;
+        
+        let mouseX = -9999;
+        let mouseY = -9999;
+        
+        window.addEventListener('mousemove', (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        }, { passive: true });
+        
+        window.addEventListener('mouseleave', () => {
+          mouseX = -9999;
+          mouseY = -9999;
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+          W = canvas.width  = window.innerWidth;
+          H = canvas.height = window.innerHeight;
+        }, { passive: true });
+
+        // Authentic Minecraft items color palette (gold, wood oak, green leaves, charcoal)
+        const COLORS = [
+          'rgba(197,168,128,', // Gold oak
+          'rgba(232,200,122,', // Gold
+          'rgba(221,208,196,', // Cream paper
+          'rgba(133,169,71,',  // Moss sapling green
+          'rgba(92,92,92,',    // Cobblestone gray
+        ];
+
+        interface Particle {
+          x: number; y: number;
+          vx: number; vy: number;
+          r: number;
+          color: string;
+          alpha: number;
+        }
+
+        const COUNT = Math.min(30, Math.floor(W * H / 35000)); // Sparser cozy particles
+        const pool: Particle[] = [];
+
+        const mkParticle = (): Particle => ({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: -(Math.random() * 0.4 + 0.1),
+          r: Math.floor(Math.random() * 3) + 2, // Blocky pixel sizes: 2px to 4px
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          alpha: Math.random() * 0.28 + 0.05,
+        });
+
+        for (let i = 0; i < COUNT; i++) pool.push(mkParticle());
+
+        const draw = (p: Particle) => {
+          ctx.save();
+          ctx.fillStyle   = p.color + p.alpha + ')';
+          // Sharp pixelated squares only, zero smoothing
+          ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.r, p.r);
+          ctx.restore();
+        };
+
+        const tick = () => {
+          ctx.clearRect(0, 0, W, H);
+          for (const p of pool) {
+            p.x += p.vx; p.y += p.vy;
+            
+            // Cursor repulsion force field
+            if (mouseX !== -9999) {
+              const dx = p.x - mouseX;
+              const dy = p.y - mouseY;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 120) {
+                const force = (120 - dist) / 120;
+                const angle = Math.atan2(dy, dx);
+                p.x += Math.cos(angle) * force * 1.5;
+                p.y += Math.sin(angle) * force * 1.5;
+              }
+            }
+
+            if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
+            if (p.x < -10) p.x = W + 10;
+            if (p.x > W + 10) p.x = -10;
+            draw(p);
+          }
+          requestAnimationFrame(tick);
+        };
+        tick();
+      })();
+
+      /* ── DOM Leaf Emitter ────────────────────────────────────── */
+      (function initLeaves() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const layer = document.getElementById('leaf-layer');
+        if (!layer) return;
+
+        const LEAVES = ['🍃','🌿','🍂','🍁'];
+        const MAX = 4; // Decreased frequency for calming breeze
+        let active = 0;
+
+        const spawn = () => {
+          if (active >= MAX) return;
+          active++;
+          const el  = document.createElement('span');
+          const dur = 10 + Math.random() * 12; // Slower fall speed
+          const del = Math.random() * 3;
+          el.textContent = LEAVES[Math.floor(Math.random() * LEAVES.length)];
+          el.style.cssText = [
+            'position:absolute',
+            `left:${Math.random() * 100}vw`,
+            'top:-40px',
+            `font-size:${10 + Math.random() * 12}px`,
+            'opacity:0',
+            'pointer-events:none',
+            'user-select:none',
+            `animation:leaf-tumble ${dur}s ${del}s linear forwards`,
+            `filter:hue-rotate(${Math.random() * 20 - 10}deg) saturate(0.7)`,
+          ].join(';');
+          layer.appendChild(el);
+          el.addEventListener('animationend', () => { el.remove(); active--; });
+        };
+
+        // Emit new leaf every 7000ms (7 seconds) instead of 2200ms
+        setInterval(spawn, 7000);
+        setTimeout(() => { spawn(); }, 1500);
+      })();
+    </script>
+  </body>
+</html>

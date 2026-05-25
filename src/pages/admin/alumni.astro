@@ -1,0 +1,19 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ReactAlumniTable from '../../components/ReactAlumniTable.tsx';
+
+// Hybrid mode - SSR at edge
+export const prerender = false;
+---
+
+<AdminLayout title="Kelola Alumni Purna Bakti - Panel Admin">
+  <div class="space-y-8">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-wider">CMS Alumni Purna Bakti</h2>
+      <p class="text-xs text-slate-600 font-medium mt-1">Kelola data pengurus demisioner purna bakti angkatan terdahulu secara mandiri dan terpisah dari kepengurusan aktif.</p>
+    </div>
+
+    {/* Load hydrated Alumni CRUD component */}
+    <ReactAlumniTable client:load />
+  </div>
+</AdminLayout>

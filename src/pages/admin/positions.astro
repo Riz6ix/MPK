@@ -1,0 +1,21 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ReactPositionTree from '../../components/ReactPositionTree.tsx';
+
+// Hybrid mode - SSR at edge
+export const prerender = false;
+---
+
+<AdminLayout title="Kelola Hirarki Jabatan MPK SMANSAMAL">
+  <div class="space-y-8">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-wider">Hirarki Jabatan</h2>
+      <p class="text-xs text-slate-600 font-medium mt-1">
+        Kelola hirarki jabatan ("Akar Professional") dan urutan organogram secara interaktif dengan Drag-and-Drop.
+      </p>
+    </div>
+
+    {/* Load hydrated Position Tree CRUD component */}
+    <ReactPositionTree client:load />
+  </div>
+</AdminLayout>

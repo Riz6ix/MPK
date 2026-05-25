@@ -1,0 +1,19 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ReactClassManager from '../../components/ReactClassManager.tsx';
+
+// Hybrid mode - SSR at edge
+export const prerender = false;
+---
+
+<AdminLayout title="Kelola Kelas & Monitoring MPK - Admin Panel">
+  <div class="space-y-8">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-wider">Kelola Kelas & Sebaran MPK</h2>
+      <p class="text-xs text-slate-600 font-medium mt-1">Konfigurasikan daftar kelas aktif dan pantau penyebaran anggota pengurus aktif secara real-time.</p>
+    </div>
+
+    {/* Load hydrated Class CRUD & Monitoring component */}
+    <ReactClassManager client:load />
+  </div>
+</AdminLayout>

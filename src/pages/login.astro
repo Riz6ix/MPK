@@ -1,0 +1,394 @@
+---
+import '../styles/global.css';
+---
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Pengurus MPK</title>
+    
+    <link rel="icon" type="image/png" href="/images/Logo_MPK.jpeg" />
+    <link rel="shortcut icon" href="/images/Logo_MPK.jpeg" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+
+    <!-- Phosphor Icons Web Font -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+    <style is:global>
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        15%, 45%, 75% { transform: translateX(-4px); }
+        30%, 60%, 90% { transform: translateX(4px); }
+      }
+      .animate-shake {
+        animation: shake 0.5s ease-in-out;
+      }
+    </style>
+
+    <!-- Strict Client Auth Check (Redirect instantly if already logged in with valid cookies) -->
+    <script is:inline>
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+      }
+      
+      const sessionKey = Object.keys(localStorage).find(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
+      const session = sessionKey ? localStorage.getItem(sessionKey) : null;
+      const cookie = getCookie('sb-access-token');
+
+      if (session && cookie) {
+        window.location.href = '/admin';
+      } else if (session && !cookie) {
+        // Clear stale client-side session to prevent infinite server redirect loops
+        localStorage.removeItem(sessionKey);
+      }
+    </script>
+  </head>
+  <body class="bg-cream-100 text-slate-800 font-['Poppins',sans-serif] min-h-screen flex items-center justify-center py-10 px-4 sm:px-6 antialiased relative overflow-hidden">
+    
+    <!-- Cozy Minecraft Dust Canvas -->
+    <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+    <div class="w-full max-w-sm relative z-10 animate-fade-up">
+      <div class="bg-white/80 border border-cream-300/60 p-8 rounded-2xl shadow-xl backdrop-blur-md space-y-6">
+        
+        <!-- Header -->
+        <div class="text-center space-y-3.5">
+          <img 
+            src="/images/Logo_MPK.jpeg" 
+            alt="Logo MPK" 
+            class="w-16 h-16 rounded-full mx-auto border-2 border-cream-400/60 object-cover shadow-md transition duration-300 hover:scale-110 hover:rotate-3" 
+          />
+          <div>
+            <h1 class="text-xl font-black uppercase text-slate-900 tracking-wider leading-tight">Login Pengurus</h1>
+            <p class="text-[10px] text-cream-500 uppercase tracking-widest font-bold mt-1.5">Majelis Perwakilan Kelas</p>
+          </div>
+        </div>
+
+        <!-- Alert Box -->
+        <div id="alert-box" class="hidden p-3 rounded-xl text-xs font-semibold border"></div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="space-y-4">
+
+          <!-- Email Field -->
+          <div class="space-y-1.5">
+            <label for="email" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              Email
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="ph-duotone ph-envelope-simple text-base"></i>
+              </span>
+              <input 
+                type="email" 
+                id="email" 
+                name="email"
+                required 
+                autocomplete="email"
+                placeholder="Email"
+                class="w-full bg-cream-50/50 border border-cream-300 rounded-xl pl-10 pr-4 py-2.5 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/20 transition duration-200"
+              />
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="space-y-1.5">
+            <label for="password" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              Kata Sandi
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="ph-duotone ph-lock-key text-base"></i>
+              </span>
+              <input 
+                type="password" 
+                id="password" 
+                name="password"
+                required 
+                autocomplete="current-password"
+                placeholder="••••••••"
+                class="w-full bg-cream-50/50 border border-cream-300 rounded-xl pl-10 pr-11 py-2.5 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/20 transition duration-200"
+              />
+              <!-- Eye Toggle Button -->
+              <button 
+                type="button"
+                id="toggle-password"
+                aria-label="Tampilkan sandi"
+                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition duration-150 cursor-pointer focus:outline-none select-none"
+              >
+                <i id="eye-icon" class="ph-duotone ph-eye text-base"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button 
+            type="submit" 
+            id="submit-btn"
+            class="w-full mt-1 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold py-3 rounded-xl transition duration-200 shadow-md text-sm cursor-pointer btn-shimmer"
+          >
+            Masuk ke Dashboard
+          </button>
+        </form>
+
+        <!-- Back link -->
+        <div class="text-center pt-1">
+          <a href="/" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-700 font-medium hover:underline transition duration-200">
+            <i class="ph-bold ph-arrow-left text-xs"></i>
+            Kembali ke Website Utama
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Eye Toggle: pure inline JS, runs immediately, no bundler, no TypeScript -->
+    <script is:inline>
+      (function () {
+        var btn = document.getElementById('toggle-password');
+        var inp = document.getElementById('password');
+        var ico = document.getElementById('eye-icon');
+        if (!btn || !inp || !ico) return;
+
+        function doToggle() {
+          var isHidden = inp.type === 'password';
+          inp.type = isHidden ? 'text' : 'password';
+          ico.className = isHidden
+            ? 'ph-duotone ph-eye-slash text-base'
+            : 'ph-duotone ph-eye text-base';
+          btn.setAttribute('aria-label', isHidden ? 'Sembunyikan sandi' : 'Tampilkan sandi');
+          // Keep focus on input so mobile keyboard stays open
+          inp.focus();
+          var len = inp.value.length;
+          inp.setSelectionRange(len, len);
+        }
+
+        // MOBILE: touchstart fires before blur — preventDefault stops focus transfer
+        btn.addEventListener('touchstart', function (e) {
+          e.preventDefault();
+          doToggle();
+        }, { passive: false });
+
+        // DESKTOP: prevent mousedown from stealing focus, then handle click
+        btn.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+        });
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          doToggle();
+        });
+      })();
+    </script>
+
+    <script>
+      import { supabase } from '../lib/supabase';
+
+      const alertBox = document.getElementById('alert-box');
+      const form = document.getElementById('login-form');
+      const submitBtn = document.getElementById('submit-btn');
+
+      // Check for URL query messages
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorMsg = urlParams.get('error');
+      const infoMsg = urlParams.get('message');
+
+      if (errorMsg) {
+        showAlert('error', errorMsg);
+      } else if (infoMsg) {
+        showAlert('info', infoMsg);
+      }
+
+      function showAlert(type: 'error' | 'success' | 'info', message: string) {
+        if (!alertBox) return;
+        
+        alertBox.className = "p-3.5 rounded-xl text-[11px] font-mono font-bold border transition-all duration-300 flex items-center gap-2.5 shadow-sm";
+        let friendlyMessage = message;
+        let iconHtml = '';
+
+        if (type === 'error') {
+          alertBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700', 'animate-shake');
+          iconHtml = '<i class="ph-duotone ph-warning text-base shrink-0"></i>';
+          
+          if (message.toLowerCase().includes('invalid login credentials')) {
+            friendlyMessage = "Kredensial Salah: Kata sandi atau email pengurus tidak terdaftar.";
+          } else if (message.toLowerCase().includes('email not confirmed')) {
+            friendlyMessage = "Aktivasi Diperlukan: Alamat email belum terkonfirmasi.";
+          }
+        } else if (type === 'info') {
+          alertBox.classList.add('bg-amber-50', 'border-amber-200', 'text-amber-800');
+          iconHtml = '<i class="ph-duotone ph-info text-base shrink-0"></i>';
+          
+          if (message.toLowerCase().includes('silakan login terlebih dahulu')) {
+            friendlyMessage = "Akses Dibatasi: Silakan masuk ke gerbang admin terlebih dahulu.";
+          } else if (message.toLowerCase().includes('sesi telah berakhir')) {
+            friendlyMessage = "Sesi Berakhir: Masa aktif keamanan habis, silakan masuk kembali.";
+          }
+        } else {
+          alertBox.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-800');
+          iconHtml = '<i class="ph-duotone ph-check-circle text-base shrink-0"></i>';
+        }
+        
+        alertBox.innerHTML = `${iconHtml}<span>${friendlyMessage}</span>`;
+        alertBox.classList.remove('hidden');
+      }
+
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const emailInput = document.getElementById('email') as HTMLInputElement;
+        const passwordInput = document.getElementById('password') as HTMLInputElement;
+        
+        if (!emailInput || !passwordInput || !submitBtn) return;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Menautkan Sesi...';
+        
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: emailInput.value,
+            password: passwordInput.value
+          });
+
+          if (error) throw error;
+
+          // Set session cookies for Server-Side Auth Middleware
+          // Note: 'Secure' flag only works on HTTPS — omit it for HTTP (local dev)
+          const session = data.session;
+          if (session) {
+            const isHttps = window.location.protocol === 'https:';
+            const secureFlag = isHttps ? '; Secure' : '';
+            document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${session.expires_in}; SameSite=Lax${secureFlag}`;
+            document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=604800; SameSite=Lax${secureFlag}`;
+          }
+
+          showAlert('success', 'Login berhasil! Sedang dialihkan...');
+          
+          setTimeout(() => {
+            window.location.href = '/admin';
+          }, 800);
+
+        } catch (err: any) {
+          showAlert('error', err.message || 'Login gagal. Periksa email/kata sandi Anda.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Masuk ke Dashboard';
+        }
+      });
+
+      // Canvas Particle System (Lightweight for login screen)
+      (function initLoginParticles() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const canvas = document.getElementById('particle-canvas') as HTMLCanvasElement | null;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        let W = canvas.width  = window.innerWidth;
+        let H = canvas.height = window.innerHeight;
+        let mouseX = -9999;
+        let mouseY = -9999;
+
+        window.addEventListener('mousemove', (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        }, { passive: true });
+
+        window.addEventListener('mouseleave', () => {
+          mouseX = -9999;
+          mouseY = -9999;
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+          W = canvas.width  = window.innerWidth;
+          H = canvas.height = window.innerHeight;
+        }, { passive: true });
+
+        const COLORS = [
+          'rgba(197,168,128,',
+          'rgba(232,200,122,',
+          'rgba(221,208,196,',
+        ];
+
+        interface Particle {
+          x: number; y: number;
+          vx: number; vy: number;
+          r: number;
+          color: string;
+          alpha: number;
+          shape: 'circle' | 'square' | 'diamond';
+        }
+
+        const COUNT = 22; // Lightweight
+        const pool: Particle[] = [];
+
+        const mkParticle = (): Particle => ({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: -(Math.random() * 0.45 + 0.15),
+          r: Math.random() * 3 + 1,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          alpha: Math.random() * 0.28 + 0.08,
+          shape: (['circle','square','diamond'] as const)[Math.floor(Math.random() * 3)],
+        });
+
+        for (let i = 0; i < COUNT; i++) pool.push(mkParticle());
+
+        const draw = (p: Particle) => {
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle   = p.color + p.alpha + ')';
+          if (p.shape === 'square') {
+            ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+          } else if (p.shape === 'diamond') {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y - p.r * 1.4);
+            ctx.lineTo(p.x + p.r, p.y);
+            ctx.lineTo(p.x, p.y + p.r * 1.4);
+            ctx.lineTo(p.x - p.r, p.y);
+            ctx.closePath(); ctx.fill();
+          } else {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        };
+
+        const tick = () => {
+          ctx.clearRect(0, 0, W, H);
+          for (const p of pool) {
+            p.x += p.vx; p.y += p.vy;
+
+            if (mouseX !== -9999) {
+              const dx = p.x - mouseX;
+              const dy = p.y - mouseY;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 120) {
+                const force = (120 - dist) / 120;
+                const angle = Math.atan2(dy, dx);
+                p.x += Math.cos(angle) * force * 1.5;
+                p.y += Math.sin(angle) * force * 1.5;
+              }
+            }
+
+            if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
+            if (p.x < -10) p.x = W + 10;
+            if (p.x > W + 10) p.x = -10;
+            draw(p);
+          }
+          requestAnimationFrame(tick);
+        };
+        tick();
+      })();
+    </script>
+  </body>
+</html>

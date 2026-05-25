@@ -1,0 +1,393 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { supabase } from '../../lib/supabase';
+
+// Hybrid mode - SSR at edge
+export const prerender = false;
+
+let totalMembers = 0;
+let totalAspirations = 0;
+let pendingAspirations = 0;
+let resolvedAspirations = 0;
+
+try {
+  const [membersRes, aspirationsRes, pendingRes, resolvedRes] = await Promise.all([
+    supabase.from('members').select('*', { count: 'exact', head: true }),
+    supabase.from('aspirations').select('*', { count: 'exact', head: true }),
+    supabase.from('aspirations').select('*', { count: 'exact', head: true }).eq('status', 'Belum Diproses'),
+    supabase.from('aspirations').select('*', { count: 'exact', head: true }).eq('status', 'Selesai')
+  ]);
+
+  totalMembers = membersRes.count || 0;
+  totalAspirations = aspirationsRes.count || 0;
+  pendingAspirations = pendingRes.count || 0;
+  resolvedAspirations = resolvedRes.count || 0;
+} catch (err) {
+  console.error("Gagal memuat statistik admin:", err);
+}
+
+// Compute dynamic progress statistics
+let inReviewAspirations = totalAspirations - pendingAspirations - resolvedAspirations;
+if (inReviewAspirations < 0) inReviewAspirations = 0;
+
+const pendingPercent = totalAspirations > 0 ? Math.round((pendingAspirations / totalAspirations) * 100) : 0;
+const inReviewPercent = totalAspirations > 0 ? Math.round((inReviewAspirations / totalAspirations) * 100) : 0;
+const resolvedPercent = totalAspirations > 0 ? Math.round((resolvedAspirations / totalAspirations) * 100) : 0;
+---
+
+<AdminLayout title="Panel Kontrol MPK SMANSAMAL">
+  <div class="space-y-8">
+    
+    {/* Page Header */}
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-wider">Ringkasan Sistem</h2>
+      <p class="text-xs text-slate-600 font-medium mt-1">Tata kelola kesiswaan transparan, aman, dan berkelanjutan untuk pengurus MPK.</p>
+    </div>
+
+    {/* Dynamic Cards Grid (Cozy Parchment Paper theme) */}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      
+      {/* Card 1: Total Anggota */}
+      <div class="cozy-paper-card p-6 group">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Pengurus</p>
+            <h4 class="text-3xl sm:text-4xl font-mono font-bold text-slate-900 mt-2 tracking-tight">{totalMembers}</h4>
+          </div>
+          <span class="p-3 bg-cream-100/80 text-cream-600 rounded-xl text-lg border border-cream-300/40 shadow-sm"><i class="ph-duotone ph-users-three"></i></span>
+        </div>
+        <p class="text-[9px] text-slate-500 font-mono font-medium uppercase tracking-wider mt-4">Anggota organogram aktif</p>
+      </div>
+
+      {/* Card 2: Total Aspirasi */}
+      <div class="cozy-paper-card p-6 group">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Aspirasi Masuk</p>
+            <h4 class="text-3xl sm:text-4xl font-mono font-bold text-slate-900 mt-2 tracking-tight">{totalAspirations}</h4>
+          </div>
+          <span class="p-3 bg-cream-100/80 text-cream-600 rounded-xl text-lg border border-cream-300/40 shadow-sm"><i class="ph-duotone ph-chat-centered-text"></i></span>
+        </div>
+        <p class="text-[9px] text-slate-500 font-mono font-medium uppercase tracking-wider mt-4">Total aspirasi kesiswaan</p>
+      </div>
+
+      {/* Card 3: Pending Aspirations */}
+      <div class="cozy-paper-card p-6 group">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Belum Diproses</p>
+            <h4 class="text-3xl sm:text-4xl font-mono font-bold text-amber-700 mt-2 tracking-tight">{pendingAspirations}</h4>
+          </div>
+          <span class="p-3 bg-amber-50 text-amber-600 rounded-xl text-lg border border-amber-200/50 shadow-sm"><i class="ph-duotone ph-hourglass"></i></span>
+        </div>
+        <p class="text-[9px] text-slate-500 font-mono font-medium uppercase tracking-wider mt-4">Menunggu tindak lanjut</p>
+      </div>
+
+      {/* Card 4: Resolved Aspirations */}
+      <div class="cozy-paper-card p-6 group">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Selesai Ditinjau</p>
+            <h4 class="text-3xl sm:text-4xl font-mono font-bold text-emerald-700 mt-2 tracking-tight">{resolvedAspirations}</h4>
+          </div>
+          <span class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-lg border border-emerald-200/50 shadow-sm"><i class="ph-duotone ph-check-circle"></i></span>
+        </div>
+        <p class="text-[9px] text-slate-500 font-mono font-medium uppercase tracking-wider mt-4">Aspirasi tuntas dikerjakan</p>
+      </div>
+
+    </div>
+
+    <!-- Peta Progres Suara Siswa (Hand-styled Crayon Progress Analytics) -->
+    <div class="cozy-paper-card p-6 shadow-md">
+      <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest font-mono mb-4 flex items-center gap-2">
+        <i class="ph-duotone ph-chart-bar text-cream-600 text-base"></i>
+        Laporan Progres Keluhan Siswa
+      </h3>
+      <div class="space-y-4">
+        {totalAspirations > 0 ? (
+          <div>
+            <!-- Organic Stacked Bar -->
+            <div class="w-full h-5 rounded-full overflow-hidden flex border-2 border-[#E6DDD4] bg-cream-100 p-0.5">
+              {pendingPercent > 0 && (
+                <div 
+                  style={`width: ${pendingPercent}%`} 
+                  class="bg-amber-100 border border-amber-300 rounded-l-full transition-all duration-500 hover:opacity-90"
+                  title={`Belum Diproses: ${pendingPercent}%`}
+                ></div>
+              )}
+              {inReviewPercent > 0 && (
+                <div 
+                  style={`width: ${inReviewPercent}%`} 
+                  class="bg-sky-100 border border-sky-300 transition-all duration-500 hover:opacity-90"
+                  title={`Sedang Ditinjau: ${inReviewPercent}%`}
+                ></div>
+              )}
+              {resolvedPercent > 0 && (
+                <div 
+                  style={`width: ${resolvedPercent}%`} 
+                  class="bg-emerald-100 border border-emerald-300 rounded-r-full transition-all duration-500 hover:opacity-90"
+                  title={`Selesai: ${resolvedPercent}%`}
+                ></div>
+              )}
+            </div>
+            
+            <!-- Labels list -->
+            <div class="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-[10px] sm:text-xs font-bold text-slate-500 font-mono">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-amber-100 border border-amber-300"></span>
+                Belum Diproses ({pendingPercent}%)
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-sky-100 border border-sky-300"></span>
+                Sedang Ditinjau ({inReviewPercent}%)
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded bg-emerald-100 border border-emerald-300"></span>
+                Selesai ({resolvedPercent}%)
+              </span>
+            </div>
+          </div>
+        ) : (
+          <p class="text-xs text-slate-500 font-mono">Belum ada aspirasi masuk untuk dianalisis.</p>
+        )}
+      </div>
+    </div>
+
+    <!-- Papan Catatan Tempel & Jurnal Kebijaksanaan (Dynamic grid) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Sticky Notes Widget -->
+      <div class="lg:col-span-2 bg-[#FAF6F0] border-2 border-dashed border-cream-400 p-6 rounded-2xl relative shadow-inner min-h-[340px]">
+        {/* Board title */}
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest font-mono flex items-center gap-2">
+            <i class="ph-duotone ph-notepad text-cream-700 text-base"></i>
+            Papan Memo Tempel
+          </h3>
+          <button 
+            id="add-memo-btn"
+            class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[10px] font-bold tracking-wider uppercase transition active:scale-95 shadow cursor-pointer"
+          >
+            + Tempel Memo
+          </button>
+        </div>
+
+        {/* Notes Board Container */}
+        <div id="memo-board-container" class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Memo notes populated dynamically via local script */}
+        </div>
+        
+        <div id="memo-board-empty" class="hidden absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-40">
+          <i class="ph-duotone ph-note-blank text-4xl text-cream-600 mb-2"></i>
+          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Papan Memo Kosong</p>
+        </div>
+      </div>
+
+      <!-- Jurnal Kebijaksanaan Hari Ini (Dynamic Leadership Quote Box - NO STOICISM WORD) -->
+      <div class="bg-[#FFFDF3] border border-cream-300/60 p-6 rounded-2xl shadow-md flex flex-col justify-between space-y-6 relative overflow-hidden">
+        {/* Soft lining pattern like a school diary page */}
+        <div class="absolute inset-0 bg-linear-to-b from-transparent via-[#FAF6F0]/20 to-transparent pointer-events-none"></div>
+        <div class="space-y-4 relative z-10">
+          <h3 class="text-xs font-black text-cream-700 uppercase tracking-widest font-mono flex items-center gap-1.5">
+            <i class="ph-duotone ph-book-open text-base"></i>
+            Jurnal Kebijaksanaan Hari Ini
+          </h3>
+          <div class="space-y-3">
+            <!-- Dynamic Quote -->
+            <p id="cozy-quote-text" class="text-base text-slate-800 font-medium italic leading-relaxed font-serif">
+              "Memuat tulisan harian..."
+            </p>
+            <p id="cozy-quote-author" class="text-xs text-cream-600 font-mono font-bold text-right uppercase tracking-wider">
+              — Memuat...
+            </p>
+          </div>
+        </div>
+        <div class="border-t border-cream-200/80 pt-4 flex justify-between items-center relative z-10 text-[9px] text-slate-400 font-mono uppercase tracking-wider">
+          <span>Halaman Harian</span>
+          <span id="cozy-quote-date">25 Mei</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</AdminLayout>
+
+<script>
+  // Dynamic Wisdom Quotes (Curated for leadership & resilience)
+  const WISDOM_QUOTES = [
+    {
+      text: "Kita tidak bisa memilih situasi kita, tetapi kita selalu bisa memilih bagaimana kita respon.",
+      author: "Epictetus"
+    },
+    {
+      text: "Fokuslah pada apa yang ada di bawah kendalimu, abaikan apa yang di luar kendalimu.",
+      author: "Epictetus"
+    },
+    {
+      text: "Respon terbaik terhadap kritik atau ketidakpuasan murid adalah dengan tidak membalas dengan hal serupa, melainkan tetap tenang dan berbuat baik.",
+      author: "Marcus Aurelius"
+    },
+    {
+      text: "Kesulitan melatih pikiran, sebagaimana pekerjaan melatih tubuh.",
+      author: "Seneca"
+    },
+    {
+      text: "Orang yang bijak mendengarkan fakta secara dingin dan bertindak secara adil, menjauhkan diri dari kebisingan opini sesaat.",
+      author: "Marcus Aurelius"
+    },
+    {
+      text: "Kedaulatan sejati diraih bukan dengan menguasai orang lain, melainkan dengan menguasai diri sendiri terlebih dahulu.",
+      author: "Seneca"
+    },
+    {
+      text: "Jadilah seperti karang di lautan yang terus dihantam ombak, tetapi tetap berdiri kokoh dan menenangkan amarah ombak di sekitarnya.",
+      author: "Marcus Aurelius"
+    }
+  ];
+
+  // 1. Render Dynamic Quote based on day
+  (function initWisdomQuote() {
+    const textEl = document.getElementById('cozy-quote-text');
+    const authorEl = document.getElementById('cozy-quote-author');
+    const dateEl = document.getElementById('cozy-quote-date');
+    if (!textEl || !authorEl || !dateEl) return;
+
+    // Pick dynamic quote based on day of month
+    const day = new Date().getDate();
+    const quote = WISDOM_QUOTES[day % WISDOM_QUOTES.length];
+
+    textEl.textContent = `"${quote.text}"`;
+    authorEl.textContent = `— ${quote.author}`;
+
+    // Render formatted date
+    dateEl.textContent = new Date().toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long'
+    });
+  })();
+
+  // 2. Interactive Sticky Notes (Supabase Database driven with Real-Time)
+  import { supabase } from '../../lib/supabase';
+
+  (function initStickyNotes() {
+    const container = document.getElementById('memo-board-container');
+    const emptyEl = document.getElementById('memo-board-empty');
+    const addBtn = document.getElementById('add-memo-btn');
+    if (!container || !emptyEl || !addBtn) return;
+
+    let notes: any[] = [];
+    const PALETTES = ['sticky-note-straw', 'sticky-note-rose', 'sticky-note-sage'];
+
+    async function fetchMemos(isSilent = false) {
+      try {
+        const { data, error } = await supabase
+          .from('memos')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        notes = data || [];
+        renderNotes();
+      } catch (err: any) {
+        console.error("Gagal memuat memo:", err.message);
+      }
+    }
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('memos-realtime-sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'memos' },
+        () => {
+          fetchMemos(true);
+        }
+      )
+      .subscribe();
+
+    fetchMemos();
+
+    function renderNotes() {
+      container.innerHTML = '';
+      if (notes.length === 0) {
+        emptyEl.classList.remove('hidden');
+        return;
+      }
+      emptyEl.classList.add('hidden');
+
+      notes.forEach((memo, index) => {
+        const card = document.createElement('div');
+        
+        // Pick a palette and rotation
+        const palette = memo.color || PALETTES[index % PALETTES.length];
+        const rot = (index % 2 === 0 ? -1 : 1.2) * (1 + (index * 0.15) % 0.8);
+        
+        card.className = `${palette} p-5 rounded-2xl relative shadow-md flex flex-col justify-between transition-all hover:scale-102 duration-300 min-h-[110px] group`;
+        card.style.transform = `rotate(${rot}deg)`;
+
+        card.innerHTML = `
+          <p class="text-xs text-slate-800 font-semibold leading-relaxed pr-6 break-words">${memo.content}</p>
+          <button 
+            data-id="${memo.id}" 
+            class="delete-memo-btn absolute top-2 right-2 p-1.5 text-slate-400 hover:text-red-600 transition flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100"
+            aria-label="Hapus catatan"
+          >
+            <i class="ph-bold ph-x text-xs"></i>
+          </button>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // Add delete listeners
+      container.querySelectorAll('.delete-memo-btn').forEach(btn => {
+        btn.addEventListener('click', async (e: any) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          if (!id) return;
+          
+          try {
+            const { error } = await supabase
+              .from('memos')
+              .delete()
+              .eq('id', id);
+
+            if (error) throw error;
+            // Optimistic update locally
+            notes = notes.filter(n => n.id !== id);
+            renderNotes();
+          } catch (err: any) {
+            console.error("Gagal menghapus memo:", err.message);
+          }
+        });
+      });
+    }
+
+    // Add note handler
+    addBtn.addEventListener('click', () => {
+      (window as any).showCozyPrompt(
+        "Memo Baru",
+        "Masukkan catatan pengingat pengurus baru:",
+        "",
+        "Tulis catatan memo...",
+        async (text) => {
+          if (!text || text.trim() === '') return;
+          
+          // Pick a random palette color from the allowed list
+          const color = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+          
+          try {
+            const { error } = await supabase
+              .from('memos')
+              .insert([{ content: text.trim(), color }]);
+
+            if (error) throw error;
+            fetchMemos(true);
+          } catch (err: any) {
+            console.error("Gagal menambahkan memo:", err.message);
+          }
+        }
+      );
+    });
+  })();
+</script>

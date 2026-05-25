@@ -1,0 +1,2593 @@
+:root {
+  --primary: #e0b62c;
+  --bg: #010101;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.commission-section {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f9fa;
+  padding-top: 70px;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  margin: 0 auto;
+}
+
+/* Navbar Styles */
+.navbar {
+  position: fixed !important;
+  display: flex !important;
+  width: 100% !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 1rem 5% !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1) !important;
+  min-height: 70px !important;
+  transition: all 0.3s ease !important;
+  -webkit-transition: all 0.3s ease !important;
+  -moz-transition: all 0.3s ease !important;
+  -ms-transition: all 0.3s ease !important;
+  -o-transition: all 0.3s ease !important;
+}
+
+/* Efek saat scroll - navbar menjadi lebih compact */
+.navbar.scrolled {
+  padding: 0.5rem 5%;
+  min-height: 60px;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.95) 0%,
+    rgba(118, 75, 162, 0.95) 100%
+  );
+}
+
+.navbar-logo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  z-index: 1002;
+}
+
+.navbar-logo span {
+  color: #ffd700;
+  font-weight: 400;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
+.navbar-nav {
+  display: flex;
+  gap: 2rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.navbar-nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.navbar-nav a:hover {
+  color: #ffd700;
+  transform: translateY(-2px);
+}
+
+.navbar-nav a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  background-color: #ffd700;
+  transition: width 0.3s ease;
+}
+
+.navbar-nav a:hover::after {
+  width: 100%;
+}
+
+.navbar-extra {
+  display: none;
+}
+
+.navbar-extra a {
+  color: white;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.navbar-extra a:hover {
+  color: #ffd700;
+  transform: rotate(90deg);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 3%;
+    z-index: 1001;
+  }
+
+  .navbar.scrolled {
+    padding: 0.5rem 3%;
+  }
+
+  .navbar-nav.active {
+    right: 0;
+  }
+
+  .navbar-nav a {
+    display: block;
+    font-size: 1.2rem;
+    margin: 1rem 0;
+  }
+
+  .navbar-extra {
+    display: block;
+  }
+
+  .navbar-logo {
+    font-size: 1.1rem;
+  }
+}
+
+/* CSS untuk Animasi Scrolling dan Jump Text */
+
+/* Animasi Scroll Reveal - Element muncul dari bawah dengan fade */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Animasi Scroll Reveal - Element muncul dari kiri */
+.scroll-reveal-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Animasi Scroll Reveal - Element muncul dari kanan */
+.scroll-reveal-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Animasi Scroll Reveal - Element muncul dengan scale */
+.scroll-reveal-scale {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Jump Text Animation untuk Judul Utama */
+.hero-title {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  word-spacing: 0.17em;
+  margin-right: 6em;
+}
+
+.hero-title .jump-char {
+  display: inline-block;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+}
+
+/* Keyframe untuk animasi jump */
+@keyframes jumpGlow {
+  0% {
+    transform: translateY(0);
+    text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+  50% {
+    transform: translateY(-15px);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+      0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
+  }
+  100% {
+    transform: translateY(0);
+    text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.hero-title .jump-char.animate {
+  animation: jumpGlow 0.6s ease-in-out;
+}
+
+/* Stagger delay untuk different scroll reveal elements */
+.scroll-reveal:nth-child(1) {
+  transition-delay: 0.1s;
+}
+.scroll-reveal:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.scroll-reveal:nth-child(3) {
+  transition-delay: 0.3s;
+}
+.scroll-reveal:nth-child(4) {
+  transition-delay: 0.4s;
+}
+.scroll-reveal:nth-child(5) {
+  transition-delay: 0.5s;
+}
+
+/* Member cards stagger animation */
+.member-card.scroll-reveal {
+  transition-delay: 0s;
+}
+
+.member-card.scroll-reveal:nth-child(1) {
+  transition-delay: 0.1s;
+}
+.member-card.scroll-reveal:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.member-card.scroll-reveal:nth-child(3) {
+  transition-delay: 0.3s;
+}
+.member-card.scroll-reveal:nth-child(4) {
+  transition-delay: 0.4s;
+}
+.member-card.scroll-reveal:nth-child(5) {
+  transition-delay: 0.5s;
+}
+.member-card.scroll-reveal:nth-child(6) {
+  transition-delay: 0.6s;
+}
+
+/* Program cards animation */
+.program-card.scroll-reveal-scale:nth-child(1) {
+  transition-delay: 0.2s;
+}
+.program-card.scroll-reveal-scale:nth-child(2) {
+  transition-delay: 0.4s;
+}
+.program-card.scroll-reveal-scale:nth-child(3) {
+  transition-delay: 0.6s;
+}
+
+/* Commission sections animation */
+.commission-section.scroll-reveal {
+  transition-delay: 0.2s;
+}
+
+/* Form animation */
+.form-group.scroll-reveal {
+  transition-delay: 0s;
+}
+
+.form-group.scroll-reveal:nth-child(1) {
+  transition-delay: 0.1s;
+}
+.form-group.scroll-reveal:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.form-group.scroll-reveal:nth-child(3) {
+  transition-delay: 0.3s;
+}
+
+/* Smooth scroll behavior */
+.section {
+  scroll-margin-top: 80px;
+}
+
+/* Prevent layout shift during animations */
+.hero-title,
+.hero-title .jump-char {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .scroll-reveal,
+  .scroll-reveal-left,
+  .scroll-reveal-right,
+  .scroll-reveal-scale {
+    transform: translateY(30px);
+  }
+
+  .scroll-reveal-left {
+    transform: translateX(-30px);
+  }
+
+  .scroll-reveal-right {
+    transform: translateX(30px);
+  }
+
+  @keyframes jumpGlow {
+    0% {
+      transform: translateY(0);
+      text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+    50% {
+      transform: translateY(-10px);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.7),
+        0 0 15px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+      transform: translateY(0);
+      text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+      -webkit-transform: translateY(0);
+      -moz-transform: translateY(0);
+      -ms-transform: translateY(0);
+      -o-transform: translateY(0);
+    }
+  }
+}
+
+#hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 8px;
+  background: none;
+  border: none;
+  transition: all 0.3s ease;
+  z-index: 1002;
+  position: relative;
+  margin: auto; /* Pusatkan hamburger menu */
+}
+
+/* Animasi untuk hamburger menu */
+.hamburger-active i {
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+}
+
+#hamburger-menu i {
+  transition: transform 0.3s ease;
+}
+
+#hamburger-menu span {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  margin: 3px 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border-radius: 2px;
+  display: block;
+}
+/* Animasi hamburger menjadi X */
+#hamburger-menu.hamburger-active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px); /* Pindahkan sedikit ke kanan dan bawah */
+}
+#hamburger-menu.hamburger-active span:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+#hamburger-menu.hamburger-active span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px); /* Pindahkan sedikit ke kanan dan atas */
+}
+/*
+.navbar-extra {
+  display: none;
+}
+
+.hamburger-menu {
+  color: white;
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+*/
+/* Hero Section  */
+.hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  padding: 100px 1rem 2rem; /* Account for fixed navbar */
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><polygon fill="rgba(255,255,255,0.1)" points="1000,100 1000,0 0,100"/></svg>');
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero-content {
+  z-index: 1;
+  max-width: 800px;
+  margin-top: -20px;
+  padding: 0 2rem;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  animation: slideInUp 1s ease-out;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  animation: slideInUp 1s ease-out 0.3s both;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 15px 30px;
+  background: #ffd700;
+  color: #333;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  animation: slideInUp 1s ease-out 0.6s both;
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+/* Sections */
+.section {
+  padding: 5rem 5%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: #333;
+  position: relative;
+}
+
+.section h2::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+/* About Section */
+.about-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+/* Design untuk section visi misi */
+.visi-misi-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.visi-misi-title {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #2d3748;
+  margin-bottom: 50px;
+}
+
+.visi-misi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.visi-card,
+.misi-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.visi-card:hover,
+.misi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.card-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+}
+
+.visi-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #4a5568;
+  text-align: justify;
+}
+
+.misi-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.misi-item {
+  background: rgba(102, 126, 234, 0.05);
+  margin-bottom: 12px;
+  padding: 15px 20px;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #4a5568;
+  transition: all 0.3s ease;
+}
+
+.misi-item:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: translateX(5px);
+}
+
+.misi-item::before {
+  content: "✓";
+  color: #667eea;
+  font-weight: bold;
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .visi-misi-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .visi-misi-title {
+    font-size: 2rem;
+  }
+
+  .visi-card,
+  .misi-card {
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+  }
+}
+
+.about-image {
+  text-align: center;
+  margin-bottom: -12%;
+}
+
+.about-image img {
+  max-width: 100%;
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.logo-container {
+  width: 300px;
+  height: 200px;
+  background: linear-gradient(135deg, #ffffff, #f8f9fa, #e6d7c3, #d4af37);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  position: relative;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.8),
+    0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.logo-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle,
+    rgba(212, 175, 55, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: glow 4s ease-in-out infinite alternate;
+}
+
+.logo-container img {
+  max-width: 120px;
+  max-height: 120px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 50%;
+  z-index: 2;
+  position: relative;
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes glow {
+  from {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(0.9);
+    -webkit-transform: translate(-50%, -50%) scale(0.9);
+    -moz-transform: translate(-50%, -50%) scale(0.9);
+    -ms-transform: translate(-50%, -50%) scale(0.9);
+    -o-transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* Program Kerja */
+.programs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 8vh;
+}
+
+.program-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+}
+
+.program-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.program-icon {
+  font-size: 3rem;
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+.program-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.program-card p {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Aspirasi Section */
+.aspirasi-form {
+  background: white;
+  padding: 3rem;
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Status Message Styles */
+.status-message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 1rem;
+}
+
+input[type="text"],
+select,
+textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading {
+  display: none;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.message {
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+  font-weight: 500;
+  display: none;
+}
+
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.reset-btn {
+  width: 100%;
+  padding: 0.5rem 0.1rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  gap: 0, 5rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.reset-btn:hover {
+  background: #5a6268;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 30px 20px;
+    margin: 10px;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Footer */
+.footer {
+  background: #333;
+  color: white;
+  text-align: center;
+  padding: 2rem 5%;
+}
+
+.footer p {
+  margin-bottom: 1rem;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.social-links a {
+  color: white;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+  color: #ffd700;
+}
+
+/* Animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-nav {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    /* Enhanced transparent background with glassmorphism effect */
+    background: rgba(102, 126, 234, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: none;
+    flex-direction: column;
+    padding: 30px 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+      0 4px 16px rgba(102, 126, 234, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    z-index: 999;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-radius: 0 0 20px 20px;
+  }
+
+  .navbar-nav.mobile-menu-open {
+    position: absolute;
+    top: 100%;
+    left: 0%;
+    right: 0%;
+    backdrop-filter: blur(10px);
+    z-index: 999;
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Enhanced styling untuk item menu di mobile */
+  .navbar-nav li {
+    margin: 8px 0;
+    text-align: center;
+    list-style: none;
+  }
+
+  .navbar-nav a {
+    padding: 18px 25px;
+    margin: 8px 0;
+    border-radius: 15px;
+    text-align: center;
+    display: block;
+    /* Transparent background dengan hover effect */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #333;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Hover effect yang lebih keren */
+  .navbar-nav a:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(8px) scale(1.02);
+    border-color: rgba(255, 215, 0, 0.3);
+    color: #2d3748;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1),
+      0 4px 12px rgba(102, 126, 234, 0.15);
+  }
+
+  /* Shimmer effect saat hover */
+  .navbar-nav a::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .navbar-nav a:hover::before {
+    left: 100%;
+  }
+
+  /* Active state */
+  .navbar-nav a.active {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: rgba(255, 215, 0, 0.4);
+    color: #b8860b;
+    font-weight: 600;
+  }
+
+  /* Reset after pseudo-element untuk mobile */
+  .navbar-nav a::after {
+    display: none;
+  }
+
+  /* Enhanced overlay dengan blur effect */
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Enhanced hamburger animation */
+  #hamburger-menu {
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  #hamburger-menu:hover {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  #hamburger-menu span {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Smooth closing animation */
+  .navbar-nav.mobile-menu-closing {
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  }
+}
+
+/* Extra enhancement for very small screens */
+@media (max-width: 480px) {
+  .navbar-nav {
+    padding: 25px 15px;
+    border-radius: 0 0 15px 15px;
+  }
+
+  .navbar-nav a {
+    padding: 15px 20px;
+    margin: 6px 0;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .navbar-nav a:hover {
+    transform: translateX(5px) scale(1.01);
+  }
+}
+
+/* Hero section adjustment untuk mobile */
+.hero {
+  padding: 120px 1rem 2rem; /* Tambah padding top untuk navbar */
+}
+
+/* Overlay untuk mobile menu */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Perbaikan untuk desktop - pastikan navbar normal terlihat */
+@media (min-width: 769px) {
+  .navbar-nav {
+    position: static !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: none !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    gap: 2rem !important;
+  }
+
+  .navbar-nav li {
+    margin: 0 !important;
+  }
+
+  .navbar-nav a {
+    padding: 0.5rem 0 !important;
+    font-size: 14px !important;
+    background: none !important;
+    border-left: none !important;
+  }
+
+  .navbar-nav a:hover {
+    background: none !important;
+    transform: translateY(-2px) !important;
+  }
+
+  .navbar-nav a::after {
+    display: block !important;
+  }
+
+  #hamburger-menu {
+    display: none !important;
+  }
+}
+
+#hamburger-menu {
+  display: flex;
+}
+.navbar-extra {
+  display: block;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+}
+
+.hero p {
+  font-size: 1rem;
+}
+
+.about-content {
+  grid-template-columns: 1fr;
+  text-align: center;
+}
+
+.section {
+  padding: 3rem 5%;
+}
+
+.aspirasi-form {
+  padding: 2rem;
+}
+
+/* Members Section Styles */
+.members-section {
+  margin-left: -4%;
+  display: block;
+  padding-top: 1.5rem;
+  margin-bottom: 4vh;
+}
+
+.members-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 0.25rem;
+  color: #333;
+  font-weight: 700;
+}
+
+.members-title2 {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  color: #282626;
+  font-weight: 500;
+}
+
+/* Core Members (Pengurus Inti) Section */
+.core-members-section {
+  margin-bottom: 4rem;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1.8rem;
+  padding-left: 1rem;
+  border-left: 4px solid #667eea;
+  font-weight: 600;
+  margin-left: -1rem;
+  margin-right: 0;
+  text-align: left;
+}
+
+.core-members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+/* Commission Sections */
+.commission-section {
+  margin-bottom: 3rem;
+  margin-left: -1rem;
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+}
+
+.commission-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.commission-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.commission-icon i {
+  color: white;
+  font-size: 1.5rem;
+}
+
+.commission-info h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.commission-description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.commission-members {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+/* Member Card Styles */
+.member-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  position: relative;
+  overflow: hidden;
+  max-width: 295px;
+}
+
+.member-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+.member-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.member-card:hover::before {
+  width: 6px;
+}
+
+.member-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.member-icon i {
+  color: white;
+  font-size: 1.2rem;
+}
+
+.member-card:hover .member-icon {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.3rem;
+  transition: color 0.3s ease;
+}
+
+.member-position {
+  font-size: 0.9rem;
+  color: #667eea;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+
+.member-card:hover .member-name {
+  color: #667eea;
+}
+
+/* Efek khusus/spesial buat beberapa members */
+.member-card.ketua {
+  background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+  border: 2px solid #ffd700;
+  position: relative;
+  overflow: hidden;
+}
+
+.member-card.ketua::before {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  width: 5px;
+}
+
+.member-card.ketua::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 215, 0, 0.1),
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
+.member-card.ketua .member-icon {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  animation: gentle-glow 2s ease-in-out infinite alternate;
+  -webkit-animation: gentle-glow 2s ease-in-out infinite alternate;
+}
+
+.member-card.ketua .member-name {
+  color: #b8860b;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(255, 215, 0, 0.2);
+}
+
+.member-card.ketua .member-position {
+  color: #daa520;
+  font-weight: 600;
+}
+
+.member-card.ketua .member-class {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #333;
+  font-weight: 600;
+  opacity: 20;
+}
+/* wakil ketua */
+.member-card.wakil-ketua {
+  background: linear-gradient(135deg, white 0%, white 100%);
+  border: 1px solid #ffea03;
+  position: relative;
+  overflow: hidden;
+}
+
+.member-card.wakil-ketua::before {
+  background: linear-gradient(135deg, #49a2eb);
+  width: 3px;
+}
+
+.member-card.wakil-ketua::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(152, 158, 249, 0.3),
+    transparent
+  );
+  transform: rotate(45deg);
+  opacity: 40%;
+  animation: shimmer 4s infinite;
+  -webkit-animation: shimmer 4s infinite;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+}
+
+.member-card.wakil-ketua .member-icon {
+  background: linear-gradient(135deg, #f5d522, #667eea, #866c9f);
+  box-shadow: 0 2px 8px rgba(192, 192, 192, 0.2);
+  animation: gentle-glow 3s ease-in-out infinite alternate;
+  -webkit-animation: gentle-glow 3s ease-in-out infinite alternate;
+}
+
+.member-card.wakil-ketua .member-name {
+  color: #333;
+  font-weight: 600;
+}
+
+.member-card.wakil-ketua .member-position {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.member-card.wakil-ketua .member-class {
+  background: linear-gradient(135deg, #fefa29e4, #ffffff);
+  color: #333;
+  font-weight: 500;
+}
+
+.member-card.developer {
+  background: linear-gradient(135deg, white 0%, rgb(255, 255, 255) 100%);
+}
+
+.member-card.developer .member-icon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: code-shine 2.5s infinite;
+}
+
+/* Coordinator Badge */
+.coordinator-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+@keyframes gentle-glow {
+  0% {
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+  }
+}
+
+@keyframes code-shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ===== ANIMASI KOMISI STYLES ===== */
+.commission-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.commission-section {
+  margin-bottom: 3rem;
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.commission-section.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Header dengan animasi slide */
+.commission-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.commission-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.commission-section.animate-in .commission-header::after {
+  left: 0;
+}
+
+/* Icon dengan pulse effect */
+.commission-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  transform: scale(0.8);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.commission-section.animate-in .commission-icon {
+  transform: scale(1);
+  animation: gentle-pulse 3s ease-in-out infinite;
+}
+
+.commission-icon i {
+  color: white;
+  font-size: 1.5rem;
+}
+
+/* Info text dengan typewriter effect */
+.commission-info {
+  flex: 1;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.6s ease;
+  transition-delay: 0.3s;
+}
+
+.commission-section.animate-in .commission-info {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.commission-info h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.commission-description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Members grid dengan stagger animation */
+.member-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(-50px) rotateY(-15deg);
+  transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.commission-section.animate-in .member-card {
+  opacity: 1;
+  transform: translateX(0) rotateY(0deg);
+}
+
+/* Stagger delay untuk member cards */
+.member-card:nth-child(1) {
+  transition-delay: 0.1s;
+}
+.member-card:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.member-card:nth-child(3) {
+  transition-delay: 0.3s;
+}
+.member-card:nth-child(4) {
+  transition-delay: 0.4s;
+}
+.member-card:nth-child(5) {
+  transition-delay: 0.5s;
+}
+.member-card:nth-child(6) {
+  transition-delay: 0.6s;
+}
+
+/* Garis kiri dengan animasi */
+.member-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  transition: width 0.4s ease;
+  transition-delay: 0.8s;
+}
+
+.commission-section.animate-in .member-card::before {
+  width: 4px;
+}
+
+/* Hover effects */
+.member-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.member-card:hover::before {
+  width: 6px;
+}
+
+/* Member icon dengan bounce */
+.member-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.member-icon i {
+  color: white;
+  font-size: 1.2rem;
+}
+
+.member-card:hover .member-icon {
+  transform: scale(1.1) rotate(360deg);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Member info */
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.3rem;
+  transition: color 0.3s ease;
+}
+
+.member-position {
+  font-size: 0.9rem;
+  color: #667eea;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+
+.member-class {
+  font-size: 0.8rem;
+  color: #676565;
+  background: #f8f9fa;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  display: inline-block;
+  font-weight: 500;
+  transform: translateY(10px);
+  opacity: 20;
+  transition: all 0.4s ease;
+  transition-delay: 1.1s;
+}
+
+.commission-section.animate-in .member-class {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.member-card:hover .member-name {
+  color: #667eea;
+}
+
+/* Floating background elements */
+.commission-section::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(
+    45deg,
+    rgba(102, 126, 234, 0.03),
+    rgba(118, 75, 162, 0.03)
+  );
+  border-radius: 50%;
+  animation: float-bg 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+.commission-section::after {
+  content: "";
+  position: absolute;
+  bottom: -30%;
+  left: -30%;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.05),
+    rgba(118, 75, 162, 0.05)
+  );
+  border-radius: 50%;
+  animation: float-bg 10s ease-in-out infinite reverse;
+  z-index: 0;
+}
+
+.commission-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Keyframe animations */
+@keyframes gentle-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+  }
+}
+
+@keyframes float-bg {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-20px) rotate(120deg);
+  }
+  66% {
+    transform: translateY(10px) rotate(240deg);
+  }
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+
+  .commission-section {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .commission-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .commission-icon {
+    margin-right: 0;
+    width: 50px;
+    height: 50px;
+  }
+
+  .commission-info h3 {
+    font-size: 1.3rem;
+  }
+
+  .commission-members {
+    grid-template-columns: (2, 1fr);
+    gap: 0.8rem;
+  }
+
+  .member-card {
+    padding: 1rem;
+    gap: 0.8rem;
+    min-height: 100px;
+    transform: translateY(30px);
+  }
+
+  .commission-section.animate-in .member-card {
+    transform: translateY(0);
+  }
+
+  .member-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .member-icon i {
+    font-size: 1rem;
+  }
+
+  /* Reduce animation complexity on mobile */
+  .member-card:hover .member-icon {
+    transform: scale(1.05) rotate(180deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .commission-section {
+    padding: 1rem;
+  }
+
+  .member-card {
+    padding: 0.8rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+    min-height: 90px;
+    font-size: 0.9rem;
+  }
+
+  .member-card::before {
+    width: 100%;
+    height: 2px;
+    top: 0;
+    left: 0;
+  }
+
+  .commission-section.animate-in .member-card::before {
+    width: 100%;
+  }
+
+  .member-icon {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* Reduced motion untuk accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.3s !important;
+    transition-duration: 0.3s !important;
+  }
+
+  .member-card:hover .member-icon {
+    transform: scale(1.05);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  body {
+    padding: 0rem;
+  }
+
+  hero h1 {
+    letter-spacing: 0.2rem;
+  }
+
+  .members-title {
+    font-size: 2rem;
+  }
+
+  .members-title2 {
+    font-size: 1rem;
+  }
+
+  .commission-section {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .commission-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .commission-icon {
+    margin-right: 0;
+    width: 50px;
+    height: 50px;
+  }
+
+  .commission-info h3 {
+    font-size: 1.3rem;
+  }
+
+  .commission-members {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .core-members-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .member-card {
+    padding: 1rem;
+    gap: 0.8rem;
+  }
+
+  .member-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .member-icon i {
+    font-size: 1rem;
+  }
+
+  .member-name {
+    font-size: 1rem;
+  }
+
+  .member-position {
+    font-size: 0.8rem;
+  }
+
+  .member-class {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    padding-left: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .commission-section {
+    padding: 1rem;
+  }
+
+  .member-card {
+    padding: 0.8rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .member-card::before {
+    width: 100%;
+    height: 3px;
+    top: 0;
+    left: 0;
+  }
+
+  .member-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .member-name {
+    font-size: 0.9rem;
+  }
+
+  .coordinator-badge {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-top: 0.5rem;
+  }
+}
+
+/* =======================================
+   ENHANCED SCROLL ANIMATION STYLES
+   ======================================= */
+
+/* Ensure smooth animations and prevent flash */
+.preload * {
+  transition: none !important;
+}
+
+/* Base animation setup */
+section:not(.hero),
+.program-card,
+.member-card,
+.aspirasi-form,
+.about-content,
+.commission-section,
+h2:not(.hero h2),
+h3,
+.members-title,
+.members-title2 {
+  opacity: 1;
+  will-change: auto;
+}
+
+.commission-section,
+.commission-section * {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Enhanced performance for animations */
+.program-card,
+.member-card,
+.aspirasi-form {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Smooth text rendering for animated headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Enhanced hover effects that work with scroll animations */
+.program-card:hover,
+.member-card:hover {
+  transform: translateY(-12px) !important;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* Special animation states */
+.animate-glow {
+  animation: pulseGlow 2s ease-in-out;
+}
+
+.animate-text-glow {
+  animation: textGlow 2s ease-in-out;
+}
+
+/* Animation keyframes */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+  }
+  100% {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes textGlow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+
+/* Responsive animation adjustments */
+@media (max-width: 768px) {
+  /* Reduce animation intensity on mobile for better performance */
+  section:not(.hero),
+  .program-card,
+  .member-card,
+  .aspirasi-form {
+    transition-duration: 0.6s !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Respect user's motion preferences */
+  * {
+    transition-duration: 0.1s !important;
+    animation-duration: 0.1s !important;
+  }
+}
+
+/* Ensure hero section is always visible */
+.hero,
+.hero * {
+  opacity: 1 !important;
+}
+
+/* Animasi untuk setiap huruf dalam judul hero */
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  animation: slideInUp 1s ease-out;
+  display: inline-block;
+  overflow: visible;
+  /*Pastikantexttetapterlihat*/
+  letter-spacing: -0.02em;
+  -webkit-animation: slideInUp 1s ease-out;
+}
+
+/* Wrapper untuk setiap huruf */
+.letter {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: letterJump 0.6s ease-in-out;
+  animation-fill-mode: both;
+  white-space: pre;
+  vertical-align: vertical;
+  -webkit-transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  -moz-transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  -ms-transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  -o-transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Keyframe untuk animasi loncat huruf */
+@keyframes letterJump {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Animasi berulang dengan delay 5 detik */
+.letter-wave {
+  animation: letterWave 0.6s ease-in-out;
+  animation-fill-mode: both;
+}
+
+@keyframes letterWave {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  40% {
+    transform: translateY(-20px) scale(1.1);
+  }
+  60% {
+    transform: translateY(-12px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+}
+
+/* Efek glow saat loncat */
+.letter-glow {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+    0 0 30px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4);
+  animation: glowPulse 0.6s ease-in-out;
+}
+
+@keyframes glowPulse {
+  0% {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+      0 0 30px rgba(255, 255, 255, 0.6);
+  }
+  100% {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Variasi animasi untuk huruf berbeda */
+.letter:nth-child(odd) {
+  animation-delay: 0.1s;
+}
+
+.letter:nth-child(even) {
+  animation-delay: 0.05s;
+}
+
+/* Spasi tetap normal */
+.letter.space {
+  width: 0.37em;
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.5rem;
+    letter-spacing: -0.02rem;
+    margin-left: 2%;
+  }
+
+  @keyframes letterJump {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes letterWave {
+    0% {
+      transform: translateY(0px) scale(1);
+    }
+    40% {
+      transform: translateY(-15px) scale(1.08);
+    }
+    60% {
+      transform: translateY(-8px) scale(1.04);
+    }
+    100% {
+      transform: translateY(0px) scale(1);
+    }
+  }
+}
+
+/* Override Mobile Program Kerja - 2 kolom */
+@media (max-width: 768px) {
+  .programs {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+
+  .program-card {
+    padding: 1rem !important;
+    text-align: center;
+    min-height: auto;
+  }
+
+  .program-icon {
+    font-size: 2rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .program-card h3 {
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .program-card p {
+    font-size: 0.8rem !important;
+    line-height: 1.3 !important;
+  }
+}
+
+/* Untuk layar sangat kecil tetap 1 kolom */
+@media (max-width: 480px) {
+  .programs {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  scroll-behavior: auto !important;
+}
+
+/* Pastikan text bisa diselect dengan normal */
+body {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Hapus transform yang bisa menyebabkan masalah */
+.problematic-element {
+  transform: none !important;
+  will-change: auto !important;
+}
+
+/* Bagian Animasi Navbar */
+
+.navbar-nav a.active {
+  color: #ffd700 !important;
+  font-weight: 600;
+  position: relative;
+}
+
+.navbar-nav a.active::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  border-radius: 2px;
+  animation: activeMenuGlow 2s infinite alternate;
+}
+
+@keyframes activeMenuGlow {
+  0% {
+    box-shadow: 0 0 5px #ffd700;
+  }
+  100% {
+    box-shadow: 0 0 15px #ffd700, 0 0 25px #ffd700;
+  }
+}
+
+.navbar-nav a {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.navbar-nav a:hover {
+  transform: translateY(-2px);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hamburger-active {
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .navbar-nav.mobile-menu-open {
+    display: flex !important;
+    animation: slideDown 0.3s ease-out;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+input[type="checkbox"] {
+  transition: all 0.2s ease;
+}
+
+.form-group {
+  transition: all 0.3s ease;
+}
+
+.form-group:hover {
+  transform: translateY(-2px);
+}
+
+.message {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  display: none;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
