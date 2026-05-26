@@ -6,7 +6,8 @@
   <br />
   <br />
 
-  <h1>🌲 MPK SMAN 1 Malingping 🍂</h1>
+  <h1>🌲 Majelis Perwakilan Kelas 🍂</h1>
+  <p>sma negeri 1 malingping</p>
 
   <p>
     <strong>A premium, cozy, and highly-engineered governance portal for student councils.</strong>
@@ -39,17 +40,17 @@ Styled with visual psychology to maximize user comfort and engagement:
 
 ### ✦ Relational Node Architecture (100% Synced)
 
-All modules act as interconnected relational nodes, updating automatically to eliminate manual sync errors.
-
 ```mermaid
-erDiagram
-    CLASSES ||--o{ ALUMNI : "class_lookup"
-    CLASSES ||--o{ MEMBERS : "class_lookup"
-    GENERATIONS ||--o{ ALUMNI : "generation_link"
-    POSITIONS ||--o{ MEMBERS : "position_link"
-    POSITIONS ||--o| POSITIONS : "command_tree"
-    ASPIRATIONS }o--|| CLASSES : "submitted_by"
+flowchart LR
+    classDef default fill:#faf6f0,stroke:#2e473b,stroke-width:2px,color:#2e473b;
+    
+    Aspirasi[🗳️ Aspirasi Murid] --> Kelas[🏛️ Direktori Kelas]
+    Kelas <--> Pengurus[👥 Pengurus Aktif]
+    Pengurus <--> Jabatan[🌿 Hirarki Jabatan]
 ```
+
+*   **Primary Relational Sync**: Main operations are dynamically synchronized in real-time. Aspirations are automatically filed under master class directories, which in turn are bound to active representative rosters and sorted hierarchically.
+*   **Archived Data Nodes**: Historical alumni rosters and purna tenure periods are securely cataloged in a separate relational node.
 
 ---
 

@@ -6,7 +6,8 @@
   <br />
   <br />
 
-  <h1>🌲 MPK SMAN 1 Malingping 🍂</h1>
+  <h1>🌲 Majelis Perwakilan Kelas 🍂</h1>
+  <p>sma negeri 1 malingping</p>
 
   <p>
     <strong>Portal tata kelola kesiswaan premium, cozy, dan berkinerja tinggi.</strong>
@@ -39,17 +40,17 @@ Didesain dengan psikologi tata letak untuk kenyamanan mata dan keaslian interaks
 
 ### ✦ Arsitektur Node Relasional (100% Sinkron)
 
-Seluruh data saling terhubung sebagai simpul relasional, memperbarui secara real-time demi mencegah kesalahan sinkronisasi manual.
-
 ```mermaid
-erDiagram
-    CLASSES ||--o{ ALUMNI : "class_lookup"
-    CLASSES ||--o{ MEMBERS : "class_lookup"
-    GENERATIONS ||--o{ ALUMNI : "generation_link"
-    POSITIONS ||--o{ MEMBERS : "position_link"
-    POSITIONS ||--o| POSITIONS : "command_tree"
-    ASPIRATIONS }o--|| CLASSES : "submitted_by"
+flowchart LR
+    classDef default fill:#faf6f0,stroke:#2e473b,stroke-width:2px,color:#2e473b;
+    
+    Aspirasi[🗳️ Aspirasi Murid] --> Kelas[🏛️ Direktori Kelas]
+    Kelas <--> Pengurus[👥 Pengurus Aktif]
+    Pengurus <--> Jabatan[🌿 Hirarki Jabatan]
 ```
+
+*   **Sinkronisasi Relasional Utama**: Operasional inti disinkronisasikan secara real-time. Aspirasi yang masuk otomatis dikelompokkan berdasarkan direktori kelas utama, yang kemudian terikat langsung ke daftar perwakilan kelas aktif dan diurutkan secara hierarkis.
+*   **Simpul Data Arsip**: Riwayat alumni dan masa bakti angkatan terdahulu diarsipkan secara aman pada simpul relasional terpisah.
 
 ---
 
