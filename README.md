@@ -66,21 +66,18 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    classDef default fill:#faf6f0,stroke:#2e473b,stroke-width:2px,color:#2e473b;
-    classDef safe fill:#eef7e8,stroke:#4a7c59,stroke-width:2px,color:#2e473b;
-    classDef block fill:#fdf0f0,stroke:#c05c5c,stroke-width:2px,color:#803030;
-    classDef dec fill:#fffdf3,stroke:#c5a880,stroke-width:2px,color:#4a3b2f;
+    classDef default fill:#faf6f0,stroke:#2e473b,stroke-width:2px,color:#2e473b
+    classDef safe fill:#eef7e8,stroke:#4a7c59,stroke-width:2px,color:#2e473b
+    classDef block fill:#fdf0f0,stroke:#c05c5c,stroke-width:2px,color:#803030
+    classDef dec fill:#fffdf3,stroke:#c5a880,stroke-width:2px,color:#4a3b2f
 
-    A[🗳️ Student Voice Submit] --> B{🕸️ Honeypot Empty?}:::dec
-    
-    B -- "No (Spam Bot)" --> C[🍂 Dropped to Earth]:::block
-    B -- "Yes (Human)" --> D{⏳ Device Cooldown < 1hr?}:::dec
-    
-    D -- "Yes (Locked)" --> E[💤 Cozy Rest]:::block
-    D -- "No (Allowed)" --> F{🌲 IP Limit < 5/hr?}:::dec
-    
-    F -- "Exceeded" --> G[🛡️ Sentinel Hold]:::block
-    F -- "Allowed" --> H[🍃 Whispering Roots (Stored)]:::safe
+    A[🗳 Student Voice] --> B{🕸 Honeypot OK?}:::dec
+    B -- Bot --> C[🍂 Dropped]:::block
+    B -- Human --> D{⏳ Device Cooldown?}:::dec
+    D -- Locked --> E[💤 Rest]:::block
+    D -- Free --> F{🌲 IP Limit OK?}:::dec
+    F -- Exceeded --> G[🛡 Sentinel Hold]:::block
+    F -- Allowed --> H[🍃 Stored Safely]:::safe
 ```
 
 *   **Sentinel Rate Limiting**: Friendly to school-shared Wi-Fi (allowing 5 posts/hour per IP) paired with a strict 1-hour Local Storage device cooldown to deter spam.

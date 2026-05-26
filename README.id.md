@@ -66,21 +66,18 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    classDef default fill:#faf6f0,stroke:#2e473b,stroke-width:2px,color:#2e473b;
-    classDef safe fill:#eef7e8,stroke:#4a7c59,stroke-width:2px,color:#2e473b;
-    classDef block fill:#fdf0f0,stroke:#c05c5c,stroke-width:2px,color:#803030;
-    classDef dec fill:#fffdf3,stroke:#c5a880,stroke-width:2px,color:#4a3b2f;
+    classDef default fill:#faf6f0,stroke:#2e473b,stroke-width:2px,color:#2e473b
+    classDef safe fill:#eef7e8,stroke:#4a7c59,stroke-width:2px,color:#2e473b
+    classDef block fill:#fdf0f0,stroke:#c05c5c,stroke-width:2px,color:#803030
+    classDef dec fill:#fffdf3,stroke:#c5a880,stroke-width:2px,color:#4a3b2f
 
-    A[🗳️ Kirim Suara Siswa] --> B{🕸️ Honeypot Kosong?}:::dec
-    
-    B -- "Tidak (Spam Bot)" --> C[🍂 Gugur ke Bumi]:::block
-    B -- "Ya (Manusia)" --> D{⏳ Cooldown Peranti < 1 Jam?}:::dec
-    
-    D -- "Ya (Terkunci)" --> E[💤 Rehat Sejenak]:::block
-    D -- "Tidak (Diizinkan)" --> F{🌲 Batas IP Bersama < 5/Jam?}:::dec
-    
-    F -- "Terlampaui" --> G[🛡️ Ditahan Penjaga]:::block
-    F -- "Diizinkan" --> H[🍃 Masuk Jalinan Akar (Disimpan)]:::safe
+    A[🗳 Kirim Suara Siswa] --> B{🕸 Honeypot Kosong?}:::dec
+    B -- Bot --> C[🍂 Gugur ke Bumi]:::block
+    B -- Manusia --> D{⏳ Cooldown Peranti?}:::dec
+    D -- Terkunci --> E[💤 Rehat]:::block
+    D -- Bebas --> F{🌲 Batas IP OK?}:::dec
+    F -- Terlampaui --> G[🛡 Ditahan Penjaga]:::block
+    F -- Diizinkan --> H[🍃 Tersimpan Aman]:::safe
 ```
 
 *   **Batasan Laju Penjaga (Rate Limiting)**: Ramah terhadap Wi-Fi bersama sekolah (toleransi 5 pengiriman/jam per IP) dipadukan dengan jeda penguncian perangkat Local Storage selama 1 jam untuk mencegah spam.
