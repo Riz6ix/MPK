@@ -7,7 +7,7 @@
   <br />
 
   <h1>🌲 Majelis Perwakilan Kelas 🍂</h1>
-  <p>sma negeri 1 malingping</p>
+  <p>🏛️ <em>SMA Negeri 1 Malingping</em></p>
 
   <p>
     <strong>A premium, cozy, and highly-engineered governance portal for student councils.</strong>

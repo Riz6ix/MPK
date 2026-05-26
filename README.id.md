@@ -7,7 +7,7 @@
   <br />
 
   <h1>🌲 Majelis Perwakilan Kelas 🍂</h1>
-  <p>sma negeri 1 malingping</p>
+  <p>🏛️ <em>SMA Negeri 1 Malingping</em></p>
 
   <p>
     <strong>Portal tata kelola kesiswaan premium, cozy, dan berkinerja tinggi.</strong>
