@@ -31,19 +31,37 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
   <body class="bg-cream-100 text-slate-800 font-['Poppins',sans-serif] min-h-screen flex flex-col md:flex-row antialiased">
     
     <!-- Sidebar Navigation (Dark Oak wood panel frame) -->
-    <aside class="w-full md:w-64 sidebar-wood-panel flex flex-col justify-between p-6 shrink-0 z-10">
-      <div class="space-y-8">
-        {/* Brand Header */}
+    <aside class="w-full md:w-64 sidebar-wood-panel flex flex-col md:justify-between p-6 shrink-0 z-20 md:h-screen md:sticky md:top-0">
+      
+      <!-- Brand Header Bar (Mobile row, Desktop stack) -->
+      <div class="flex items-center justify-between w-full md:block">
         <div class="flex items-center space-x-3">
-          <img src="/images/Logo_MPK.jpeg" alt="Logo" class="w-10 h-10 rounded-full border border-cream-500/30 object-cover" />
+          <img src="/images/Logo_MPK.jpeg" alt="Logo" class="w-9 h-9 rounded-full border border-cream-500/30 object-cover" />
           <div>
             <div class="text-sm font-black tracking-wide text-white">MPK ADMIN</div>
             <div class="text-[10px] text-cream-300/50 font-bold tracking-wider uppercase font-mono">SMAN 1 Malingping</div>
           </div>
         </div>
 
+        <!-- Mobile Menu Toggle Button -->
+        <button 
+          id="admin-mobile-btn" 
+          class="md:hidden p-2 text-cream-200 hover:text-white focus:outline-none flex flex-col justify-center items-center gap-1.5 w-10 h-10 relative cursor-pointer" 
+          aria-label="Toggle admin menu"
+        >
+          <span class="w-6 h-0.5 bg-cream-200 transition-all duration-300 transform origin-center"></span>
+          <span class="w-6 h-0.5 bg-cream-200 transition-all duration-300 transform origin-center"></span>
+          <span class="w-6 h-0.5 bg-cream-200 transition-all duration-300 transform origin-center font-medium"></span>
+        </button>
+      </div>
+
+      <!-- Collapsible Navigation Drawer (Hidden on mobile by default) -->
+      <div 
+        id="admin-sidebar-menu" 
+        class="hidden md:flex flex-col flex-1 justify-between mt-6 md:mt-8 space-y-8 md:space-y-0 w-full transition-all duration-300"
+      >
         {/* Navigation Items */}
-        <nav class="space-y-2.5 text-xs sm:text-sm font-semibold">
+        <nav class="space-y-2.5 text-xs sm:text-sm font-semibold flex flex-col">
           <a 
             href="/admin" 
             class="flex items-center space-x-3.5 px-4 py-3 rounded-xl hover:bg-[#463629] text-cream-200/80 hover:text-white transition-all group"
@@ -93,36 +111,36 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
             <span>Kelola Aspirasi</span>
           </a>
         </nav>
-      </div>
 
-      {/* Footer / Account Management */}
-      <div class="pt-6 border-t border-[#463629] mt-8 md:mt-0 space-y-4">
-        
-        <!-- Cozy ID Tag: Menampilkan profil admin yang login -->
-        <div id="admin-profile-tag" class="hidden p-3 bg-[#4A3B2F]/60 border border-cream-500/10 rounded-xl flex items-center space-x-3 shadow-inner">
-          <div class="w-8 h-8 rounded-full bg-cream-500 text-slate-950 flex items-center justify-center font-mono font-bold text-xs uppercase shadow border border-cream-300" id="admin-avatar-initial">
-            ?
+        {/* Footer / Account Management */}
+        <div class="pt-6 border-t border-[#463629] mt-8 md:mt-0 space-y-4">
+          
+          <!-- Cozy ID Tag: Menampilkan profil admin yang login -->
+          <div id="admin-profile-tag" class="hidden p-3 bg-[#4A3B2F]/60 border border-cream-500/10 rounded-xl flex items-center space-x-3 shadow-inner">
+            <div class="w-8 h-8 rounded-full bg-cream-500 text-slate-950 flex items-center justify-center font-mono font-bold text-xs uppercase shadow border border-cream-300" id="admin-avatar-initial">
+              ?
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[9px] text-cream-300/40 uppercase tracking-widest font-bold font-mono">Petugas Aktif</div>
+              <div class="text-xs text-white font-semibold truncate font-mono" id="admin-email-text">Memuat...</div>
+            </div>
           </div>
-          <div class="min-w-0 flex-1">
-            <div class="text-[9px] text-cream-300/40 uppercase tracking-widest font-bold font-mono">Petugas Aktif</div>
-            <div class="text-xs text-white font-semibold truncate font-mono" id="admin-email-text">Memuat...</div>
-          </div>
+
+          <a 
+            href="/" 
+            class="flex items-center space-x-3 px-4 py-2 text-xs font-semibold text-cream-300/50 hover:text-cream-200 transition"
+          >
+            <i class="ph-duotone ph-arrow-left text-sm"></i>
+            <span>Kembali ke Web Publik</span>
+          </a>
+          <button 
+            id="logout-btn" 
+            class="w-full flex items-center justify-center space-x-2 bg-red-950/20 hover:bg-red-900/40 border border-red-900/40 hover:border-red-900/85 text-red-300 hover:text-white font-bold py-2.5 rounded-xl text-xs transition cursor-pointer"
+          >
+            <i class="ph-duotone ph-sign-out text-sm"></i>
+            <span>Keluar Sesi</span>
+          </button>
         </div>
-
-        <a 
-          href="/" 
-          class="flex items-center space-x-3 px-4 py-2 text-xs font-semibold text-cream-300/50 hover:text-cream-200 transition"
-        >
-          <i class="ph-duotone ph-arrow-left text-sm"></i>
-          <span>Kembali ke Web Publik</span>
-        </a>
-        <button 
-          id="logout-btn" 
-          class="w-full flex items-center justify-center space-x-2 bg-red-950/20 hover:bg-red-900/40 border border-red-900/40 hover:border-red-900/85 text-red-300 hover:text-white font-bold py-2.5 rounded-xl text-xs transition cursor-pointer"
-        >
-          <i class="ph-duotone ph-sign-out text-sm"></i>
-          <span>Keluar Sesi</span>
-        </button>
       </div>
     </aside>
 
@@ -175,6 +193,30 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
 
     <script>
       import { supabase } from '../lib/supabase';
+
+      // Admin mobile hamburger menu logic
+      const mobileBtn = document.getElementById('admin-mobile-btn');
+      const sidebarMenu = document.getElementById('admin-sidebar-menu');
+      
+      if (mobileBtn && sidebarMenu) {
+        const spans = mobileBtn.querySelectorAll('span');
+        mobileBtn.addEventListener('click', () => {
+          const isClosed = sidebarMenu.classList.contains('hidden');
+          if (isClosed) {
+            // Open
+            sidebarMenu.classList.remove('hidden');
+            spans[0]?.classList.add('rotate-45', 'translate-y-2');
+            spans[1]?.classList.add('opacity-0');
+            spans[2]?.classList.add('-rotate-45', '-translate-y-2');
+          } else {
+            // Close
+            sidebarMenu.classList.add('hidden');
+            spans[0]?.classList.remove('rotate-45', 'translate-y-2');
+            spans[1]?.classList.remove('opacity-0');
+            spans[2]?.classList.remove('-rotate-45', '-translate-y-2');
+          }
+        });
+      }
 
       // Set active state styling based on pathname
       const currentPath = window.location.pathname;
