@@ -10,9 +10,9 @@
   <p>🏛️ <em>SMA Negeri 1 Malingping</em></p>
 
   <p>
-    <strong>Portal tata kelola kesiswaan premium, cozy, dan berkinerja tinggi.</strong>
+    <strong>Sebuah tempat bernaung bagi tata kelola kesiswaan, dirancang dengan estetika hutan yang hangat dan performa rekayasa tinggi.</strong>
     <br />
-    <em>Simpul relasional tersinkronisasi, respon kueri sub-milidetik, dan keamanan edge yang kokoh.</em>
+    <em>Akar jalinan relasi yang saling berbisik, respon kueri sub-milidetik, dan perlindungan privasi yang kokoh.</em>
   </p>
 
   <p>
@@ -29,16 +29,16 @@
 
 ---
 
-### ✦ Sentuhan Visual & Cozy
+### ✦ 🍃 Estetika Forest Academy & Kertas Perkamen
 
 Didesain dengan psikologi tata letak untuk kenyamanan mata dan keaslian interaksi pengguna:
-*   **Warm Forest Palette**: Kombinasi warna forest green pekat (`#2e473b`), aksen emas amber, dan latar kertas perkamen yang hangat.
-*   **Transisi Mengalir**: Transisi panel akordion tanpa pergeseran tata letak (*zero-layout shift*) dan dropdown kustom popover HP.
-*   **Minecraft Suspended Dust**: Partikel debu emas mengambang secara tenang dan bereaksi lembut mengikuti gerakan kursor mouse.
+*   **Warm Forest Canvas**: Kombinasi warna forest green pekat (`#2e473b`), aksen emas amber, dan latar kertas perkamen yang hangat untuk menenangkan mata.
+*   **Transisi Daun Mengalir**: Transisi panel akordion tanpa jeda dan dropdown dinamis yang terasa selembut desiran daun tertiup angin.
+*   **Minecraft Suspended Dust**: Partikel debu emas mengambang secara tenang di latar belakang, terinspirasi oleh partikel atmosferik hangat Minecraft yang bereaksi lembut.
 
 ---
 
-### ✦ Arsitektur Node Relasional (100% Sinkron)
+### ✦ 🕸️ Jalinan Akar Relasi Kesiswaan (100% Sinkron)
 
 ```mermaid
 flowchart LR
@@ -49,20 +49,20 @@ flowchart LR
     Pengurus <--> Jabatan[🌿 Hirarki Jabatan]
 ```
 
-*   **Sinkronisasi Relasional Utama**: Operasional inti disinkronisasikan secara real-time. Aspirasi yang masuk otomatis dikelompokkan berdasarkan direktori kelas utama, yang kemudian terikat langsung ke daftar perwakilan kelas aktif dan diurutkan secara hierarkis.
-*   **Simpul Data Arsip**: Riwayat alumni dan masa bakti angkatan terdahulu diarsipkan secara aman pada simpul relasional terpisah.
+*   **Sinkronisasi Akar Dinamis**: Layaknya jalinan akar pohon yang saling terhubung, aspirasi siswa secara dinamis masuk ke dalam direktori kelas utama, terikat langsung pada daftar perwakilan kelas aktif, dan terurut secara real-time.
+*   **Arsip Kuno Angkatan**: Riwayat alumni dan masa bakti pengurus terdahulu disimpan dengan aman pada simpul relasional terpisah guna menjaga warisan sejarah sekolah.
 
 ---
 
-### ✦ Panel Admin & Alat Administratif Pintar
+### ✦ ⚡ Meja Ek Tua & Alat Administratif Cerdas
 
-*   **⚡ Smart Batch Import**: Salin-tempel list mentah pengurus/alumni. Sistem otomatis menebak kelas, komisi, gender, dan menyematkan avatar Dicebear.
-*   **🛡️ Kunci Eksklusif Developer**: Jabatan `"Developer"` secara ketat hanya dapat disematkan kepada **Rizky Setiawan** (Angkatan Primordial).
-*   **📋 Memo Tempel & Jurnal**: Catatan local storage interaktif dan kutipan kepemimpinan harian dinamis.
+*   **Smart Quill Batch Import**: Salin dan tempel daftar mentah siswa. Sistem secara cerdas mengurai kelas, komisi, gender, serta langsung menyematkan avatar Dicebear yang elegan.
+*   **Segel Kerajaan (Kunci Developer)**: Batasan ketat di tingkat database yang mengunci peran `"Developer"` secara eksklusif hanya untuk **Rizky Setiawan** (Angkatan Primordial).
+*   **Memo Perkamen & Catatan Harian**: Catatan local storage interaktif dan widget kutipan kepemimpinan harian untuk memandu tugas administratif harian.
 
 ---
 
-### ✦ Kerangka Kerja Keamanan Tingkat Elit
+### ✦ 🛡️ Penjaga Pohon Ek (Benteng Keamanan & Proteksi Privasi)
 
 ```mermaid
 flowchart LR
@@ -75,15 +75,15 @@ flowchart LR
     F -- Diizinkan --> H[Sanitasi & Simpan]
 ```
 
-*   **Hybrid Rate Limiting**: Batasan ramah Wi-Fi sekolah (toleransi 5 pengiriman/jam per IP) berpadu dengan kunci peranti Local Storage 1 jam.
-*   **Honeypot Trap**: Menggugurkan spam-bot secara otomatis jika mendeteksi kolom jebakan tersembunyi terisi.
-*   **DDL Row-Level Security**: Proteksi penuh Postgres RLS aktif di seluruh tabel utama untuk memblokir bypass klien API ilegal.
+*   **Batasan Laju Penjaga (Rate Limiting)**: Ramah terhadap Wi-Fi bersama sekolah (toleransi 5 pengiriman/jam per IP) dipadukan dengan jeda penguncian perangkat Local Storage selama 1 jam untuk mencegah spam.
+*   **Jebakan Honeypot**: Bidang formulir tersembunyi yang berfungsi sebagai jaring laba-laba, secara senyap menggugurkan bot spam otomatis yang mencoba mengisinya.
+*   **Tembok Kokoh Row-Level Security**: Proteksi penuh PostgreSQL RLS yang aktif di seluruh 7 tabel utama untuk memblokir manipulasi API klien secara ilegal dan melindungi suara siswa.
 
 ---
 
-### 🚀 Panduan Setup Pengembang lokal
+### 🚀 Menyalakan Lentera (Panduan Setup Lokal)
 
-Jalankan workspace lokal dengan fitur hot-reloading dalam waktu di bawah 60 detik:
+Nyalakan server lokal hot-reloading Anda dalam waktu kurang dari 60 detik:
 
 ```bash
 # 1. Klon repositori dan pasang dependensi

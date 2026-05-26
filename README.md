@@ -10,9 +10,9 @@
   <p>🏛️ <em>SMA Negeri 1 Malingping</em></p>
 
   <p>
-    <strong>A premium, cozy, and highly-engineered governance portal for student councils.</strong>
+    <strong>A sanctuary for student governance, crafted with warm forest aesthetics and high-performance engineering.</strong>
     <br />
-    <em>Structured relational nodes, sub-millisecond query response, and robust edge security.</em>
+    <em>Whispering relational roots, sub-millisecond query response, and sentinel-shielded privacy.</em>
   </p>
 
   <p>
@@ -29,16 +29,16 @@
 
 ---
 
-### ✦ Visual Cozy Aesthetics
+### ✦ 🍃 The Forest Academy & Parchment Aesthetics
 
 Styled with visual psychology to maximize user comfort and engagement:
-*   **Warm Forest Palette**: Deep forest green (`#2e473b`), soft amber highlights, and warm parchment layouts.
-*   **Fluid Transitions**: Zero-lag accordion panels, smooth slide-ins, and flexible dropdowns.
-*   **Minecraft Suspended Dust**: Melodic, low-frequency pixelated gold dust particles floating elegantly in the background.
+*   **Warm Forest Canvas**: Deep forest green (`#2e473b`), soft amber highlights, and warm parchment layouts that soothe the eyes.
+*   **Fluid Leaf Transitions**: Zero-lag accordion panels, smooth slide-ins, and flexible dropdowns reminiscent of rustling leaves.
+*   **Suspended Gold Dust**: Melodic, low-frequency pixelated gold dust particles floating elegantly in the background, drawing inspiration from Minecraft's warm atmospheric particles.
 
 ---
 
-### ✦ Relational Node Architecture (100% Synced)
+### ✦ 🕸️ The Whispering Roots (Relational Node Architecture)
 
 ```mermaid
 flowchart LR
@@ -49,20 +49,20 @@ flowchart LR
     Pengurus <--> Jabatan[🌿 Hirarki Jabatan]
 ```
 
-*   **Primary Relational Sync**: Main operations are dynamically synchronized in real-time. Aspirations are automatically filed under master class directories, which in turn are bound to active representative rosters and sorted hierarchically.
-*   **Archived Data Nodes**: Historical alumni rosters and purna tenure periods are securely cataloged in a separate relational node.
+*   **Dynamic Root Synchronization**: Just like interconnected tree roots, student aspirations are dynamically filed under master class directories, bound to active representative rosters, and sorted in real-time.
+*   **The Ancient Archives**: Historical alumni rosters and purna tenure periods are securely cataloged in a separate relational node, preserving the school's heritage.
 
 ---
 
-### ✦ Admin Panel & Smart Tools
+### ✦ ⚡ The Oak Desk (Smart Administrative Tools)
 
-*   **⚡ Smart Batch Import**: Copy-paste raw lists. System auto-guesses class, commission, gender, and generates initial-seeded avataars.
-*   **🛡️ Exclusive Developer Lock**: Strict constraint hard-locks the **"Developer"** role exclusively to **Rizky Setiawan** (Angkatan Primordial).
-*   **📋 interactive Memo & Jurnal**: Local storage scrap-notes and daily leadership quote widget.
+*   **Smart Quill Batch Import**: Drag or paste raw student rosters. The system automatically parses class directories, commissions, genders, and seeds elegant Dicebear avatars.
+*   **The Royal Seal (Developer Lock)**: A strict database-level constraint hard-locks the **"Developer"** role exclusively to **Rizky Setiawan** (Angkatan Primordial).
+*   **Parchment Memo & Chronicles**: Interactive local storage sticky-notes and a daily leadership quote widget to inspire daily duties.
 
 ---
 
-### ✦ Robust Security Architecture
+### ✦ 🛡️ The Oak Sentinel (Privacy Shielding & Access Controls)
 
 ```mermaid
 flowchart LR
@@ -75,15 +75,15 @@ flowchart LR
     F -- Allowed --> H[Sanitize & Store]
 ```
 
-*   **Hybrid Rate Limiting**: Friendly to school-shared Wi-Fi (tolerating 5 posts/hour per IP) combined with a strict 1-hour Local Storage device cooldown.
-*   **Honeypot Trap**: Silently drops automatic spam-bots that fill out hidden inputs.
-*   **DDL Row-Level Security**: Full postgres RLS active on all 7 main tables, blocking direct client manipulation.
+*   **Sentinel Rate Limiting**: Friendly to school-shared Wi-Fi (allowing 5 posts/hour per IP) paired with a strict 1-hour Local Storage device cooldown to deter spam.
+*   **Spam Honeypot Trap**: Invisible form fields that act as spiderwebs, silently dropping automatic spam-bots that dare to fill them.
+*   **Stone Wall Row-Level Security**: Full postgres RLS active on all 7 main tables, blocking direct API manipulation and protecting student voice.
 
 ---
 
-### 🚀 Developer Setup Guide
+### 🚀 Lighting the Lanterns (Developer Setup Guide)
 
-Ready to spin up the local hot-reloading environment in under 60 seconds:
+Ignite your local hot-reloading workspace in under 60 seconds:
 
 ```bash
 # 1. Clone the repository and install dependencies
