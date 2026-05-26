@@ -10,9 +10,9 @@
   <p>🏛️ <em>SMA Negeri 1 Malingping</em></p>
 
   <p>
-    <strong>Sebuah tempat bernaung bagi tata kelola kesiswaan, dirancang dengan estetika hutan yang hangat dan performa rekayasa tinggi.</strong>
+    <strong>Tempat bernaung bagi tata kelola kesiswaan — estetika hutan yang hangat, performa rekayasa tinggi.</strong>
     <br />
-    <em>Akar jalinan relasi yang saling berbisik, respon kueri sub-milidetik, dan perlindungan privasi yang kokoh.</em>
+    <em>Akar relasi yang saling berbisik · kueri sub-milidetik · perlindungan privasi berlapis</em>
   </p>
 
   <p>
@@ -23,7 +23,7 @@
   </p>
 
   <p>
-    <kbd> <a href="README.md">🌐 English</a> </kbd> • <kbd> <a href="README.id.md">🇮🇩 Bahasa Indonesia</a> </kbd>
+    <kbd> <a href="README.md">🌐 English</a> </kbd> • <kbd> <a href="README.id.md">🇮🇩 Bahasa Indonesia</a> </kbd>
   </p>
 </div>
 
@@ -31,38 +31,43 @@
 
 ### ✦ 🍃 Estetika Forest Academy & Kertas Perkamen
 
-Didesain dengan psikologi tata letak untuk kenyamanan mata dan keaslian interaksi pengguna:
-*   **Warm Forest Canvas**: Kombinasi warna forest green pekat (`#2e473b`), aksen emas amber, dan latar kertas perkamen yang hangat untuk menenangkan mata.
-*   **Transisi Daun Mengalir**: Transisi panel akordion tanpa jeda dan dropdown dinamis yang terasa selembut desiran daun tertiup angin.
-*   **Minecraft Suspended Dust**: Partikel debu emas mengambang secara tenang di latar belakang, terinspirasi oleh partikel atmosferik hangat Minecraft yang bereaksi lembut.
+*Didesain dengan psikologi tata letak untuk kenyamanan mata dan keterlibatan yang alami:*
+
+- 🌿 **Kanvas Hutan Hangat** — Forest green pekat `#2e473b`, aksen emas amber, latar kertas perkamen
+- 🍂 **Transisi Daun Mengalir** — Panel akordion dan dropdown yang terasa selembut desiran daun angin
+- ✨ **Debu Emas Melayang** — Partikel piksel emas bergaya Minecraft yang mengapung tenang di latar belakang
 
 ---
 
-### ✦ 🕸️ Jalinan Akar Relasi Kesiswaan (100% Sinkron)
+### ✦ 🕸️ Jalinan Akar Relasi Kesiswaan
+
+*Suara siswa mengalir melalui akar jalinan relasi — layaknya pohon data hutan yang hidup:*
 
 ```mermaid
 flowchart LR
-    classDef default fill:#faf6f0,stroke:#2e473b,stroke-width:2px,color:#2e473b;
-    
-    Aspirasi[🗳️ Aspirasi Murid] --> Kelas[🏛️ Direktori Kelas]
-    Kelas <--> Pengurus[👥 Pengurus Aktif]
-    Pengurus <--> Jabatan[🌿 Hirarki Jabatan]
+    classDef default fill:#faf6f0,stroke:#2e473b,stroke-width:2px,color:#2e473b
+
+    A[🗳 Suara Siswa] --> B[🏛 Direktori Kelas]
+    B <--> C[👥 Pengurus Aktif]
+    C <--> D[🌿 Hirarki Jabatan]
 ```
 
-*   **Sinkronisasi Akar Dinamis**: Layaknya jalinan akar pohon yang saling terhubung, aspirasi siswa secara dinamis masuk ke dalam direktori kelas utama, terikat langsung pada daftar perwakilan kelas aktif, dan terurut secara real-time.
-*   **Arsip Kuno Angkatan**: Riwayat alumni dan masa bakti pengurus terdahulu disimpan dengan aman pada simpul relasional terpisah guna menjaga warisan sejarah sekolah.
+- 🌱 **Sinkronisasi Akar Dinamis** — Aspirasi masuk otomatis dikelompokkan ke direktori kelas & terikat ke daftar perwakilan aktif secara real-time
+- 📜 **Arsip Kuno Angkatan** — Riwayat alumni dan masa bakti terdahulu diarsipkan di simpul relasional terpisah
 
 ---
 
 ### ✦ ⚡ Meja Ek Tua & Alat Administratif Cerdas
 
-*   **Smart Quill Batch Import**: Salin dan tempel daftar mentah siswa. Sistem secara cerdas mengurai kelas, komisi, gender, serta langsung menyematkan avatar Dicebear yang elegan.
-*   **Segel Kerajaan (Kunci Developer)**: Batasan ketat di tingkat database yang mengunci peran `"Developer"` secara eksklusif hanya untuk **Rizky Setiawan** (Angkatan Primordial).
-*   **Memo Perkamen & Catatan Harian**: Catatan local storage interaktif dan widget kutipan kepemimpinan harian untuk memandu tugas administratif harian.
+- 📋 **Smart Quill Import** — Tempel daftar mentah; sistem otomatis mengurai kelas, komisi, gender & menyematkan avatar Dicebear
+- 🔏 **Segel Kerajaan** — Batasan database mengunci peran `"Developer"` secara eksklusif hanya untuk **Rizky Setiawan** *(Angkatan Primordial)*
+- 📎 **Memo Perkamen** — Catatan local-storage interaktif & widget kutipan kepemimpinan harian
 
 ---
 
-### ✦ 🛡️ Penjaga Pohon Ek (Benteng Keamanan & Proteksi Privasi)
+### ✦ 🛡️ Penjaga Pohon Ek (Benteng Privasi & Keamanan)
+
+*Setiap suara siswa melewati tiga gerbang penjaga sebelum mencapai akar jalinan:*
 
 ```mermaid
 flowchart TD
@@ -71,7 +76,7 @@ flowchart TD
     classDef block fill:#fdf0f0,stroke:#c05c5c,stroke-width:2px,color:#803030
     classDef dec fill:#fffdf3,stroke:#c5a880,stroke-width:2px,color:#4a3b2f
 
-    A[🗳 Kirim Suara Siswa] --> B{🕸 Honeypot Kosong?}:::dec
+    A[🗳 Suara Siswa] --> B{🕸 Honeypot Kosong?}:::dec
     B -- Bot --> C[🍂 Gugur ke Bumi]:::block
     B -- Manusia --> D{⏳ Cooldown Peranti?}:::dec
     D -- Terkunci --> E[💤 Rehat]:::block
@@ -80,32 +85,28 @@ flowchart TD
     F -- Diizinkan --> H[🍃 Tersimpan Aman]:::safe
 ```
 
-*   **Batasan Laju Penjaga (Rate Limiting)**: Ramah terhadap Wi-Fi bersama sekolah (toleransi 5 pengiriman/jam per IP) dipadukan dengan jeda penguncian perangkat Local Storage selama 1 jam untuk mencegah spam.
-*   **Jebakan Honeypot**: Bidang formulir tersembunyi yang berfungsi sebagai jaring laba-laba, secara senyap menggugurkan bot spam otomatis yang mencoba mengisinya.
-*   **Tembok Kokoh Row-Level Security**: Proteksi penuh PostgreSQL RLS yang aktif di seluruh 7 tabel utama untuk memblokir manipulasi API klien secara ilegal dan melindungi suara siswa.
+- 🕷️ **Jebakan Honeypot** — Kolom tersembunyi seperti jaring laba-laba yang menangkap bot spam secara senyap
+- ⏱️ **Rate Limit Ramah** — 5 kiriman/jam per IP, cooldown 1 jam per perangkat; bersahabat dengan Wi-Fi sekolah
+- 🧱 **Tembok Batu RLS** — PostgreSQL Row-Level Security aktif di seluruh 7 tabel utama
 
 ---
 
-### 🚀 Menyalakan Lentera (Panduan Setup Lokal)
-
-Nyalakan server lokal hot-reloading Anda dalam waktu kurang dari 60 detik:
+### 🚀 Menyalakan Lentera *(Panduan Setup Lokal)*
 
 ```bash
-# 1. Klon repositori dan pasang dependensi
-git clone https://github.com/Riz6ix/MPK.git
-cd MPK
-npm install
+# Klon & pasang dependensi
+git clone https://github.com/Riz6ix/MPK.git && cd MPK && npm install
 
-# 2. Masukkan kredensial API ke file lokal .env
+# Isi kredensial ke .env
 echo 'PUBLIC_SUPABASE_URL="https://proyek-anda.supabase.co"
 PUBLIC_SUPABASE_ANON_KEY="kunci-anon-anda"' > .env
 
-# 3. Jalankan server lokal
+# Jalankan server lokal
 npm run dev
 ```
-> Buka tautan [http://localhost:4321](http://localhost:4321) untuk mulai menjelajah.
+> Buka [http://localhost:4321](http://localhost:4321) · membutuhkan kredensial proyek Supabase
 
 ---
 <div align="center">
-  <sub>Developed with sustainable dedication by <strong>Angkatan Primordial</strong>. All Rights Reserved.</sub>
+  <sub>Dikembangkan dengan dedikasi yang berkelanjutan oleh <strong>Angkatan Primordial</strong> · Seluruh Hak Dilindungi</sub>
 </div>
