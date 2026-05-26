@@ -1,0 +1,37 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build & Verify
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Build Application
+      run: npm run build
+      env:
+        # Note: In production, these should be set in Netlify/GitHub Secrets.
+        # These dummy values just satisfy build-time environment checks if any exist.
+        PUBLIC_SUPABASE_URL: "https://dummy.supabase.co"
+        PUBLIC_SUPABASE_ANON_KEY: "dummy-key"
