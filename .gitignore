@@ -33,5 +33,5 @@ secret.txt
 archive/
 docs/
 
-# Supabase local migrations
-supabase/migrations/
+# Supabase local migrations (tracked for team synchronization)
+!supabase/migrations/
