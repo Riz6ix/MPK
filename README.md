@@ -73,9 +73,9 @@ Follow these steps to set up the project locally.
    ```
    Your site will be available at `http://localhost:4321`
 
-## ☁️ Deployment (Cozy Deploy to Netlify)
+## ☁️ Deployment
 
-This project is configured for seamless deployment to Netlify via GitHub.
+This project is configured for continuous deployment to Netlify via GitHub.
 
 1. Push your code to a GitHub repository.
 2. Log in to [Netlify](https://app.netlify.com/) and click **"Add new site" -> "Import an existing project"**.
