@@ -52,8 +52,14 @@ export default function ReactAlumniTable() {
 
   // Avatar
   const [avatarStyle, setAvatarStyle] = useState('all');
-  const [activeStyle, setActiveStyle] = useState(() => STYLES_LIST[Math.floor(Math.random() * STYLES_LIST.length)]);
-  const [identiconSeed, setIdenticonSeed] = useState(() => Math.random().toString(36).substring(2, 9));
+  const [activeStyle, setActiveStyle] = useState('identicon'); // stable initial for SSR hydration
+  const [identiconSeed, setIdenticonSeed] = useState('Parchment'); // stable initial for SSR hydration
+  const [classes, setClasses] = useState<{ name: string; grade: string }[]>([]);
+
+  // States for Smart Batch Import
+  const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
+  const [batchInputText, setBatchInputText] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
 
   // Dropdown open states
   const [isCommOpen, setIsCommOpen] = useState(false);
@@ -82,6 +88,46 @@ export default function ReactAlumniTable() {
     fetchAlumni();
     fetchGenerations();
     fetchPositions();
+
+    // Randomize avatar preview on first client-side mount (safe from SSR hydration mismatch)
+    const randomStyle = STYLES_LIST[Math.floor(Math.random() * STYLES_LIST.length)];
+    setActiveStyle(randomStyle);
+    setIdenticonSeed(Math.random().toString(36).substring(2, 9));
+
+    async function fetchClasses() {
+      try {
+        const { data, error } = await supabase
+          .from('classes')
+          .select('name, grade, order_index')
+          .eq('is_active', true);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const gradeOrderMap: Record<string, number> = { 'X': 1, 'XI': 2, 'XII': 3 };
+          const sorted = [...data].sort((a, b) => {
+            if (gradeOrderMap[a.grade] !== gradeOrderMap[b.grade]) {
+              return gradeOrderMap[a.grade] - gradeOrderMap[b.grade];
+            }
+            return (a.order_index || 0) - (b.order_index || 0);
+          });
+          setClasses(sorted);
+        } else {
+          setClasses(generateDefaultClasses());
+        }
+      } catch (err) {
+        console.error('Gagal mengambil kelas:', err);
+        setClasses(generateDefaultClasses());
+      }
+    }
+    
+    function generateDefaultClasses() {
+      const arr = [];
+      for (let i = 1; i <= 11; i++) arr.push({ name: `X-E${i}`, grade: 'X' });
+      for (let i = 1; i <= 10; i++) arr.push({ name: `XI-F${i}`, grade: 'XI' });
+      for (let i = 1; i <= 10; i++) arr.push({ name: `XII-F${i}`, grade: 'XII' });
+      return arr;
+    }
+    
+    fetchClasses();
 
     const channel = supabase
       .channel('alumni-realtime-sync')
@@ -198,6 +244,106 @@ export default function ReactAlumniTable() {
     if (avatarStyle === 'all') setActiveStyle(STYLES_LIST[Math.floor(Math.random() * STYLES_LIST.length)]);
   };
 
+  // Smart Batch Import Handler for Alumni
+  const handleBatchImport = async () => {
+    if (!batchInputText.trim()) return;
+    setIsImporting(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const lines = batchInputText.split('\n').map(l => l.trim()).filter(Boolean);
+      const parsedPayloads: any[] = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        let parts = line.split(/[|;,\t]+/).map(p => p.trim()).filter(Boolean);
+
+        // Fallback split by ' - ' with spaces to avoid splitting classes like XII-F1
+        if (parts.length < 3 && !line.includes('|') && !line.includes(',') && !line.includes(';')) {
+          parts = line.split(/\s+-\s+/).map(p => p.trim()).filter(Boolean);
+        }
+
+        if (parts.length < 2) {
+          throw new Error(`Baris ${i + 1} tidak valid: "${line}". Minimal harus diisi Nama dan Jabatan.`);
+        }
+
+        const name = parts[0];
+        const position = parts[1];
+        let className = parts[2] || 'XII-F1';
+        let commission = parts[3] || 'Inti';
+        let gender = parts[4] || 'Laki-laki';
+
+        // ── HAK EKSKLUSIF DEVELOPER = RIZKY SETIAWAN ──
+        const isDeveloperRole = position.toLowerCase().includes('developer');
+        if (isDeveloperRole && name.toLowerCase() !== 'rizky setiawan') {
+          throw new Error(`Akses Ditolak (Baris ${i + 1}): Jabatan Developer dikunci secara eksklusif untuk Rizky Setiawan (Angkatan Primordial)!`);
+        }
+
+        // Intelligent commission guessing
+        if (!parts[3]) {
+          const lowerPos = position.toLowerCase();
+          if (lowerPos.includes('ketua') || lowerPos.includes('sekretaris') || lowerPos.includes('bendahara') || lowerPos.includes('developer')) {
+            commission = 'Inti';
+          } else if (lowerPos.includes('komisi a')) {
+            commission = 'A';
+          } else if (lowerPos.includes('komisi b')) {
+            commission = 'B';
+          } else if (lowerPos.includes('komisi c')) {
+            commission = 'C';
+          } else if (lowerPos.includes('komisi d')) {
+            commission = 'D';
+          } else if (lowerPos.includes('komisi e')) {
+            commission = 'E';
+          } else if (lowerPos.includes('komisi f')) {
+            commission = 'F';
+          }
+        }
+
+        // Intelligent gender guessing
+        if (parts[4]) {
+          const lowerGen = parts[4].toLowerCase();
+          if (lowerGen === 'p' || lowerGen.includes('perempuan') || lowerGen.includes('wanita') || lowerGen.includes('cewe')) {
+            gender = 'Perempuan';
+          } else {
+            gender = 'Laki-laki';
+          }
+        }
+
+        const stableSeed = encodeURIComponent(name.trim());
+        const randomStyle = STYLES_LIST[Math.floor(Math.random() * STYLES_LIST.length)];
+        const finalAvatarUrl = `https://api.dicebear.com/9.x/${randomStyle}/svg?seed=${stableSeed}`;
+
+        parsedPayloads.push({
+          name,
+          position,
+          class: className,
+          commission,
+          gender,
+          avatar_url: finalAvatarUrl,
+          generation_id: generationId || null
+        });
+      }
+
+      if (parsedPayloads.length === 0) {
+        throw new Error('Tidak ada baris data valid yang berhasil diproses.');
+      }
+
+      // Bulk Insert into Supabase
+      const { error } = await supabase.from('alumni').insert(parsedPayloads);
+      if (error) throw error;
+
+      setSuccessMessage(`Sukses mengimpor ${parsedPayloads.length} alumni secara massal!`);
+      setBatchInputText('');
+      setIsBatchImportOpen(false);
+      await fetchAlumni(true);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Gagal mengimpor data massal.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -205,6 +351,13 @@ export default function ReactAlumniTable() {
     setSuccessMessage(null);
 
     try {
+      // ── HAK EKSKLUSIF DEVELOPER = RIZKY SETIAWAN ──
+      const isDeveloperRole = position.toLowerCase().includes('developer');
+      const cleanName = name.trim();
+      if (isDeveloperRole && cleanName.toLowerCase() !== 'rizky setiawan') {
+        throw new Error('Akses Ditolak: Jabatan Developer dikunci secara eksklusif untuk Rizky Setiawan (Angkatan Primordial)!');
+      }
+
       const finalAvatarUrl = `https://api.dicebear.com/9.x/${activeStyle}/svg?seed=${identiconSeed}`;
       const payload: any = {
         name, position, class: className,
@@ -318,11 +471,25 @@ export default function ReactAlumniTable() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Kelas Akhir</label>
-              <input
-                type="text" required placeholder="XII-F5"
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200"
-                value={className} onChange={e => setClassName(e.target.value)}
-              />
+              <select
+                required
+                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer font-medium"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+              >
+                <option value="">Pilih Kelas...</option>
+                {['X', 'XI', 'XII'].map(grade => {
+                  const gradeClasses = classes.filter(c => c.grade === grade);
+                  if (gradeClasses.length === 0) return null;
+                  return (
+                    <optgroup key={grade} label={`Tingkat ${grade}`}>
+                      {gradeClasses.map(c => (
+                        <option key={c.name} value={c.name}>{c.name}</option>
+                      ))}
+                    </optgroup>
+                  );
+                })}
+              </select>
             </div>
             <div ref={commRef} className="relative">
               <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Komisi</label>
@@ -561,10 +728,19 @@ export default function ReactAlumniTable() {
             <i className="ph-duotone ph-graduation-cap text-cream-600 text-xl"></i>
             Direktori Alumni Purna Bakti
           </h3>
-          <button onClick={() => fetchAlumni(true)} disabled={isRefreshing}
-            className="px-3.5 py-2 bg-cream-100 hover:bg-cream-200 text-cream-700 border border-cream-300 rounded-xl transition text-xs font-bold cursor-pointer shadow-sm active:scale-95 disabled:opacity-60">
-            {isRefreshing ? 'Memperbarui...' : 'Refresh'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsBatchImportOpen(true)}
+              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition text-xs font-bold cursor-pointer shadow-sm active:scale-95 flex items-center gap-1.5"
+            >
+              <i className="ph-bold ph-file-arrow-up"></i>
+              Tempel List
+            </button>
+            <button onClick={() => fetchAlumni(true)} disabled={isRefreshing}
+              className="px-3.5 py-2 bg-cream-100 hover:bg-cream-200 text-cream-700 border border-cream-300 rounded-xl transition text-xs font-bold cursor-pointer shadow-sm active:scale-95 disabled:opacity-60">
+              {isRefreshing ? 'Memperbarui...' : 'Refresh'}
+            </button>
+          </div>
         </div>
 
         {errorMessage && (
@@ -730,6 +906,57 @@ export default function ReactAlumniTable() {
           </div>
         )}
       </div>
+
+      {/* Smart Batch Import Modal Overlay */}
+      {isBatchImportOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="cozy-paper-card max-w-lg w-full p-6 shadow-2xl border-2 border-amber-800/20 relative animate-fadeIn">
+            <button
+              onClick={() => setIsBatchImportOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer hover:scale-105 transition duration-150"
+            >
+              <i className="ph-bold ph-x text-lg"></i>
+            </button>
+
+            <h3 className="text-lg font-black text-slate-900 mb-2 flex items-center gap-2">
+              <i className="ph-duotone ph-file-arrow-up text-amber-600 text-xl"></i>
+              Smart Batch Import Alumni
+            </h3>
+            
+            <p className="text-[10px] text-slate-500 leading-relaxed mb-4">
+              Salin-tempel baris data alumni Anda di bawah ini secara massal. Format per baris:<br />
+              <strong className="font-mono text-amber-800">Nama | Jabatan | Kelas | Komisi (Opsional) | Gender (Opsional)</strong><br />
+              *Catatan: Data akan dimasukkan di bawah angkatan <strong className="text-amber-700">{generations.find(g => g.id === generationId)?.name || 'angkatan terpilih'}</strong>.
+            </p>
+
+            <div className="space-y-4">
+              <textarea
+                rows={8}
+                value={batchInputText}
+                onChange={(e) => setBatchInputText(e.target.value)}
+                placeholder="Rizky Setiawan | Developer | XII-F5 | Inti | Laki-laki&#10;Tri Dewi Utami | Ketua MPK | XII-F1 | Inti | Perempuan&#10;Muhamad Saripudin | Wakil Ketua | XII-F5 | Inti | Laki-laki"
+                className="w-full bg-cream-50/50 border border-cream-300 rounded-xl p-3 text-xs text-slate-800 font-mono focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition resize-none"
+              />
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsBatchImportOpen(false)}
+                  className="flex-1 bg-cream-100 hover:bg-cream-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer border border-cream-300 text-center"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleBatchImport}
+                  disabled={isImporting || !batchInputText.trim()}
+                  className="flex-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl text-xs transition cursor-pointer text-center shadow-md active:scale-95 btn-shimmer"
+                >
+                  {isImporting ? 'Mengimpor...' : 'Mulai Impor Massal'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

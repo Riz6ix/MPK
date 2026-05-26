@@ -91,6 +91,11 @@ export default function ReactMemberTable() {
   const [regenStep, setRegenStep] = useState<'options' | 'class12' | 'all-demision'>('options');
   const [regenGenInput, setRegenGenInput] = useState('Angkatan I');
 
+  // States for Smart Batch Import
+  const [isBatchImportOpen, setIsBatchImportOpen] = useState(false);
+  const [batchInputText, setBatchInputText] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+
   // Custom Dropdown Open States
   const [isCommOpen, setIsCommOpen] = useState(false);
   const [isPosOpen, setIsPosOpen] = useState(false);
@@ -314,6 +319,107 @@ export default function ReactMemberTable() {
     }
   };
 
+  // Smart Batch Import Handler
+  const handleBatchImport = async () => {
+    if (!batchInputText.trim()) return;
+    setIsImporting(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const lines = batchInputText.split('\n').map(l => l.trim()).filter(Boolean);
+      const parsedPayloads: any[] = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        let parts = line.split(/[|;,\t]+/).map(p => p.trim()).filter(Boolean);
+
+        // Fallback split by ' - ' with spaces to avoid splitting classes like XII-F1
+        if (parts.length < 3 && !line.includes('|') && !line.includes(',') && !line.includes(';')) {
+          parts = line.split(/\s+-\s+/).map(p => p.trim()).filter(Boolean);
+        }
+
+        if (parts.length < 2) {
+          throw new Error(`Baris ${i + 1} tidak valid: "${line}". Minimal harus diisi Nama dan Jabatan.`);
+        }
+
+        const name = parts[0];
+        const position = parts[1];
+        let className = parts[2] || 'XII-F1';
+        let commission = parts[3] || 'Inti';
+        let gender = parts[4] || 'Laki-laki';
+
+        // ── HAK EKSKLUSIF DEVELOPER = RIZKY SETIAWAN ──
+        const isDeveloperRole = position.toLowerCase().includes('developer');
+        if (isDeveloperRole && name.toLowerCase() !== 'rizky setiawan') {
+          throw new Error(`Akses Ditolak (Baris ${i + 1}): Jabatan Developer dikunci secara eksklusif untuk Rizky Setiawan (Angkatan Primordial)!`);
+        }
+
+        // Intelligent commission guessing
+        if (!parts[3]) {
+          const lowerPos = position.toLowerCase();
+          if (lowerPos.includes('ketua') || lowerPos.includes('sekretaris') || lowerPos.includes('bendahara') || lowerPos.includes('developer')) {
+            commission = 'Inti';
+          } else if (lowerPos.includes('komisi a')) {
+            commission = 'A';
+          } else if (lowerPos.includes('komisi b')) {
+            commission = 'B';
+          } else if (lowerPos.includes('komisi c')) {
+            commission = 'C';
+          } else if (lowerPos.includes('komisi d')) {
+            commission = 'D';
+          } else if (lowerPos.includes('komisi e')) {
+            commission = 'E';
+          } else if (lowerPos.includes('komisi f')) {
+            commission = 'F';
+          }
+        }
+
+        // Intelligent gender guessing
+        if (parts[4]) {
+          const lowerGen = parts[4].toLowerCase();
+          if (lowerGen === 'p' || lowerGen.includes('perempuan') || lowerGen.includes('wanita') || lowerGen.includes('cewe')) {
+            gender = 'Perempuan';
+          } else {
+            gender = 'Laki-laki';
+          }
+        }
+
+        const stableSeed = encodeURIComponent(name.trim());
+        const randomStyle = STYLES_LIST[Math.floor(Math.random() * STYLES_LIST.length)];
+        const finalAvatarUrl = `https://api.dicebear.com/9.x/${randomStyle}/svg?seed=${stableSeed}`;
+
+        parsedPayloads.push({
+          name,
+          position,
+          class: className,
+          commission,
+          gender,
+          avatar_url: finalAvatarUrl,
+          status: 'Aktif',
+          generation: 'Angkatan I'
+        });
+      }
+
+      if (parsedPayloads.length === 0) {
+        throw new Error('Tidak ada baris data valid yang berhasil diproses.');
+      }
+
+      // Bulk Insert into Supabase
+      const { error } = await supabase.from('members').insert(parsedPayloads);
+      if (error) throw error;
+
+      setSuccessMessage(`Sukses mengimpor ${parsedPayloads.length} pengurus baru secara massal!`);
+      setBatchInputText('');
+      setIsBatchImportOpen(false);
+      await fetchMembers(true);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Gagal mengimpor data massal.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   // Scroll-to-form + highlight + focus helper
   const scrollToForm = useCallback(() => {
     setTimeout(() => {
@@ -331,6 +437,13 @@ export default function ReactMemberTable() {
     setSuccessMessage(null);
 
     try {
+      // ── HAK EKSKLUSIF DEVELOPER = RIZKY SETIAWAN ──
+      const isDeveloperRole = position.toLowerCase().includes('developer');
+      const cleanName = name.trim();
+      if (isDeveloperRole && cleanName.toLowerCase() !== 'rizky setiawan') {
+        throw new Error('Akses Ditolak: Jabatan Developer dikunci secara eksklusif untuk Rizky Setiawan (Angkatan Primordial)!');
+      }
+
       // Validate singular unique positions (Inti commission or positions containing 'Koordinator')
       const isSinglePosition = commission === 'Inti' || position.toLowerCase().includes('koordinator');
 
@@ -773,6 +886,13 @@ export default function ReactMemberTable() {
             </span>
           </h3>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsBatchImportOpen(true)}
+              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition text-xs font-bold cursor-pointer shadow-sm active:scale-95 flex items-center gap-1.5"
+            >
+              <i className="ph-bold ph-file-arrow-up"></i>
+              Tempel List
+            </button>
             <button
               onClick={() => {
                 setRegenStep('options');
@@ -1242,6 +1362,57 @@ export default function ReactMemberTable() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Smart Batch Import Modal Overlay */}
+      {isBatchImportOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="cozy-paper-card max-w-lg w-full p-6 shadow-2xl border-2 border-amber-800/20 relative animate-fadeIn">
+            <button
+              onClick={() => setIsBatchImportOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer hover:scale-105 transition duration-150"
+            >
+              <i className="ph-bold ph-x text-lg"></i>
+            </button>
+
+            <h3 className="text-lg font-black text-slate-900 mb-2 flex items-center gap-2">
+              <i className="ph-duotone ph-file-arrow-up text-amber-600 text-xl"></i>
+              Smart Batch Import Pengurus
+            </h3>
+            
+            <p className="text-[10px] text-slate-500 leading-relaxed mb-4">
+              Salin-tempel baris data pengurus Anda di bawah ini secara massal. Format per baris:<br />
+              <strong className="font-mono text-amber-800">Nama | Jabatan | Kelas | Komisi (Opsional) | Gender (Opsional)</strong><br />
+              *Contoh: <code className="font-mono text-slate-600 bg-cream-50 px-1 py-0.5 rounded">Siti Nurasyiah \| Sekretaris I \| XI-F1 \| Inti \| Perempuan</code>
+            </p>
+
+            <div className="space-y-4">
+              <textarea
+                rows={8}
+                value={batchInputText}
+                onChange={(e) => setBatchInputText(e.target.value)}
+                placeholder="Rizky Setiawan | Developer | XII-F5 | Inti | Laki-laki&#10;Tri Dewi Utami | Ketua MPK | XII-F1 | Inti | Perempuan&#10;Muhamad Saripudin | Wakil Ketua | XII-F5 | Inti | Laki-laki"
+                className="w-full bg-cream-50/50 border border-cream-300 rounded-xl p-3 text-xs text-slate-800 font-mono focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition resize-none"
+              />
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsBatchImportOpen(false)}
+                  className="flex-1 bg-cream-100 hover:bg-cream-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer border border-cream-300 text-center"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleBatchImport}
+                  disabled={isImporting || !batchInputText.trim()}
+                  className="flex-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl text-xs transition cursor-pointer text-center shadow-md active:scale-95 btn-shimmer"
+                >
+                  {isImporting ? 'Mengimpor...' : 'Mulai Impor Massal'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
