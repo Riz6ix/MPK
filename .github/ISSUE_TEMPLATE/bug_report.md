@@ -1,42 +1,43 @@
 ---
-name: Bug Report
-about: Create a report to help us improve the platform.
+name: 🐛 Bug Report
+about: Submit a detailed report to help us improve system integrity.
 title: "[BUG] "
-labels: bug
+labels: bug, triage
 assignees: ''
 ---
 
-## 🐛 Bug Description
-A clear and concise description of what the bug is.
+<!-- 
+Thank you for reporting an issue! 
+To help us resolve this quickly, please provide as much context as possible.
+-->
 
-## 🔄 Reproduction Steps
-Steps to reproduce the behavior:
-- [ ] 1. Go to '...'
-- [ ] 2. Click on '....'
-- [ ] 3. Scroll down to '....'
-- [ ] 4. See error
+### 🛑 Anomaly Description
+Provide a crisp, clear description of the bug. What is failing?
 
-## 📉 Expected vs Actual Behavior
-**Expected behavior:**
-A clear and concise description of what you expected to happen.
+### 🔄 Reproduction Matrix
+Steps to reproduce the anomaly:
+1. Navigate to `...`
+2. Interact with `...`
+3. Observe the error at `...`
 
-**Actual behavior:**
-What actually happened instead.
+### 📉 Delta: Expected vs. Actual
+**Expected Behavior:**
+> What the system *should* have done.
 
-## 💻 System Environment
-Please complete the following information:
-- **OS**: [e.g. macOS 14, Windows 11]
-- **Browser**: [e.g. Chrome, Safari, Firefox]
-- **Node.js Version**: [e.g. v22.12.0]
-- **Framework Version**: [e.g. Astro v6.x, React v19.x]
+**Actual Behavior:**
+> What the system *actually* did.
 
-## 📋 Additional Context (Optional)
-Add any other context, logs, or screenshots about the problem here.
+### 💻 Environment Telemetry
+Please provide your environment specifications:
+- **OS**: [e.g., macOS Sonoma, Windows 11]
+- **Browser**: [e.g., Chrome 120, Safari 17]
+- **Node.js**: [e.g., v22.12.0]
 
+### 🗂️ Stack Traces & Context
 <details>
-<summary><b>Terminal Logs (Click to expand)</b></summary>
+<summary><b>View Terminal / Console Logs</b></summary>
 
 ```bash
-# Paste your logs here
+# Paste your logs or stack traces here
 ```
 </details>

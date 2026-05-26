@@ -1,103 +1,95 @@
 <div align="center">
-  <img src="public/images/Logo_MPK.jpeg" alt="MPK Logo" width="120" style="border-radius: 12px;"/>
-  <h1>Website Majelis Perwakilan Kelas SMA</h1>
-  <p><strong>A modern, centralized platform for Student Council (MPK) governance and administration.</strong></p>
-  
-  <p>
-    <a href="https://astro.build"><img src="https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square" alt="Build Status"/></a>
-    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License"/></a>
-    <img src="https://img.shields.io/badge/Version-1.0.0-lightgrey?style=flat-square" alt="Version"/>
+  <br />
+  <a href="https://github.com/Riz6ix/MPK">
+    <img src="public/images/Logo_MPK.jpeg" alt="MPK Logo" width="140" style="border-radius: 24px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);" />
+  </a>
+  <br />
+  <br />
+
+  <h1 align="center">Website Majelis Perwakilan Kelas SMA</h1>
+
+  <p align="center">
+    <strong>A centralized, high-performance governance platform for modern Student Councils.</strong>
+    <br />
+    <br />
+    <a href="https://astro.build"><img src="https://img.shields.io/badge/Astro-FF5D01?style=for-the-badge&logo=astro&logoColor=white" alt="Astro" /></a>
+    <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" /></a>
+    <a href="https://supabase.com"><img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" /></a>
+    <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" /></a>
   </p>
 </div>
 
-<div align="center">
-  🌐 English | <a href="README.id.md">🇮🇩 Bahasa Indonesia</a>
-</div>
+<p align="center">
+  <kbd> <a href="README.md">🌐 English</a> </kbd> • <kbd> <a href="README.id.md">🇮🇩 Bahasa Indonesia</a> </kbd>
+</p>
 
 ---
 
-## 🎯 The Why
+## ✦ The Vision
 
-Managing a Student Council (Majelis Perwakilan Kelas) often involves scattered spreadsheets, physical feedback boxes, and fragmented communication. 
+Managing student governance often relies on fragmented tools—scattered spreadsheets, physical suggestion boxes, and disconnected communication channels. 
 
-This project aims to solve that by providing a **centralized digital workspace**. It acts as a single source of truth for student aspirations, alumni tracking, and organizational structure, built upon a high-performance modern web stack (Astro + React + Supabase).
+This platform reengineers the **Student Council (MPK)** workflow into a single, unified digital workspace. It acts as the definitive source of truth for student aspirations, roster management, and structural organization, engineered on a modern, edge-ready technology stack.
 
-## ⚡ Core Architecture & Capabilities
+<br />
 
-Instead of listing trivial features, here is the architectural matrix of what this platform actually handles:
+## ✦ Core Architecture
 
-| Capability | Module | Description |
+We prioritize system integrity and performance over feature bloat. Here is the architectural breakdown:
+
+| Module | Subsystem | Technical Description |
 | :--- | :--- | :--- |
-| 🗳️ **Aspiration Intake** | `Aspirasi Form` | A secure, structured ingestion system for student feedback, utilizing Supabase for real-time data persistence. |
-| 👥 **HR & Roster** | `Alumni & Member Table` | Centralized relational tables for tracking active organizational members and preserving historical alumni data. |
-| 🏛️ **Governance** | `Class Manager` | Administrative dashboard components to manage class delegations, hierarchical structures, and internal data. |
-| 🚀 **Delivery** | `Astro SSR` | Optimized Server-Side Rendering (SSR) pipeline ensuring lightning-fast load times and accessible static assets. |
+| 🗳️ **Intake** | `Aspirations` | Secure ingestion pipeline for student feedback. Built with edge-function validation and Supabase real-time persistence. |
+| 👥 **Roster** | `Alumni & HR` | Centralized relational schemas to track active members, hierarchical data, and historical alumni records. |
+| 🏛️ **Governance**| `Class Manager` | Administrative interfaces handling class delegations, representative structures, and internal permissions. |
+| 🚀 **Delivery** | `Astro SSR` | Highly optimized Server-Side Rendering (SSR) ensuring zero-layout-shift and sub-second load times. |
 
-## 🛠️ Quick Start
+<br />
 
-Follow these instructions to spin up the development environment locally.
+## ✦ Developer Guide
 
-<details>
-<summary><b>1. System Requirements</b></summary>
-<br>
+Spin up the local environment in seconds. We enforce strict node versioning for consistency.
 
-Ensure your local development environment meets the following specifications:
-- **Node.js**: `v22.12.0` or higher.
-- **Git**: Installed and configured.
-- **Supabase**: An active Supabase project for the backend database.
+### 1. Environment Setup
 
-</details>
-
-<details>
-<summary><b>2. Installation & Setup</b></summary>
-<br>
-
-Clone the repository and install the required dependencies:
+Ensure you have **Node.js v22.12.0+** and an active **Supabase** instance. Clone the repository and install dependencies:
 
 ```bash
-# Clone the repository
 git clone https://github.com/Riz6ix/MPK.git
-
-# Navigate into the directory
 cd MPK
-
-# Install Node.js dependencies
 npm install
 ```
-</details>
 
-<details>
-<summary><b>3. Configuration (Environment Variables)</b></summary>
-<br>
+### 2. Configuration
 
-The application relies on Supabase for data handling. You must define your environment variables before running the server.
-
-Create a `.env` file in the root directory:
+Duplicate the environment template (if available) or create a `.env` file at the project root. Securely inject your Supabase credentials:
 
 ```env
+# .env
 PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
 ```
-> **Security Note:** Never commit your `.env` file to version control. It is already included in `.gitignore`.
-</details>
 
-<details>
-<summary><b>4. Running the Development Server</b></summary>
-<br>
+> **Warning:** Never commit your `.env` file. This repository uses strict `.gitignore` rules to prevent credential leaks.
 
-Initialize the Astro development server:
+### 3. Initialize Server
+
+Boot the Astro development server with Hot Module Replacement (HMR):
 
 ```bash
 npm run dev
 ```
-The server will start, and the application will be accessible at <samp>http://localhost:4321</samp>.
-</details>
+> The application will safely ignite at `http://localhost:4321`.
 
-## ☁️ Deployment
+<br />
 
-This project is configured for continuous deployment out-of-the-box. 
+## ✦ Deployment Infrastructure
 
-By utilizing Netlify's GitHub integration, any commits pushed to the `main` branch will automatically trigger the build pipeline (`npm run build`) and deploy the `dist` artifact to production. No complex GitHub Actions workflows are required for basic hosting.
+This repository is optimized for **Continuous Deployment (CD)** via Netlify.
+
+Pushing to the `main` branch automatically triggers the CI/CD pipeline. Netlify reads the pre-configured `netlify.toml`, executes `npm run build`, and distributes the static/SSR artifacts globally. No manual intervention is required.
 
 ---
-*Built with ❤️ for better student governance.*
+<div align="center">
+  <i>Engineered for better student governance.</i>
+</div>

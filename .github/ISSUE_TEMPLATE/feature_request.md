@@ -1,22 +1,29 @@
 ---
-name: Feature Request
-about: Suggest an idea or a new capability for this project.
-title: "[FEATURE] "
-labels: enhancement
+name: ✨ Feature Proposal
+about: Architect a new capability or subsystem for the platform.
+title: "[PROPOSAL] "
+labels: enhancement, architecture
 assignees: ''
 ---
 
-## 🚀 The Problem
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+<!--
+We appreciate your ideas!
+Please provide architectural context for your proposed feature.
+-->
 
-## 💡 Proposed Solution
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen. Consider architectural impact (Does it need changes to Supabase? Does it require new UI components?).
+### 🎯 The Pain Point
+**What organizational or technical problem does this solve?**
+> A clear description of the friction point. (e.g., "Administrators currently cannot filter alumni by graduation year without...")
 
-## 🔄 Alternative Alternatives Considered
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+### 💡 Proposed Architecture
+**How should the system resolve this?**
+Describe your ideal solution. Consider the impact on:
+- Database schemas (Supabase)
+- UI/UX components
+- SSR Data fetching
 
-## 📋 Additional Context
-Add any other context, wireframes, or screenshots about the feature request here.
+### 🔄 Evaluated Alternatives
+Did you consider other approaches before proposing this one? Why were they rejected?
+
+### 📎 Additional Schemas / Mocks
+*Attach wireframes, database diagrams, or UI mockups here.*

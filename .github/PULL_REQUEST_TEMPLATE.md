@@ -1,35 +1,43 @@
-## 🚀 Pull Request Overview
+## 🚀 Engineering Summary
 
-**Description:**
-Please include a summary of the changes and the related issue. Outline the motivation and context for this PR.
+**Context & Motivation:**
+> Provide a high-level summary of the architectural changes introduced in this PR. Why is this PR necessary?
 
-**Resolves Issue(s):**
+**Closes / Resolves:**
 - Fixes # (issue number)
 
-## 🏗️ Architectural Impact
-- [ ] Supabase Database / Migrations modified
-- [ ] React UI Components modified
-- [ ] Astro Pages / SSR logic modified
-- [ ] Tailwind CSS configuration modified
+---
 
-## ✅ Pre-Merge Checklist
-Before requesting a review, please ensure you have completed the following:
+## 🏗️ Impact Matrix
+Check all subsystems affected by this PR:
+- [ ] **Database**: Supabase migrations or schema changes
+- [ ] **Core UI**: React / Astro component modifications
+- [ ] **Delivery**: SSR logic or routing changes
+- [ ] **Styling**: Tailwind CSS / Design tokens
+- [ ] **Config**: Project configuration or dependencies
 
-- [ ] My code follows the established style guidelines of this project.
-- [ ] I have performed a self-review of my own code.
-- [ ] I have commented my code, particularly in hard-to-understand areas.
-- [ ] I have verified that my changes generate no new build warnings (`npm run build`).
-- [ ] There are no breaking changes (or I have documented them below).
+---
+
+## ✅ Quality Assurance
+Before requesting a review, verify the following standards:
+
+- [ ] I have maintained strict adherence to the project's coding conventions.
+- [ ] I have executed a thorough self-review of the architectural logic.
+- [ ] I have added inline documentation for complex algorithms.
+- [ ] The build pipeline completes flawlessly (`npm run build`).
 
 ## ⚠️ Breaking Changes
-*(If applicable, describe any breaking changes here. Otherwise, state "None".)*
+> Does this PR introduce breaking changes to existing data structures or APIs? 
+> *(If yes, detail the migration path below. Otherwise, write "None")*
 
-## 📸 Screenshots / Outputs (if appropriate)
-*(Drag & drop screenshots or paste terminal outputs here)*
+---
+
+## 📸 Telemetry / Visual Proof
 <details>
-<summary>View Output</summary>
+<summary><b>Expand for Screenshots / CLI Output</b></summary>
 
 ```bash
-# Terminal outputs go here
+# Paste test results or terminal outputs
 ```
+*(Drag & drop UI screenshots here if applicable)*
 </details>
