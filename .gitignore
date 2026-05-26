@@ -27,3 +27,11 @@ secret.txt
 
 # Local Netlify folder
 .netlify
+
+# Local IDE and temporary files
+.vscode/
+archive/
+docs/
+
+# Supabase local migrations
+supabase/migrations/
