@@ -19,8 +19,23 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    
-    <link rel="icon" type="image/png" href="/images/Logo_MPK.jpeg" />
+
+    <!-- Open Graph / WhatsApp / LINE Preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mpksmansamal.netlify.app/" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="https://mpksmansamal.netlify.app/images/Logo_MPK.jpeg" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:site_name" content="MPK SMAN 1 Malingping" />
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content="https://mpksmansamal.netlify.app/images/Logo_MPK.jpeg" />
+
+    <link rel="icon" type="image/jpeg" href="/images/Logo_MPK.jpeg" />
     <link rel="shortcut icon" href="/images/Logo_MPK.jpeg" />
 
     <!-- Google Fonts -->
@@ -28,8 +43,8 @@ const {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
 
-    <!-- Phosphor Icons Web Font -->
-    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <!-- Phosphor Icons (deferred to prevent render blocking) -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
   </head>
   <body class="bg-cream-100 text-slate-800 font-['Poppins',sans-serif] antialiased overflow-x-hidden">
 

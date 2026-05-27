@@ -33,6 +33,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
             path: '/',
             sameSite: 'lax' as const,
             secure: isHttps,
+            httpOnly: true, // Blokir akses token via JS (XSS → Session Hijacking mitigation)
           };
           context.cookies.set('sb-access-token', newSession.access_token, {
             ...cookieOpts,

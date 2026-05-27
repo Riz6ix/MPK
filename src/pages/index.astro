@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import ReactAspirasiForm from '../components/ReactAspirasiForm.tsx';
 import { supabase } from '../lib/supabase';
+import type { Member, Position } from '../lib/types';
 
 export const prerender = false; // Enable live SSR to sync instantly with Supabase CMS on every page hit
 
@@ -12,50 +13,31 @@ Astro.response.headers.set(
 );
 
 // Fetch positions to get active sort hierarchy
-let positions: any[] = [];
+let positions: Position[] = [];
 try {
   const { data, error } = await supabase
     .from('positions')
-    .select('*')
+    .select('id, name, order_index, parent_id')
     .order('order_index', { ascending: true });
   if (!error && data) {
-    positions = data;
+    positions = data as Position[];
   }
 } catch (err) {
   console.error("Gagal mengambil data jabatan:", err);
 }
 
-// Fetch members from Supabase
-let members: any[] = [];
+// Fetch members from Supabase (column projection untuk efisiensi bandwidth)
+let members: Member[] = [];
 try {
   const { data, error } = await supabase
     .from('members')
-    .select('*');
+    .select('id, name, position, commission, class, gender, avatar_url, order_index');
   
   if (!error && data) {
-    members = data;
+    members = data as Member[];
   }
 } catch (err) {
   console.error("Gagal mengambil data pengurus:", err);
-}
-
-// Fallback seeding in memory if database is empty so the site looks stunning on first load
-if (members.length === 0) {
-  members = [
-    { id: '1', name: 'Tri Dewi Utami', position: 'Ketua MPK', class: 'XII-F1', commission: 'Inti', avatar_url: null, order_index: 0, gender: 'Perempuan' },
-    { id: '2', name: 'Muhamad Saripudin', position: 'Wakil Ketua', class: 'XII-F5', commission: 'Inti', avatar_url: null, order_index: 1, gender: 'Laki-laki' },
-    { id: '3', name: 'Siti Nurasyiah', position: 'Sekretaris I', class: 'XI-F1', commission: 'Inti', avatar_url: null, order_index: 2, gender: 'Perempuan' },
-    { id: '4', name: 'Erissa Valencia Putri', position: 'Sekretaris II', class: 'XI-F7', commission: 'Inti', avatar_url: null, order_index: 3, gender: 'Perempuan' },
-    { id: '5', name: 'Tiara Dewi Anjani', position: 'Bendahara', class: 'XII-F9', commission: 'Inti', avatar_url: null, order_index: 4, gender: 'Perempuan' },
-    { id: '6', name: 'Rizky Setiawan', position: 'Developer', class: 'XII-F5', commission: 'Inti', avatar_url: null, order_index: 5, gender: 'Laki-laki' },
-    { id: '7', name: 'Lesti', position: 'Koordinator Komisi A', class: 'XI-F1', commission: 'A', avatar_url: null, order_index: 0, gender: 'Perempuan' },
-    { id: '8', name: 'Charissa Aini', position: 'Anggota Komisi A', class: 'XI-F5', commission: 'A', avatar_url: null, order_index: 1, gender: 'Perempuan' },
-    { id: '9', name: 'Muhamad Saep', position: 'Koordinator Komisi B', class: 'XII-F3', commission: 'B', avatar_url: null, order_index: 0, gender: 'Laki-laki' },
-    { id: '10', name: 'Muhamad Rizky Nur Giffari', position: 'Koordinator Komisi C', class: 'XII-F8', commission: 'C', avatar_url: null, order_index: 0, gender: 'Laki-laki' },
-    { id: '11', name: 'Saparudin', position: 'Koordinator Komisi D', class: 'XII-F1', commission: 'D', avatar_url: null, order_index: 0, gender: 'Laki-laki' },
-    { id: '12', name: 'Diva Khalifatul Hasanah', position: 'Koordinator Komisi E', class: 'XI-F1', commission: 'E', avatar_url: null, order_index: 0, gender: 'Perempuan' },
-    { id: '13', name: 'Bagus Adi Darmawan', position: 'Koordinator Komisi F', class: 'XII-F7', commission: 'F', avatar_url: null, order_index: 0, gender: 'Laki-laki' }
-  ];
 }
 
 // Sort members by position's order_index if positions are available, else fallback to standard sorting

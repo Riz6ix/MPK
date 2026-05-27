@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+export const prerender = false; // SSR agar query string ?error= selalu diproses server-side
 ---
 
 <!DOCTYPE html>
@@ -7,9 +8,10 @@ import '../styles/global.css';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
     <title>Login Pengurus MPK</title>
     
-    <link rel="icon" type="image/png" href="/images/Logo_MPK.jpeg" />
+    <link rel="icon" type="image/jpeg" href="/images/Logo_MPK.jpeg" />
     <link rel="shortcut icon" href="/images/Logo_MPK.jpeg" />
 
     <!-- Fonts -->
@@ -17,8 +19,8 @@ import '../styles/global.css';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
 
-    <!-- Phosphor Icons Web Font -->
-    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <!-- Phosphor Icons (deferred to prevent render blocking) -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
 
     <style is:global>
       @keyframes shake {

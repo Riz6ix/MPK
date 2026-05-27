@@ -4,10 +4,14 @@ import { sanitizeInput, hashIp, checkRateLimit } from '../../lib/security';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    // Validate request origin to block cross-domain spamming
+    // Validate request origin via exact-match allowlist (prevent cross-domain spam)
     const origin = request.headers.get('origin');
-    const allowedHost = request.headers.get('host') || '';
-    if (origin && !origin.includes(allowedHost) && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
+    const ALLOWED_ORIGINS = [
+      'https://mpksmansamal.netlify.app',
+      'http://localhost:4321',
+      'http://127.0.0.1:4321',
+    ];
+    if (origin && !ALLOWED_ORIGINS.includes(origin)) {
       return new Response(
         JSON.stringify({ error: 'Akses ditolak.' }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }
