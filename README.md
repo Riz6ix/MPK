@@ -6,13 +6,13 @@
   <br />
   <br />
 
-  <h1>🌲 Majelis Perwakilan Kelas 🍂</h1>
-  <p>🏛️ <em>SMA Negeri 1 Malingping</em></p>
+  <h1>🍂 MAJELIS PERWAKILAN KELAS 🍃</h1>
+  <p><sub>SMA Negeri 1 Malingping</sub></p>
 
   <p>
-    <strong>A sanctuary for student governance — warm forest aesthetics, high-performance engineering.</strong>
+    <strong>A simple, cozy, and highly secure student governance portal.</strong>
     <br />
-    <em>Whispering relational roots · sub-millisecond queries · sentinel-shielded privacy</em>
+    <em>Friendly user experience · optimized database queries · tight privacy protection</em>
   </p>
 
   <p>
@@ -29,19 +29,19 @@
 
 ---
 
-### ✦ 🍃 The Forest Academy & Parchment Aesthetics
+### ✦ 🍃 Cozy & Warm UI/UX
 
-*Crafted with visual psychology for warmth, calm, and natural engagement:*
+*Designed with a welcoming, natural interface for school-friendly engagement:*
 
-- 🌿 **Warm Forest Canvas** — Deep forest green `#2e473b`, soft amber accents, warm parchment backdrops
-- 🍂 **Fluid Leaf Transitions** — Smooth accordion panels and dropdowns that feel like rustling leaves
-- ✨ **Suspended Gold Dust** — Pixelated Minecraft-inspired gold particles drifting gently in the background
+- 🌿 **Warm Colors** — Soft forest greens, warm amber accents, and clean parchment backdrops
+- 🍂 **Smooth Transitions** — Natural animations on accordion panels and dropdowns for a cozy feel
+- ✨ **Floating Gold Dust** — Subtle Minecraft-inspired gold dust drifting gently in the background
 
 ---
 
-### ✦ 🕸️ The Whispering Roots (Relational Architecture)
+### ✦ 🕸️ The Roots (Relational Data Flow)
 
-*Student voices flow through interconnected roots — like a living forest data tree:*
+*All student data flows seamlessly through interconnected database relations:*
 
 ```mermaid
 flowchart LR
@@ -52,22 +52,24 @@ flowchart LR
     C <--> D[🌿 Role Hierarchy]
 ```
 
-- 🌱 **Living Root Sync** — Aspirations auto-filed under class directories, bound to active rosters in real-time
-- 📜 **Ancient Archives** — Alumni and purna-tenure records preserved in a dedicated relational node
+- 🌱 **Automatic Sorting** — Aspirations are auto-sorted under classes and linked to active rosters
+- 📜 **Alumni Directory** — Senior and purna-tenure records are automatically preserved in dedicated tables
 
 ---
 
-### ✦ ⚡ The Oak Desk (Smart Admin Tools)
+### ✦ ⚡ Smart Admin Desk
 
-- 📋 **Smart Quill Import** — Paste raw rosters; system auto-parses class, commission, gender & seeds Dicebear avatars
-- 🔏 **Royal Seal Lock** — Database-level constraint pins **"Developer"** exclusively to **Rizky Setiawan** *(Angkatan Primordial)*
-- 📎 **Parchment Memos** — Local-storage sticky notes & a daily leadership quote widget
+*Functional tools built to simplify student council operations:*
+
+- 📋 **Smart List Import** — Simply paste raw rosters; the system auto-parses name, class, commission, gender, and seeds avatars
+- 🔏 **Developer Constraint** — Built-in database rule locks the **"Developer"** role exclusively to **Rizky Setiawan**
+- 📎 **Cozy Notes & Quotes** — Interactive board for sticky notes and a wisdom quote generator
 
 ---
 
-### ✦ 🛡️ The Oak Sentinel (Privacy & Access Shield)
+### ✦ 🛡️ Security & Privacy Shield
 
-*Every student voice passes through three guardian gates before reaching the roots:*
+*Ensuring student voices are sent safely with multi-layered backend protection:*
 
 ```mermaid
 flowchart TD
@@ -85,28 +87,28 @@ flowchart TD
     F -- Allowed --> H[🍃 Stored Safely]:::safe
 ```
 
-- 🕷️ **Honeypot Spiderweb** — Hidden fields silently catch and drop spam bots
-- ⏱️ **Friendly Rate Limit** — 5 posts/hour per IP, 1-hour device cooldown; gentle on shared school Wi-Fi
-- 🧱 **Stone Wall RLS** — Full Postgres Row-Level Security on all 7 core tables
+- 🕷️ **Honeypot Trap** — Hidden input fields capture and discard spam bots silently
+- ⏱️ **Rate Limiting** — Smart post-per-hour limit and device cooldown to prevent database flooding
+- 🧱 **PostgreSQL RLS** — Secure Row-Level Security active on all core database tables
 
 ---
 
-### 🚀 Lighting the Lanterns *(Developer Setup)*
+### 🚀 Developer Setup
 
 ```bash
-# Clone & install
+# Clone and install dependencies
 git clone https://github.com/Riz6ix/MPK.git && cd MPK && npm install
 
-# Add credentials to .env
+# Add your credentials to .env
 echo 'PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 PUBLIC_SUPABASE_ANON_KEY="your-anon-key"' > .env
 
-# Start local dev server
+# Run local dev server
 npm run dev
 ```
-> Open [http://localhost:4321](http://localhost:4321) · requires Supabase project credentials
+> Open [http://localhost:4321](http://localhost:4321) · requires Supabase credentials
 
 ---
 <div align="center">
-  <sub>Developed with sustainable dedication by <strong>Angkatan Primordial</strong> · All Rights Reserved</sub>
+  <sub>Developed with dedication by <strong>Angkatan Primordial</strong> · SMAN 1 Malingping</sub>
 </div>

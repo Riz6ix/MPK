@@ -167,9 +167,10 @@ export default function ReactAlumniTable() {
     if (!silent) setLoading(true);
     else setIsRefreshing(true);
     try {
+      // Ambil kolom alumni dan relasi angkatan secara eksplisit
       const { data, error } = await supabase
         .from('alumni')
-        .select('*, generations(id, name, active_year, graduation_year)')
+        .select('id, name, position, class, commission, gender, avatar_url, order_index, generation_id, created_at, updated_at, generations(id, name, active_year, graduation_year)')
         .order('name', { ascending: true });
       if (error) throw error;
       if (data) setAlumni(data);
@@ -183,9 +184,10 @@ export default function ReactAlumniTable() {
 
   const fetchGenerations = async () => {
     try {
+      // Ambil kolom angkatan secara eksplisit
       const { data, error } = await supabase
         .from('generations')
-        .select('*')
+        .select('id, name, active_year, graduation_year, created_at, updated_at')
         .order('graduation_year', { ascending: false });
       if (error) throw error;
       if (data) setGenerations(data);
@@ -196,9 +198,10 @@ export default function ReactAlumniTable() {
 
   const fetchPositions = async () => {
     try {
+      // Ambil kolom jabatan secara eksplisit
       const { data, error } = await supabase
         .from('positions')
-        .select('*')
+        .select('id, title, parent_id, order_index, commission, created_at')
         .order('order_index', { ascending: true });
       if (error) throw error;
       if (data) setPositions(data);

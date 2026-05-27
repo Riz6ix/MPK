@@ -11,19 +11,23 @@ let pendingAspirations = 0;
 let resolvedAspirations = 0;
 
 try {
-  const [membersRes, aspirationsRes, pendingRes, resolvedRes] = await Promise.all([
-    supabase.from('members').select('*', { count: 'exact', head: true }),
-    supabase.from('aspirations').select('*', { count: 'exact', head: true }),
-    supabase.from('aspirations').select('*', { count: 'exact', head: true }).eq('status', 'Belum Diproses'),
-    supabase.from('aspirations').select('*', { count: 'exact', head: true }).eq('status', 'Selesai')
+  // Ambil total pengurus dengan proyeksi kolom 'id' saja (head: true agar hemat bandwidth)
+  // dan panggil RPC get_aspirations_stats untuk agregasi keluhan siswa dalam 1 round-trip
+  const [membersRes, statsRes] = await Promise.all([
+    supabase.from('members').select('id', { count: 'exact', head: true }),
+    supabase.rpc('get_aspirations_stats')
   ]);
 
   totalMembers = membersRes.count || 0;
-  totalAspirations = aspirationsRes.count || 0;
-  pendingAspirations = pendingRes.count || 0;
-  resolvedAspirations = resolvedRes.count || 0;
+
+  if (statsRes.error) throw statsRes.error;
+
+  const stats = statsRes.data && statsRes.data[0];
+  totalAspirations = Number(stats?.total_count || 0);
+  pendingAspirations = Number(stats?.pending_count || 0);
+  resolvedAspirations = Number(stats?.resolved_count || 0);
 } catch (err) {
-  console.error("Gagal memuat statistik admin:", err);
+  console.error("Gagal memuat statistik admin via RPC:", err);
 }
 
 // Compute dynamic progress statistics
@@ -283,7 +287,7 @@ const resolvedPercent = totalAspirations > 0 ? Math.round((resolvedAspirations /
       try {
         const { data, error } = await supabase
           .from('memos')
-          .select('*')
+          .select('id, content, color, created_at')
           .order('created_at', { ascending: true });
 
         if (error) throw error;

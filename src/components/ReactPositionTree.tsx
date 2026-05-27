@@ -90,8 +90,9 @@ export default function ReactPositionTree() {
   const fetchData = async () => {
     setLoading(true);
     try {
+      // Ambil data jabatan secara spesifik dan relasi anggota untuk hirarki
       const [posRes, memRes] = await Promise.all([
-        supabase.from('positions').select('*').order('order_index', { ascending: true }),
+        supabase.from('positions').select('id, title, parent_id, order_index, commission, created_at').order('order_index', { ascending: true }),
         supabase.from('members').select('id, name, position')
       ]);
 
@@ -109,9 +110,10 @@ export default function ReactPositionTree() {
 
   const fetchPositionsOnly = async () => {
     try {
+      // Ambil data jabatan dengan kolom spesifik
       const { data, error } = await supabase
         .from('positions')
-        .select('*')
+        .select('id, title, parent_id, order_index, commission, created_at')
         .order('order_index', { ascending: true });
       if (error) throw error;
       if (data) setPositions(data);

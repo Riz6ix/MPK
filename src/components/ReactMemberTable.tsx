@@ -197,9 +197,10 @@ export default function ReactMemberTable() {
       setIsRefreshing(true);
     }
     try {
+      // Ambil kolom pengurus secara eksplisit untuk efisiensi transfer data
       const { data, error } = await supabase
         .from('members')
-        .select('*')
+        .select('id, name, position, class, commission, avatar_url, order_index, created_at, updated_at, gender, status, generation')
         .order('name', { ascending: true });
 
       if (error) throw error;
@@ -214,9 +215,10 @@ export default function ReactMemberTable() {
 
   const fetchPositions = async () => {
     try {
+      // Ambil kolom struktur jabatan secara eksplisit
       const { data, error } = await supabase
         .from('positions')
-        .select('*')
+        .select('id, title, parent_id, order_index, commission, created_at')
         .order('order_index', { ascending: true });
 
       if (error) throw error;

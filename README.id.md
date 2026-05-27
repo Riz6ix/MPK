@@ -6,13 +6,13 @@
   <br />
   <br />
 
-  <h1>🌲 Majelis Perwakilan Kelas 🍂</h1>
-  <p>🏛️ <em>SMA Negeri 1 Malingping</em></p>
+  <h1>🍂 MAJELIS PERWAKILAN KELAS 🍃</h1>
+  <p><sub>SMA Negeri 1 Malingping</sub></p>
 
   <p>
-    <strong>Tempat bernaung bagi tata kelola kesiswaan — estetika hutan yang hangat, performa rekayasa tinggi.</strong>
+    <strong>Website portal kesiswaan yang sederhana, nyaman di mata, dan berkeamanan tinggi.</strong>
     <br />
-    <em>Akar relasi yang saling berbisik · kueri sub-milidetik · perlindungan privasi berlapis</em>
+    <em>Navigasi bersahabat · kueri database cepat · perlindungan privasi yang ketat</em>
   </p>
 
   <p>
@@ -29,19 +29,19 @@
 
 ---
 
-### ✦ 🍃 Estetika Forest Academy & Kertas Perkamen
+### ✦ 🍃 Desain *Cozy* & Hangat
 
-*Didesain dengan psikologi tata letak untuk kenyamanan mata dan keterlibatan yang alami:*
+*Tampilan visual yang ramah dan nyaman untuk interaksi warga sekolah:*
 
-- 🌿 **Kanvas Hutan Hangat** — Forest green pekat `#2e473b`, aksen emas amber, latar kertas perkamen
-- 🍂 **Transisi Daun Mengalir** — Panel akordion dan dropdown yang terasa selembut desiran daun angin
-- ✨ **Debu Emas Melayang** — Partikel piksel emas bergaya Minecraft yang mengapung tenang di latar belakang
+- 🌿 **Warna Alami** — Kombinasi hijau hutan lembut, aksen emas hangat, dan latar belakang kertas perkamen
+- 🍂 **Transisi Mulus** — Animasi natural pada panel akordion dan dropdown yang terasa bersahabat di mata
+- ✨ **Debu Emas Melayang** — Partikel piksel emas khas Minecraft yang bergerak tenang di latar belakang
 
 ---
 
-### ✦ 🕸️ Jalinan Akar Relasi Kesiswaan
+### ✦ 🕸️ Alur Relasi Data (*Database*)
 
-*Suara siswa mengalir melalui akar jalinan relasi — layaknya pohon data hutan yang hidup:*
+*Semua data kesiswaan mengalir lancar melalui relasi database yang terstruktur:*
 
 ```mermaid
 flowchart LR
@@ -52,22 +52,24 @@ flowchart LR
     C <--> D[🌿 Hirarki Jabatan]
 ```
 
-- 🌱 **Sinkronisasi Akar Dinamis** — Aspirasi masuk otomatis dikelompokkan ke direktori kelas & terikat ke daftar perwakilan aktif secara real-time
-- 📜 **Arsip Kuno Angkatan** — Riwayat alumni dan masa bakti terdahulu diarsipkan di simpul relasional terpisah
+- 🌱 **Pengelompokan Otomatis** — Aspirasi yang masuk otomatis dikelompokkan berdasarkan kelas pelapor secara seketika (*real-time*)
+- 📜 **Daftar Purna Bakti** — Data alumni dan pengurus masa bakti terdahulu tersimpan aman di tabel terpisah
 
 ---
 
-### ✦ ⚡ Meja Ek Tua & Alat Administratif Cerdas
+### ✦ ⚡ Fitur Cerdas Admin
 
-- 📋 **Smart Quill Import** — Tempel daftar mentah; sistem otomatis mengurai kelas, komisi, gender & menyematkan avatar Dicebear
-- 🔏 **Segel Kerajaan** — Batasan database mengunci peran `"Developer"` secara eksklusif hanya untuk **Rizky Setiawan** *(Angkatan Primordial)*
-- 📎 **Memo Perkamen** — Catatan local-storage interaktif & widget kutipan kepemimpinan harian
+*Alat administratif praktis untuk menyederhanakan tugas pengurus MPK:*
+
+- 📋 **Impor Daftar Cepat** — Tinggal tempel daftar nama; sistem otomatis membaca kelas, komisi, gender, dan membuat avatar Dicebear
+- 🔏 **Kunci Pengembang** — Aturan database mengunci peran `"Developer"` secara eksklusif hanya untuk **Rizky Setiawan**
+- 📎 **Memo & Nasihat** — Papan catatan tempel interaktif dan widget kata bijak kepemimpinan harian
 
 ---
 
-### ✦ 🛡️ Penjaga Pohon Ek (Benteng Privasi & Keamanan)
+### ✦ 🛡️ Sistem Keamanan & Privasi
 
-*Setiap suara siswa melewati tiga gerbang penjaga sebelum mencapai akar jalinan:*
+*Menjamin suara siswa terkirim dengan aman melalui perlindungan *backend* berlapis:*
 
 ```mermaid
 flowchart TD
@@ -76,37 +78,37 @@ flowchart TD
     classDef block fill:#fdf0f0,stroke:#c05c5c,stroke-width:2px,color:#803030
     classDef dec fill:#fffdf3,stroke:#c5a880,stroke-width:2px,color:#4a3b2f
 
-    A[🗳 Suara Siswa] --> B{🕸 Honeypot Kosong?}:::dec
-    B -- Bot --> C[🍂 Gugur ke Bumi]:::block
-    B -- Manusia --> D{⏳ Cooldown Peranti?}:::dec
-    D -- Terkunci --> E[💤 Rehat]:::block
+    A[🗳 Suara Siswa] --> B{🕸 Honeypot OK?}:::dec
+    B -- Bot --> C[🍂 Ditolak]:::block
+    B -- Manusia --> D{⏳ Cooldown Perangkat?}:::dec
+    D -- Terkunci --> E[💤 Tunggu]:::block
     D -- Bebas --> F{🌲 Batas IP OK?}:::dec
-    F -- Terlampaui --> G[🛡 Ditahan Penjaga]:::block
+    F -- Terlampaui --> G[🛡 Ditahan]:::block
     F -- Diizinkan --> H[🍃 Tersimpan Aman]:::safe
 ```
 
-- 🕷️ **Jebakan Honeypot** — Kolom tersembunyi seperti jaring laba-laba yang menangkap bot spam secara senyap
-- ⏱️ **Rate Limit Ramah** — 5 kiriman/jam per IP, cooldown 1 jam per perangkat; bersahabat dengan Wi-Fi sekolah
-- 🧱 **Tembok Batu RLS** — PostgreSQL Row-Level Security aktif di seluruh 7 tabel utama
+- 🕷️ **Jebakan *Honeypot*** — Input tersembunyi yang mendeteksi dan membuang bot spam secara senyap
+- ⏱️ **Batas Frekuensi** — Pembatasan jumlah kiriman (*rate limit*) per jam dan waktu jeda (*cooldown*) perangkat untuk mencegah database macet
+- 🧱 **PostgreSQL RLS** — Kebijakan *Row-Level Security* aktif penuh di semua tabel database utama
 
 ---
 
-### 🚀 Menyalakan Lentera *(Panduan Setup Lokal)*
+### 🚀 Panduan *Setup* Lokal
 
 ```bash
-# Klon & pasang dependensi
+# Klon dan pasang dependensi
 git clone https://github.com/Riz6ix/MPK.git && cd MPK && npm install
 
-# Isi kredensial ke .env
+# Masukkan kredensial proyek ke .env
 echo 'PUBLIC_SUPABASE_URL="https://proyek-anda.supabase.co"
 PUBLIC_SUPABASE_ANON_KEY="kunci-anon-anda"' > .env
 
 # Jalankan server lokal
 npm run dev
 ```
-> Buka [http://localhost:4321](http://localhost:4321) · membutuhkan kredensial proyek Supabase
+> Buka [http://localhost:4321](http://localhost:4321) · membutuhkan akun & kredensial Supabase
 
 ---
 <div align="center">
-  <sub>Dikembangkan dengan dedikasi yang berkelanjutan oleh <strong>Angkatan Primordial</strong> · Seluruh Hak Dilindungi</sub>
+  <sub>Dikembangkan dengan dedikasi oleh <strong>Angkatan Primordial</strong> · SMAN 1 Malingping</sub>
 </div>

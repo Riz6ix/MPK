@@ -80,8 +80,9 @@ export default function ReactClassManager() {
   const fetchData = async () => {
     setLoading(true);
     try {
+      // Ambil data kelas secara spesifik beserta profil anggota aktif untuk rekap
       const [classRes, memberRes] = await Promise.all([
-        supabase.from('classes').select('*').order('grade', { ascending: false }).order('order_index', { ascending: true }),
+        supabase.from('classes').select('id, name, grade, order_index, is_active, created_at, updated_at').order('grade', { ascending: false }).order('order_index', { ascending: true }),
         supabase.from('members').select('id, name, class, status, position, avatar_url').eq('status', 'Aktif')
       ]);
 
@@ -99,9 +100,10 @@ export default function ReactClassManager() {
 
   const fetchClassesOnly = async () => {
     try {
+      // Ambil data kelas dengan kolom spesifik
       const { data, error } = await supabase
         .from('classes')
-        .select('*')
+        .select('id, name, grade, order_index, is_active, created_at, updated_at')
         .order('grade', { ascending: false })
         .order('order_index', { ascending: true });
       if (error) throw error;
