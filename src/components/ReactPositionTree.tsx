@@ -159,7 +159,7 @@ export default function ReactPositionTree() {
           .eq('id', editingId);
 
         if (error) throw error;
-        setSuccessMessage('Jabatan berhasil diperbarui!');
+        setSuccessMessage('Aman, jabatan diperbarui.');
       } else {
         // Get max order index for new item
         const sameComm = positions.filter(p => p.commission === commission);
@@ -171,7 +171,7 @@ export default function ReactPositionTree() {
           .insert([payload]);
 
         if (error) throw error;
-        setSuccessMessage('Jabatan baru berhasil ditambahkan!');
+        setSuccessMessage(`Selesai, jabatan ${title.trim()} ditambahkan.`);
       }
 
       handleReset();
@@ -192,7 +192,7 @@ export default function ReactPositionTree() {
       const suffix = assignedMembers.length > 3 ? ` dan ${assignedMembers.length - 3} lainnya` : '';
       (window as any).showCozyConfirm(
         'Hapus Jabatan',
-        `⚠️ PERINGATAN: Ada ${assignedMembers.length} pengurus (${memberNames}${suffix}) yang menempati jabatan "${titleStr}". Jika dihapus, mereka tetap terdaftar tetapi jabatannya harus diperbarui di CMS. Apakah Anda yakin ingin tetap menghapus jabatan ini?`,
+        `Jabatan "${titleStr}" masih diisi ${assignedMembers.length} orang (${memberNames}${suffix}). Hapus jabatan dan kosongkan posisi mereka?`,
         async () => {
           await executeDelete(id);
         }
@@ -200,7 +200,7 @@ export default function ReactPositionTree() {
     } else {
       (window as any).showCozyConfirm(
         'Hapus Jabatan',
-        `Apakah Anda yakin ingin menghapus jabatan "${titleStr}"?`,
+        `Hapus jabatan "${titleStr}"? Ga bisa balik lagi ya.`,
         async () => {
           await executeDelete(id);
         }
@@ -231,7 +231,7 @@ export default function ReactPositionTree() {
         console.error('Gagal melakukan cascade reset pengurus:', cascadeError);
       }
 
-      setSuccessMessage(`Jabatan "${posToDelete.title}" berhasil dihapus dan posisi pengurus terkait di-reset ke "Anggota"!`);
+      setSuccessMessage(`Aman, jabatan ${posToDelete.title} dihapus. Pengurus terkait di-reset ke Anggota.`);
       await fetchData();
     } catch (err: any) {
       setErrorMessage('Gagal menghapus jabatan: ' + err.message);
@@ -435,7 +435,7 @@ export default function ReactPositionTree() {
               type="text"
               required
               placeholder="Contoh: Koordinator Komisi X"
-              className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200"
+              className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 leading-normal"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -447,7 +447,7 @@ export default function ReactPositionTree() {
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium"
+                className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium leading-normal"
               >
                 <span className="truncate">
                   {parentSelection === '__INTI__' 

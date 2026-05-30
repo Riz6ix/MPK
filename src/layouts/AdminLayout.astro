@@ -96,6 +96,14 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
             <span>Hirarki Jabatan</span>
           </a>
           <a 
+            href="/admin/homepage" 
+            class="flex items-center space-x-3.5 px-4 py-3 rounded-xl hover:bg-[#463629] text-cream-200/80 hover:text-white transition-all group"
+            id="nav-homepage"
+          >
+            <i class="ph-duotone ph-desktop text-cream-300/30 group-hover:text-cream-500 text-lg transition"></i>
+            <span>Kelola Beranda</span>
+          </a>
+          <a 
             href="/admin/classes" 
             class="flex items-center space-x-3.5 px-4 py-3 rounded-xl hover:bg-[#463629] text-cream-200/80 hover:text-white transition-all group"
             id="nav-classes"
@@ -227,9 +235,10 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
       const navPositions = document.getElementById('nav-positions');
       const navAspirations = document.getElementById('nav-aspirations');
       const navClasses = document.getElementById('nav-classes');
+      const navHomepage = document.getElementById('nav-homepage');
 
       // Clear standard styling
-      const links = [navOverview, navMembers, navAlumni, navPositions, navAspirations, navClasses];
+      const links = [navOverview, navMembers, navAlumni, navPositions, navAspirations, navClasses, navHomepage];
       links.forEach(link => {
         link?.classList.remove('bg-[#4A3B2F]', 'text-cream-500', 'border-r-4', 'border-cream-500', 'text-white');
         link?.classList.add('text-cream-200/80');
@@ -244,6 +253,9 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
       } else if (currentPath.includes('/admin/alumni')) {
         navAlumni?.classList.add('bg-[#4A3B2F]', 'text-cream-500', 'border-r-4', 'border-cream-500');
         navAlumni?.classList.remove('text-cream-200/80');
+      } else if (currentPath.includes('/admin/homepage')) {
+        navHomepage?.classList.add('bg-[#4A3B2F]', 'text-cream-500', 'border-r-4', 'border-cream-500');
+        navHomepage?.classList.remove('text-cream-200/80');
       } else if (currentPath.includes('/admin/positions')) {
         navPositions?.classList.add('bg-[#4A3B2F]', 'text-cream-500', 'border-r-4', 'border-cream-500');
         navPositions?.classList.remove('text-cream-200/80');
@@ -344,7 +356,7 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
 
       // Logout handler
       document.getElementById('logout-btn')?.addEventListener('click', () => {
-        (window as any).showCozyConfirm('Keluar Sesi', 'Apakah Anda yakin ingin keluar dari sesi admin?', async () => {
+        (window as any).showCozyConfirm('Keluar Sesi', 'Keluar sesi? Sampai jumpa.', async () => {
           await supabase.auth.signOut();
           // Delete cookies on logout safely across HTTP (local dev) and HTTPS
           const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';

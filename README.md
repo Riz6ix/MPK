@@ -10,9 +10,9 @@
   <p><sub>SMA Negeri 1 Malingping</sub></p>
 
   <p>
-    <strong>A simple, cozy, and highly secure student governance portal.</strong>
+    <strong>A secure, sustainable, and cozy student governance portal for SMAN 1 Malingping.</strong>
     <br />
-    <em>Friendly user experience · optimized database queries · tight privacy protection</em>
+    <em>Built for zero-cost hosting, elegant readability, and watertight Supabase privacy protection.</em>
   </p>
 
   <p>

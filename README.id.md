@@ -10,9 +10,9 @@
   <p><sub>SMA Negeri 1 Malingping</sub></p>
 
   <p>
-    <strong>Website portal kesiswaan yang sederhana, nyaman di mata, dan berkeamanan tinggi.</strong>
+    <strong>Portal kesiswaan MPK SMAN 1 Malingping yang aman, berkelanjutan, dan nyaman di mata (cozy).</strong>
     <br />
-    <em>Navigasi bersahabat · kueri database cepat · perlindungan privasi yang ketat</em>
+    <em>Didesain untuk optimasi bebas biaya, keterbacaan elegan, dan keamanan data Supabase yang ketat.</em>
   </p>
 
   <p>

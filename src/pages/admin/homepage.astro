@@ -1,0 +1,22 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ReactHomepageEditor from '../../components/ReactHomepageEditor.tsx';
+
+// Hybrid mode - SSR at edge
+export const prerender = false;
+---
+
+<AdminLayout title="Kelola Konten Beranda Publik (Dynamic CMS) - Admin Panel">
+  <div class="space-y-8">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+        <i class="ph-duotone ph-desktop text-slate-800"></i>
+        Kelola Beranda Publik
+      </h2>
+      <p class="text-xs text-slate-600 font-medium mt-1">Sunting teks hero, slogan, deskripsi, visi-misi, serta program kerja komisi beranda publik secara dinamis tanpa menyentuh kode.</p>
+    </div>
+
+    {/* Load hydrated Homepage Editor component */}
+    <ReactHomepageEditor client:load />
+  </div>
+</AdminLayout>

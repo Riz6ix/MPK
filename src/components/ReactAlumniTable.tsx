@@ -220,7 +220,7 @@ export default function ReactAlumniTable() {
         graduation_year: newGenGradYear,
       }]);
       if (error) throw error;
-      setSuccessMessage(`Angkatan "${newGenName}" berhasil ditambahkan!`);
+      setSuccessMessage(`Selesai, angkatan ${newGenName} ditambahkan.`);
       setNewGenName('');
       setShowNewGenForm(false);
       await fetchGenerations();
@@ -372,11 +372,11 @@ export default function ReactAlumniTable() {
       if (editingId) {
         const { error } = await supabase.from('alumni').update(payload).eq('id', editingId);
         if (error) throw error;
-        setSuccessMessage('Data alumni berhasil diperbarui!');
+        setSuccessMessage('Aman, data alumni diperbarui.');
       } else {
         const { error } = await supabase.from('alumni').insert([payload]);
         if (error) throw error;
-        setSuccessMessage('Alumni baru berhasil ditambahkan!');
+        setSuccessMessage('Selesai, alumni ditambahkan.');
       }
       handleReset();
       await fetchAlumni(true);
@@ -390,12 +390,12 @@ export default function ReactAlumniTable() {
   const handleDelete = (id: string) => {
     (window as any).showCozyConfirm(
       'Hapus Alumni',
-      'Apakah Anda yakin ingin menghapus data alumni ini secara permanen?',
+      'Hapus alumni ini? Ga bisa balik lagi ya.',
       async () => {
         try {
           const { error } = await supabase.from('alumni').delete().eq('id', id);
           if (error) throw error;
-          setSuccessMessage('Alumni berhasil dihapus!');
+          setSuccessMessage('Aman, alumni dihapus.');
           await fetchAlumni(true);
         } catch (err: any) {
           setErrorMessage('Gagal menghapus alumni: ' + err.message);
@@ -407,7 +407,7 @@ export default function ReactAlumniTable() {
   const handleReactivate = (member: Alumni) => {
     (window as any).showCozyConfirm(
       'Aktifkan Kembali',
-      `Pindahkan ${member.name} kembali sebagai anggota aktif? Data akan dihapus dari alumni.`,
+      `Aktifin kembali ${member.name} jadi pengurus aktif?`,
       async () => {
         try {
           // INSERT ke members
@@ -424,7 +424,7 @@ export default function ReactAlumniTable() {
           // DELETE dari alumni
           const { error: delError } = await supabase.from('alumni').delete().eq('id', member.id);
           if (delError) throw delError;
-          setSuccessMessage(`${member.name} berhasil diaktifkan kembali sebagai anggota aktif!`);
+          setSuccessMessage(`Selesai, ${member.name} diaktifkan kembali.`);
           await fetchAlumni(true);
         } catch (err: any) {
           setErrorMessage('Gagal mengaktifkan kembali: ' + err.message);
@@ -465,7 +465,7 @@ export default function ReactAlumniTable() {
             <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Nama Lengkap</label>
             <input
               type="text" required
-              className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200"
+              className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 leading-normal"
               value={name} onChange={e => setName(e.target.value)}
             />
           </div>
@@ -476,7 +476,7 @@ export default function ReactAlumniTable() {
               <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Kelas Akhir</label>
               <select
                 required
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer font-medium"
+                className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer font-medium leading-normal"
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
               >
@@ -497,7 +497,7 @@ export default function ReactAlumniTable() {
             <div ref={commRef} className="relative">
               <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Komisi</label>
               <button type="button" onClick={() => setIsCommOpen(!isCommOpen)}
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium">
+                className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium leading-normal">
                 <span>{commission === 'Inti' ? 'Inti' : `Komisi ${commission}`}</span>
                 <i className={`ph-bold ${isCommOpen ? 'ph-caret-up' : 'ph-caret-down'} text-slate-400 text-sm`}></i>
               </button>
@@ -519,7 +519,7 @@ export default function ReactAlumniTable() {
           <div ref={posRef} className="relative">
             <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Jabatan Masa Khidmat</label>
             <button type="button" onClick={() => setIsPosOpen(!isPosOpen)}
-              className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium">
+              className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium leading-normal">
               <span className="truncate">{position || 'Pilih Jabatan...'}</span>
               <i className={`ph-bold ${isPosOpen ? 'ph-caret-up' : 'ph-caret-down'} text-slate-400 text-sm`}></i>
             </button>
@@ -547,7 +547,7 @@ export default function ReactAlumniTable() {
                 { val: 'Laki-laki', label: 'Laki-Laki', color: 'blue' },
                 { val: 'Perempuan', label: 'Perempuan', color: 'pink' },
               ].map(g => (
-                <label key={g.val} className={`flex items-center justify-center py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all duration-200 ${
+                <label key={g.val} className={`flex items-center justify-center py-3 px-4 rounded-xl border text-xs font-bold cursor-pointer transition-all duration-200 ${
                   gender === g.val
                     ? g.color === 'blue' ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-sm' : 'bg-pink-50 border-pink-300 text-pink-700 shadow-sm'
                     : 'bg-white border-cream-200 text-slate-600 hover:bg-cream-50'
@@ -578,18 +578,18 @@ export default function ReactAlumniTable() {
                 <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider font-mono">Tambah Angkatan Baru</p>
                 <input
                   type="text" placeholder="Nama angkatan (e.g. Angkatan II)"
-                  className="w-full bg-white border border-cream-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-cream-500 transition"
+                  className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-cream-500 transition leading-normal"
                   value={newGenName} onChange={e => setNewGenName(e.target.value)}
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="text-[9px] font-bold text-slate-500 font-mono block mb-0.5">Masa Khidmat (Tahun)</label>
-                    <input type="number" className="w-full bg-white border border-cream-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-cream-500 transition"
+                    <input type="number" className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-cream-500 transition leading-normal"
                       value={newGenActiveYear} onChange={e => setNewGenActiveYear(Number(e.target.value))} />
                   </div>
                   <div>
                     <label className="text-[9px] font-bold text-slate-500 font-mono block mb-0.5">Lulus (Tahun)</label>
-                    <input type="number" className="w-full bg-white border border-cream-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-cream-500 transition"
+                    <input type="number" className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-xs text-slate-800 focus:outline-none focus:border-cream-500 transition leading-normal"
                       value={newGenGradYear} onChange={e => setNewGenGradYear(Number(e.target.value))} />
                   </div>
                 </div>
@@ -608,7 +608,7 @@ export default function ReactAlumniTable() {
 
             <div ref={genRef} className="relative">
               <button type="button" onClick={() => setIsGenOpen(!isGenOpen)}
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium">
+                className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium leading-normal">
                 <span className="truncate">{selectedGen ? selectedGen.name : 'Pilih Angkatan...'}</span>
                 <i className={`ph-bold ${isGenOpen ? 'ph-caret-up' : 'ph-caret-down'} text-slate-400 text-sm shrink-0`}></i>
               </button>
@@ -648,7 +648,7 @@ export default function ReactAlumniTable() {
           <div ref={styleRef} className="relative mb-3">
             <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Gaya Avatar</label>
             <button type="button" onClick={() => setIsStyleOpen(!isStyleOpen)}
-              className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-xs focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-bold">
+              className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-xs focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-bold leading-normal">
               <span>
                 {avatarStyle === 'all' ? '🎲 All' :
                  avatarStyle === 'identicon' ? 'Identicon (Pola Geometris)' :

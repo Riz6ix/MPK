@@ -71,6 +71,41 @@ try {
   console.error("Gagal mengambil data aspirasi:", err);
 }
 
+// Fetch homepage configuration for Dynamic CMS
+let homepageConfigs: any[] = [];
+try {
+  const { data, error } = await supabase
+    .from('homepage_config')
+    .select('key, value, json_value');
+  
+  if (!error && data) {
+    homepageConfigs = data;
+  }
+} catch (err) {
+  console.error("Gagal mengambil data konfigurasi beranda:", err);
+}
+
+const getConfig = (key: string, fallback: string): string => {
+  const config = homepageConfigs.find(c => c.key === key);
+  return config && config.value !== null && config.value !== undefined ? config.value : fallback;
+};
+
+const getConfigJson = <T,>(key: string, fallback: T): T => {
+  const config = homepageConfigs.find(c => c.key === key);
+  return config && config.json_value ? (config.json_value as T) : fallback;
+};
+
+const formatHeroTitle = (title: string): string => {
+  // Ganti newline literal '\n' atau newline nyata dengan pembagian baris
+  const lines = title.split(/\\n|\n/);
+  if (lines.length > 1) {
+    const firstLine = lines[0].trim();
+    const secondLine = lines.slice(1).join(' ').trim();
+    return `${firstLine}<br/>\n<span class="bg-gradient-to-r from-cream-500 via-yellow-700 to-amber-800 bg-clip-text text-transparent">${secondLine}</span>`;
+  }
+  return title;
+};
+
 const getStatusStyles = (status: string) => {
   switch (status) {
     case 'Selesai':
@@ -129,14 +164,34 @@ const commissionD = activeMembers.filter(m => m.commission === 'D');
 const commissionE = activeMembers.filter(m => m.commission === 'E');
 const commissionF = activeMembers.filter(m => m.commission === 'F');
 
-const commissions = [
-  { id: 'A', title: 'Komisi A', desc: 'Mengawasi kerja OSIS seksi bidang 1 sampai 4. Menyusun aturan dasar organisasi (AD/ART).', list: commissionA },
-  { id: 'B', title: 'Komisi B', desc: 'Mengawasi kerja OSIS seksi bidang 5 sampai 7. Menyusun AD/ART organisasi.', list: commissionB },
-  { id: 'C', title: 'Komisi C', desc: 'Mengawasi seluruh program kerja OSIS dan menjadi tim evaluasi kinerja umum.', list: commissionC },
-  { id: 'D', title: 'Komisi D', desc: 'Berperan sebagai tim penampung dan penyalur aspirasi warga sekolah.', list: commissionD },
-  { id: 'E', title: 'Komisi E', desc: 'Mengelola media digital publikasi dan penyebaran informasi kegiatan sekolah.', list: commissionE },
-  { id: 'F', title: 'Komisi F', desc: 'Melakukan pengawasan internal dan evaluasi objektif program kerja MPK.', list: commissionF }
-];
+const commissionsConfig = getConfigJson('commissions_config', [
+  { id: 'A', title: 'Komisi A', desc: 'Mengawasi kerja OSIS seksi bidang 1 sampai 4. Menyusun aturan dasar organisasi (AD/ART).' },
+  { id: 'B', title: 'Komisi B', desc: 'Mengawasi kerja OSIS seksi bidang 5 sampai 7. Menyusun AD/ART organisasi.' },
+  { id: 'C', title: 'Komisi C', desc: 'Mengawasi seluruh program kerja OSIS dan menjadi tim evaluasi kinerja umum.' },
+  { id: 'D', title: 'Komisi D', desc: 'Berperan sebagai tim penampung dan penyalur aspirasi warga sekolah.' },
+  { id: 'E', title: 'Komisi E', desc: 'Mengelola media digital publikasi dan penyebaran informasi kegiatan sekolah.' },
+  { id: 'F', title: 'Komisi F', desc: 'Melakukan pengawasan internal dan evaluasi objektif program kerja MPK.' }
+]);
+
+const commissionLists: Record<string, any[]> = {
+  'A': commissionA,
+  'B': commissionB,
+  'C': commissionC,
+  'D': commissionD,
+  'E': commissionE,
+  'F': commissionF
+};
+
+const commissions = commissionsConfig.map((comm: any) => ({
+  ...comm,
+  list: commissionLists[comm.id] || []
+}));
+
+const programKerjaUtama = getConfigJson('program_kerja_utama', [
+  { title: 'Forum Aspirasi', desc: 'Menyelenggarakan forum terbuka dan penampungan aspirasi tertulis secara berkala untuk menyerap keluhan, saran, dan ide progresif dari seluruh murid.', icon: 'oak_sapling.png' },
+  { title: 'Wakil Siswa', desc: 'Bertindak sebagai pengawas independen program kerja OSIS, mengawal jalannya sidang evaluasi tengah dan akhir periode dengan asas objektivitas tinggi.', icon: 'shield.png' },
+  { title: 'Penggerak Legislatif', desc: 'Menyampaikan informasi kebijakan sekolah secara transparan, mendorong kedisiplinan koordinasi organisasi, serta merumuskan pembaharuan AD/ART.', icon: 'map.png' }
+]);
 
 // Fetch Alumni (Purna Bakti) from dedicated alumni table with generation join
 let alumniMembers: any[] = [];
@@ -176,24 +231,21 @@ const sortedGenerations = Object.keys(demisionerByGen).sort((a, b) => b.localeCo
       <div class="animate-fade-up" style="animation-delay:0.1s">
         <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-cream-200 border border-cream-400/50 text-[9px] font-bold text-slate-600 uppercase tracking-wider mb-6 font-pixel">
           <img src="/images/mc/oak_leaves.png" class="w-4 h-4 pixelated shrink-0" alt="Leaves" />
-          Majelis Perwakilan Kelas
+          {getConfig('hero_badge_text', 'Majelis Perwakilan Kelas')}
         </span>
-        <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-charcoal-900 leading-tight uppercase">
-          Suara Anda,<br/>
-          <span class="bg-gradient-to-r from-cream-500 via-yellow-700 to-amber-800 bg-clip-text text-transparent">Masa Depan Kita</span>
-        </h1>
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-charcoal-900 leading-tight uppercase" set:html={formatHeroTitle(getConfig('hero_title', 'Suara Anda,\nMasa Depan Kita'))} />
       </div>
       
       <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed font-light animate-fade-up" style="animation-delay:0.3s">
-        Majelis Perwakilan Kelas SMAN 1 Malingping hadir sebagai pengawal aspirasi siswa, pengawas objektif kinerja OSIS, dan katalisator demokrasi demi menciptakan ekosistem sekolah yang harmonis, transparan, dan inklusif.
+        {getConfig('hero_description', 'Majelis Perwakilan Kelas SMAN 1 Malingping hadir sebagai pengawal aspirasi siswa, pengawas objektif kinerja OSIS, dan katalisator demokrasi demi menciptakan ekosistem sekolah yang harmonis, transparan, dan inklusif.')}
       </p>
 
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 animate-fade-up" style="animation-delay:0.5s">
         <a href="#aspirasi" class="w-full sm:w-auto px-8 py-4 rounded-full text-white font-bold text-sm shadow-lg cursor-pointer btn-shimmer">
-          🌱 Sampaikan Aspirasi Sekarang
+          {getConfig('hero_cta_text', '🌱 Sampaikan Aspirasi Sekarang')}
         </a>
         <a href="#about" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white border border-cream-400 text-slate-700 font-bold text-sm hover:bg-cream-200 hover:text-slate-900 transition duration-200 shadow-sm cursor-pointer">
-          Pelajari Peran Kami ↓
+          {getConfig('hero_secondary_cta_text', 'Pelajari Peran Kami ↓')}
         </a>
       </div>
     </div>
@@ -230,7 +282,7 @@ const sortedGenerations = Object.keys(demisionerByGen).sort((a, b) => b.localeCo
               <h3 class="text-lg font-bold text-charcoal-900 uppercase tracking-wide">Visi</h3>
             </div>
             <p class="text-sm text-slate-600 leading-relaxed font-light">
-              Mewujudkan MPK SMAN 1 Malingping sebagai organisasi yang visioner, adaptif, dan profesional dalam menjalankan peran strategisnya sebagai pengawal aspirasi siswa, pengawas OSIS, serta sebagai mitra kolaboratif yang aktif membangun budaya sekolah yang demokratis, partisipatif, dan berintegritas.
+              {getConfig('visi_text', 'Mewujudkan MPK SMAN 1 Malingping sebagai organisasi yang visioner, adaptif, dan profesional dalam menjalankan peran strategisnya sebagai pengawal aspirasi siswa, pengawas OSIS, serta sebagai mitra kolaboratif yang aktif membangun budaya sekolah yang demokratis, partisipatif, dan berintegritas.')}
             </p>
           </div>
  
@@ -247,22 +299,17 @@ const sortedGenerations = Object.keys(demisionerByGen).sort((a, b) => b.localeCo
             <h3 class="text-lg font-bold text-charcoal-900 uppercase tracking-wide">Misi</h3>
           </div>
           <ul class="space-y-3.5 text-xs sm:text-sm text-slate-600 font-light">
-            <li class="flex items-start space-x-3">
-              <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
-              <span>Membangun sinergi yang solid dan komunikatif antara MPK, OSIS, serta pihak sekolah dalam menciptakan lingkungan organisasi yang harmonis.</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
-              <span>Mengawasi pelaksanaan program kerja OSIS secara aktif dan objektif agar tetap selaras dengan rencana dan tujuan bersama.</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
-              <span>Mengoptimalkan peran MPK sebagai lembaga legislatif siswa yang bertanggung jawab, aspiratif, serta representatif.</span>
-            </li>
-            <li class="flex items-start space-x-3">
-              <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
-              <span>Mendorong penguatan karakter anggota MPK melalui pengembangan profesionalisme, integritas, dan etika organisasi.</span>
-            </li>
+            {getConfigJson('misi_list', [
+              "Membangun sinergi yang solid dan komunikatif antara MPK, OSIS, serta pihak sekolah dalam menciptakan lingkungan organisasi yang harmonis.",
+              "Mengawasi pelaksanaan program kerja OSIS secara aktif dan objektif agar tetap selaras dengan rencana dan tujuan bersama.",
+              "Mengoptimalkan peran MPK sebagai lembaga legislatif siswa yang bertanggung jawab, aspiratif, serta representatif.",
+              "Mendorong penguatan karakter anggota MPK melalui pengembangan profesionalisme, integritas, dan etika organisasi."
+            ]).map((misi: string) => (
+              <li class="flex items-start space-x-3">
+                <i class="ph-duotone ph-check-circle text-cream-500 text-lg shrink-0 mt-0.5"></i>
+                <span>{misi}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -520,47 +567,21 @@ const sortedGenerations = Object.keys(demisionerByGen).sort((a, b) => b.localeCo
       </div>
  
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl space-y-4 shadow-sm card-lift reveal group" style="transition-delay: 0ms">
-          <div class="p-2.5 bg-cream-100 rounded-xl w-fit transition-transform duration-300 group-hover:scale-110">
-            <img 
-              src="/images/mc/oak_sapling.png" 
-              class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
-              alt="Forum"
-            />
+        {programKerjaUtama.map((proker: any, i: number) => (
+          <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl space-y-4 shadow-sm card-lift reveal group" style={`transition-delay: ${i * 150}ms`}>
+            <div class="p-2.5 bg-cream-100 rounded-xl w-fit transition-transform duration-300 group-hover:scale-110">
+              <img 
+                src={`/images/mc/${proker.icon}`} 
+                class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
+                alt={proker.title}
+              />
+            </div>
+            <h3 class="text-base font-bold text-charcoal-900 uppercase tracking-wide">{proker.title}</h3>
+            <p class="text-xs text-slate-500 leading-relaxed font-light">
+              {proker.desc}
+            </p>
           </div>
-          <h3 class="text-base font-bold text-charcoal-900 uppercase tracking-wide">Forum Aspirasi</h3>
-          <p class="text-xs text-slate-500 leading-relaxed font-light">
-            Menyelenggarakan forum terbuka dan penampungan aspirasi tertulis secara berkala untuk menyerap keluhan, saran, dan ide progresif dari seluruh murid.
-          </p>
-        </div>
- 
-        <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl space-y-4 shadow-sm card-lift reveal group" style="transition-delay: 150ms">
-          <div class="p-2.5 bg-cream-100 rounded-xl w-fit transition-transform duration-300 group-hover:scale-110">
-            <img 
-              src="/images/mc/shield.png" 
-              class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
-              alt="Wakil"
-            />
-          </div>
-          <h3 class="text-base font-bold text-charcoal-900 uppercase tracking-wide">Wakil Siswa</h3>
-          <p class="text-xs text-slate-500 leading-relaxed font-light">
-            Bertindak sebagai pengawas independen program kerja OSIS, mengawal jalannya sidang evaluasi tengah dan akhir periode dengan asas objektivitas tinggi.
-          </p>
-        </div>
- 
-        <div class="bg-white/80 backdrop-blur-sm border border-cream-300/60 p-8 rounded-2xl space-y-4 shadow-sm card-lift reveal group" style="transition-delay: 300ms">
-          <div class="p-2.5 bg-cream-100 rounded-xl w-fit transition-transform duration-300 group-hover:scale-110">
-            <img 
-              src="/images/mc/map.png" 
-              class="w-8 h-8 pixelated group-hover:animate-float-cozy block" 
-              alt="Legislatif"
-            />
-          </div>
-          <h3 class="text-base font-bold text-charcoal-900 uppercase tracking-wide">Penggerak Legislatif</h3>
-          <p class="text-xs text-slate-500 leading-relaxed font-light">
-            Menyampaikan informasi kebijakan sekolah secara transparan, mendorong kedisiplinan koordinasi organisasi, serta merumuskan pembaharuan AD/ART.
-          </p>
-        </div>
+        ))}
       </div>
     </div>
   </section>

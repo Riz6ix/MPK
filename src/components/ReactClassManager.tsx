@@ -167,13 +167,13 @@ export default function ReactClassManager() {
           .update(payload)
           .eq('id', editingId);
         if (error) throw error;
-        setSuccessMessage(`Kelas ${formattedName} berhasil diperbarui.`);
+        setSuccessMessage(`Aman, kelas ${formattedName} diperbarui.`);
       } else {
         const { error } = await supabase
           .from('classes')
           .insert([payload]);
         if (error) throw error;
-        setSuccessMessage(`Kelas ${formattedName} berhasil ditambahkan.`);
+        setSuccessMessage(`Selesai, kelas ${formattedName} ditambahkan.`);
       }
       handleReset();
       fetchClassesOnly();
@@ -205,7 +205,7 @@ export default function ReactClassManager() {
     if (confirmDelete) {
       confirmDelete(
         'Hapus Kelas',
-        `Apakah Anda yakin ingin menghapus kelas ${cls.name}? Aksi ini tidak dapat dibatalkan.`,
+        `Hapus kelas ${cls.name}? Ga bisa balik lagi ya.`,
         async () => {
           try {
             const { error } = await supabase
@@ -213,7 +213,7 @@ export default function ReactClassManager() {
               .delete()
               .eq('id', cls.id);
             if (error) throw error;
-            setSuccessMessage(`Kelas ${cls.name} berhasil dihapus.`);
+            setSuccessMessage(`Selesai, kelas ${cls.name} dihapus.`);
             fetchClassesOnly();
           } catch (err: any) {
             setErrorMessage('Gagal menghapus kelas: ' + err.message);
@@ -222,7 +222,7 @@ export default function ReactClassManager() {
       );
     } else {
       // Fallback native confirm if custom dialog not bound
-      if (window.confirm(`Apakah Anda yakin ingin menghapus kelas ${cls.name}?`)) {
+      if (window.confirm(`Hapus kelas ${cls.name}?`)) {
         (async () => {
           try {
             const { error } = await supabase
@@ -230,7 +230,7 @@ export default function ReactClassManager() {
               .delete()
               .eq('id', cls.id);
             if (error) throw error;
-            setSuccessMessage(`Kelas ${cls.name} berhasil dihapus.`);
+            setSuccessMessage(`Selesai, kelas ${cls.name} dihapus.`);
             fetchClassesOnly();
           } catch (err: any) {
             setErrorMessage('Gagal menghapus kelas: ' + err.message);
@@ -273,7 +273,7 @@ export default function ReactClassManager() {
         const { error } = await supabase.from('classes').insert(defaultClasses);
         if (error) throw error;
 
-        setSuccessMessage('Berhasil membuat 31 Kelas Default (X-E1 s/d XII-F10)!');
+        setSuccessMessage('Selesai, 31 kelas default udah dibuat.');
         fetchData();
       } catch (err: any) {
         setErrorMessage('Gagal membuat kelas default: ' + err.message);
@@ -285,7 +285,7 @@ export default function ReactClassManager() {
     if (triggerConfirm) {
       triggerConfirm(
         'Seed Kelas Default',
-        'Aksi ini akan menghapus daftar kelas saat ini dan men-seed ulang 31 kelas default (X-E1 s/d XII-F10). Apakah Anda yakin?',
+        'Seed kelas default? Ini bakal nimpa data kelas yang lama ya.',
         runSeed
       );
     } else {
@@ -343,7 +343,7 @@ export default function ReactClassManager() {
       const { error: insError } = await supabase.from('classes').insert(inserts);
       if (insError) throw insError;
 
-      setSuccessMessage(`Berhasil menyinkronkan & mengimpor ${newClassesToInsert.length} kelas baru dari data anggota (${newClassesToInsert.join(', ')}).`);
+      setSuccessMessage(`Selesai, ${newClassesToInsert.length} kelas diimpor dari data anggota.`);
       fetchData();
     } catch (err: any) {
       setErrorMessage('Gagal menyinkronkan kelas dari anggota: ' + err.message);
@@ -467,7 +467,7 @@ export default function ReactClassManager() {
                   type="text" 
                   required
                   placeholder="Contoh: X-F12 / XII-F1"
-                  className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition font-medium uppercase"
+                  className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition font-medium uppercase leading-normal"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -477,7 +477,7 @@ export default function ReactClassManager() {
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono mb-1">Tingkatan</label>
                   <select 
-                    className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-cream-500 transition font-medium"
+                    className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-cream-500 transition font-medium leading-normal"
                     value={grade}
                     onChange={(e) => setGrade(e.target.value)}
                   >
@@ -493,7 +493,7 @@ export default function ReactClassManager() {
                     type="number" 
                     required
                     min={1}
-                    className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 focus:outline-none focus:border-cream-500 transition font-medium font-mono"
+                    className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-cream-500 transition font-medium font-mono leading-normal"
                     value={orderIndex}
                     onChange={(e) => setOrderIndex(parseInt(e.target.value) || 1)}
                   />

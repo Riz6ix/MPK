@@ -2,6 +2,7 @@
   "name": "mpk-smansamal",
   "type": "module",
   "version": "1.0.0",
+  "description": "Portal kesiswaan MPK SMAN 1 Malingping yang aman, berkelanjutan, dan nyaman di mata (cozy) berbasis Astro, React, dan Supabase.",
   "engines": {
     "node": ">=22.12.0"
   },

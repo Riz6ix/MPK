@@ -478,14 +478,14 @@ export default function ReactMemberTable() {
           .eq('id', editingId);
         
         if (error) throw error;
-        setSuccessMessage('Data anggota berhasil diperbarui!');
+        setSuccessMessage('Aman, data anggota diperbarui.');
       } else {
         const { error } = await supabase
           .from('members')
           .insert([payload]);
         
         if (error) throw error;
-        setSuccessMessage('Anggota baru berhasil ditambahkan!');
+        setSuccessMessage(`Selesai, ${cleanName} ditambahkan.`);
       }
 
       handleReset();
@@ -500,7 +500,7 @@ export default function ReactMemberTable() {
   const handleDelete = (id: string, memberName: string) => {
     (window as any).showCozyConfirm(
       'Hapus Anggota',
-      `Apakah Anda yakin ingin menghapus data "${memberName}" secara permanen?`,
+      `Hapus ${memberName}? Ga bisa balik lagi ya.`,
       async () => {
         setErrorMessage(null);
         setSuccessMessage(null);
@@ -508,7 +508,7 @@ export default function ReactMemberTable() {
         try {
           const { error } = await supabase.from('members').delete().eq('id', id);
           if (error) throw error;
-          setSuccessMessage('Anggota berhasil dihapus!');
+          setSuccessMessage(`Selesai, ${memberName} dihapus.`);
           await fetchMembers(true);
         } catch (err: any) {
           setErrorMessage('Gagal menghapus anggota: ' + err.message);
@@ -569,7 +569,7 @@ export default function ReactMemberTable() {
               type="text"
               required
               placeholder="Nama lengkap pengurus"
-              className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200"
+              className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 leading-normal"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -580,7 +580,7 @@ export default function ReactMemberTable() {
               <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Kelas</label>
               <select
                 required
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer font-medium"
+                className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer font-medium leading-normal"
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
               >
@@ -603,7 +603,7 @@ export default function ReactMemberTable() {
               <button
                 type="button"
                 onClick={() => setIsCommOpen(!isCommOpen)}
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium"
+                className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium leading-normal"
               >
                 <span>{commission === 'Inti' ? 'Inti' : `Komisi ${commission}`}</span>
                 <i className={`ph-bold ${isCommOpen ? 'ph-caret-up' : 'ph-caret-down'} text-slate-400 text-sm`}></i>
@@ -638,7 +638,7 @@ export default function ReactMemberTable() {
             <button
               type="button"
               onClick={() => setIsPosOpen(!isPosOpen)}
-              className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium"
+              className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium leading-normal"
             >
               <span className="truncate">{position || 'Pilih Jabatan...'}</span>
               <i className={`ph-bold ${isPosOpen ? 'ph-caret-up' : 'ph-caret-down'} text-slate-400 text-sm`}></i>
@@ -678,7 +678,7 @@ export default function ReactMemberTable() {
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider font-mono">Gender</label>
             <div className="grid grid-cols-2 gap-3">
-              <label className={`flex items-center justify-center py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all duration-200 ${
+              <label className={`flex items-center justify-center py-3 px-4 rounded-xl border text-xs font-bold cursor-pointer transition-all duration-200 ${
                 gender === 'Laki-laki' 
                   ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-sm' 
                   : 'bg-white border-cream-200 text-slate-600 hover:bg-cream-50'
@@ -696,7 +696,7 @@ export default function ReactMemberTable() {
                 </span>
               </label>
               
-              <label className={`flex items-center justify-center py-2 px-3 rounded-xl border text-xs font-bold cursor-pointer transition-all duration-200 ${
+              <label className={`flex items-center justify-center py-3 px-4 rounded-xl border text-xs font-bold cursor-pointer transition-all duration-200 ${
                 gender === 'Perempuan' 
                   ? 'bg-pink-50 border-pink-300 text-pink-700 shadow-sm' 
                   : 'bg-white border-cream-200 text-slate-600 hover:bg-cream-50'
@@ -723,7 +723,7 @@ export default function ReactMemberTable() {
                 type="text"
                 required
                 placeholder="Contoh: Angkatan I"
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200"
+                className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 leading-normal"
                 value={generation}
                 onChange={(e) => setGeneration(e.target.value)}
               />
@@ -733,7 +733,7 @@ export default function ReactMemberTable() {
               <button
                 type="button"
                 onClick={() => setIsStatusOpen(!isStatusOpen)}
-                className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium"
+                className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-medium leading-normal"
               >
                 <span>{memberStatus === 'Demisioner' ? 'Purna Bakti' : 'Aktif'}</span>
                 <i className={`ph-bold ${isStatusOpen ? 'ph-caret-up' : 'ph-caret-down'} text-slate-400 text-sm`}></i>
@@ -768,7 +768,7 @@ export default function ReactMemberTable() {
             <button
               type="button"
               onClick={() => setIsStyleOpen(!isStyleOpen)}
-              className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-xs focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-bold"
+              className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-xs focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 cursor-pointer flex items-center justify-between shadow-sm active:scale-[0.99] font-bold leading-normal"
             >
               <span>
                 {avatarStyle === 'all' ? '🎲 All' : 
@@ -938,7 +938,7 @@ export default function ReactMemberTable() {
             placeholder="Cari nama, jabatan, komisi, atau kelas..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-cream-50/60 border border-cream-200 rounded-xl pl-9 pr-9 py-2 text-slate-700 text-xs placeholder-slate-400 focus:outline-none focus:border-cream-400 focus:ring-1 focus:ring-cream-400/30 transition duration-200"
+            className="w-full bg-cream-50/60 border border-cream-200 rounded-xl pl-10 pr-10 py-3 text-slate-700 text-xs placeholder-slate-400 focus:outline-none focus:border-cream-400 focus:ring-1 focus:ring-cream-400/30 transition duration-200 leading-normal"
           />
           {searchQuery && (
             <button
@@ -1306,7 +1306,7 @@ export default function ReactMemberTable() {
                   Sistem akan mendeteksi pengurus aktif yang kelasnya diawali dengan kata <strong className="font-mono">"XII"</strong> (misal: XII-F1, XII-F5) dan mengubah statusnya menjadi <strong className="uppercase">Purna Bakti</strong>.
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed font-bold">
-                  Apakah Anda yakin ingin memproses tindakan demisioner massal kelas XII ini?
+                  Demisionkan massal pengurus kelas XII? Ga bisa balik lagi ya.
                 </p>
                 <div className="flex gap-3 pt-2">
                   <button
@@ -1337,14 +1337,14 @@ export default function ReactMemberTable() {
                     type="text"
                     required
                     placeholder="Contoh: Angkatan I"
-                    className="w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200"
+                    className="w-full bg-white border border-cream-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 leading-normal"
                     value={regenGenInput}
                     onChange={(e) => setRegenGenInput(e.target.value)}
                   />
                 </div>
 
                 <p className="text-xs text-slate-600 leading-relaxed font-bold">
-                  Pastikan Anda telah mengisi label angkatan purna bakti dengan benar sebelum memproses. Lanjutkan?
+                  Data angkatan udah bener? Demisionkan pengurus aktif sekarang?
                 </p>
 
                 <div className="flex gap-3 pt-2">

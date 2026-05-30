@@ -41,7 +41,7 @@ export const prerender = false;
             type="text" 
             id="search-input" 
             placeholder="Cari kelas, pengirim, atau isi keluhan..." 
-            class="w-full bg-white border border-cream-300 rounded-xl pl-10 pr-4 py-2.5 text-slate-800 text-xs sm:text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200"
+            class="w-full bg-white border border-cream-300 rounded-xl pl-11 pr-4 py-3 text-slate-800 text-xs sm:text-sm focus:outline-none focus:border-cream-500 focus:ring-2 focus:ring-cream-500/10 transition duration-200 leading-normal"
           />
         </div>
       </div>
@@ -337,7 +337,7 @@ export const prerender = false;
               <div class="flex items-center gap-2">
                 <textarea 
                   data-id="${asp.id}" 
-                  class="response-textarea w-full bg-white border border-cream-300 rounded-lg px-2.5 py-1 text-xs text-slate-800 font-medium focus:outline-none focus:border-cream-500 focus:ring-1 focus:ring-cream-500/10 transition duration-150 resize-y" 
+                  class="response-textarea w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-cream-500 focus:ring-1 focus:ring-cream-500/10 transition duration-150 resize-y leading-relaxed" 
                   rows="1" 
                   placeholder="Ketik respon resmi..."
                 >${asp.response || ''}</textarea>
@@ -450,7 +450,7 @@ export const prerender = false;
             </div>
             <textarea 
               data-id="${asp.id}" 
-              class="response-textarea w-full bg-white border border-cream-300 rounded-lg px-2.5 py-2 text-xs text-slate-800 font-medium focus:outline-none focus:border-cream-500 focus:ring-1 focus:ring-cream-500/10 transition duration-150 resize-y" 
+              class="response-textarea w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-cream-500 focus:ring-1 focus:ring-cream-500/10 transition duration-150 resize-y leading-relaxed" 
               rows="2" 
               placeholder="Ketik respon resmi..."
             >${asp.response || ''}</textarea>
@@ -558,7 +558,7 @@ export const prerender = false;
           const index = aspirations.findIndex(asp => asp.id === id);
           if (index !== -1) aspirations[index].response = responseText;
 
-          showToast('success', 'Tanggapan resmi berhasil disimpan!');
+          showToast('success', 'Aman, respon udah dikirim.');
           
           // Change button style to green "Tersimpan" temporarily
           targetBtn.textContent = '✓ Tersimpan';
@@ -584,7 +584,7 @@ export const prerender = false;
         const id = e.currentTarget.getAttribute('data-id');
         (window as any).showCozyConfirm(
           'Hapus Aspirasi',
-          'Apakah Anda yakin ingin menghapus aspirasi murid ini secara permanen dari basis data?',
+          'Hapus aspirasi ini? Ga bisa balik lagi ya.',
           async () => {
             try {
               const { error } = await supabase
@@ -596,7 +596,7 @@ export const prerender = false;
 
               // Remove from local state
               aspirations = aspirations.filter(asp => asp.id !== id);
-              showToast('success', 'Aspirasi berhasil dihapus!');
+              showToast('success', 'Aman, aspirasi dihapus.');
               renderTable();
             } catch (err: any) {
               showToast('error', 'Gagal menghapus aspirasi: ' + err.message);
