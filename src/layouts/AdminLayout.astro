@@ -406,6 +406,40 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
           console.error("Gagal memuat profil admin:", err);
         }
       })();
+
+      // Idle Timeout Auto-Logout (1 jam / 3600 detik tanpa aktivitas)
+      (function initIdleTimeout() {
+        if (typeof window === 'undefined') return;
+
+        let idleTimer: ReturnType<typeof setTimeout>;
+        const IDLE_LIMIT = 60 * 60 * 1000; // 1 jam dalam milidetik
+
+        function resetTimer() {
+          clearTimeout(idleTimer);
+          idleTimer = setTimeout(triggerAutoLogout, IDLE_LIMIT);
+        }
+
+        async function triggerAutoLogout() {
+          console.log('[IdleTimeout] Sesi tidak aktif selama 1 jam. Melakukan logout otomatis...');
+          try {
+            await supabase.auth.signOut();
+            const sessionKey = Object.keys(localStorage).find(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
+            if (sessionKey) localStorage.removeItem(sessionKey);
+          } catch (err) {
+            console.warn('[IdleTimeout] Gagal signout client:', err);
+          }
+          window.location.href = '/login?error=Sesi telah berakhir karena Anda tidak aktif selama 1 jam';
+        }
+
+        // Event listener aktivitas pengguna
+        const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+        activityEvents.forEach(evt => {
+          document.addEventListener(evt, resetTimer, { passive: true });
+        });
+
+        // Jalankan timer pertama kali
+        resetTimer();
+      })();
     </script>
   </body>
 </html>

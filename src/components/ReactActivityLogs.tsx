@@ -341,7 +341,7 @@ export default function ReactActivityLogs() {
                             {meta.label}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-700 max-w-[200px] truncate" title={log.detail ?? ''}>
+                        <td className="py-3 px-4 text-slate-700 max-w-[220px] whitespace-normal break-words" title={log.detail ?? ''}>
                           {log.detail || <span className="text-slate-300 font-mono">—</span>}
                         </td>
                         <td className="py-3 px-4 font-mono text-slate-500 text-[10px] whitespace-nowrap">
@@ -375,11 +375,11 @@ export default function ReactActivityLogs() {
                       </span>
                       <span className="text-[9px] font-mono text-slate-400">{formatDate(log.created_at)}</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-800">{log.detail || '—'}</div>
+                    <div className="text-xs font-bold text-slate-800 break-words">{log.detail || '—'}</div>
                     <div className="flex items-center gap-3 text-[9px] font-mono text-slate-400 flex-wrap">
-                      <span title={log.admin_email}>👤 {log.admin_email}</span>
+                      <span className="truncate max-w-[130px] inline-block align-bottom" title={log.admin_email}>👤 {log.admin_email}</span>
                       {log.ip_address && <span>🌐 {log.ip_address}</span>}
-                      <span>📱 {parseDeviceInfo(log.device_info)}</span>
+                      <span className="truncate max-w-[120px] inline-block align-bottom">📱 {parseDeviceInfo(log.device_info)}</span>
                     </div>
                   </div>
                 );
