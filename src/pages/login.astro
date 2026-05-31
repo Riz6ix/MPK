@@ -1,6 +1,10 @@
 ---
 import '../styles/global.css';
 export const prerender = false; // SSR agar query string ?error= selalu diproses server-side
+
+// Bersihkan session cookies secara tuntas di sisi server saat mengakses gerbang login
+Astro.cookies.delete('sb-access-token', { path: '/' });
+Astro.cookies.delete('sb-refresh-token', { path: '/' });
 ---
 
 <!DOCTYPE html>

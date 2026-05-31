@@ -375,11 +375,15 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
       // Logout handler
       document.getElementById('logout-btn')?.addEventListener('click', () => {
         (window as any).showCozyConfirm('Keluar Sesi', 'Keluar sesi? Sampai jumpa.', async () => {
-          await supabase.auth.signOut();
-          // Delete cookies on logout safely across HTTP (local dev) and HTTPS
-          const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';
-          document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax${secureFlag}`;
-          document.cookie = `sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax${secureFlag}`;
+          try {
+            await supabase.auth.signOut();
+            // Hapus juga sisa token client-side di localStorage jika ada
+            const sessionKey = Object.keys(localStorage).find(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
+            if (sessionKey) localStorage.removeItem(sessionKey);
+          } catch (err) {
+            console.warn('[logout] Gagal signout di client:', err);
+          }
+          // Redirect langsung ke login page. Sisi server Astro akan menyapu bersih httpOnly cookies.
           window.location.href = '/login?message=Berhasil keluar sesi';
         });
       });
