@@ -329,9 +329,13 @@ export const prerender = false;
                   <i class="ph-duotone ph-chat-centered-text text-amber-600"></i> Tanggapan Resmi MPK
                 </label>
                 ${asp.response ? `
-                  <span class="text-[8px] font-black font-mono text-emerald-700 bg-emerald-100/80 border border-emerald-300/40 px-1.5 py-0.5 rounded uppercase tracking-wider">✓ Sudah Ditanggapi</span>
+                  <span class="inline-flex items-center gap-0.5 text-[8px] font-black font-mono text-emerald-700 bg-emerald-100/80 border border-emerald-300/40 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                    <i class="ph-bold ph-check text-[9px]"></i> Sudah Ditanggapi
+                  </span>
                 ` : `
-                  <span class="text-[8px] font-black font-mono text-amber-700 bg-amber-100/80 border border-amber-300/40 px-1.5 py-0.5 rounded uppercase tracking-wider">⚠️ Belum Ditanggapi</span>
+                  <span class="inline-flex items-center gap-0.5 text-[8px] font-black font-mono text-amber-700 bg-amber-100/80 border border-amber-300/40 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                    <i class="ph-bold ph-warning text-[9px]"></i> Belum Ditanggapi
+                  </span>
                 `}
               </div>
               <div class="flex items-center gap-2">
@@ -443,9 +447,13 @@ export const prerender = false;
                 <i class="ph-duotone ph-chat-centered-text text-amber-600"></i> Tanggapan Resmi MPK
               </label>
               ${asp.response ? `
-                <span class="text-[8px] font-black font-mono text-emerald-700 bg-emerald-100/80 border border-emerald-300/40 px-1.5 py-0.5 rounded uppercase tracking-wider">✓ Sudah Ditanggapi</span>
+                <span class="inline-flex items-center gap-0.5 text-[8px] font-black font-mono text-emerald-700 bg-emerald-100/80 border border-emerald-300/40 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                  <i class="ph-bold ph-check text-[9px]"></i> Sudah Ditanggapi
+                </span>
               ` : `
-                <span class="text-[8px] font-black font-mono text-amber-700 bg-amber-100/80 border border-amber-300/40 px-1.5 py-0.5 rounded uppercase tracking-wider">⚠️ Belum Ditanggapi</span>
+                <span class="inline-flex items-center gap-0.5 text-[8px] font-black font-mono text-amber-700 bg-amber-100/80 border border-amber-300/40 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                  <i class="ph-bold ph-warning text-[9px]"></i> Belum Ditanggapi
+                </span>
               `}
             </div>
             <textarea 

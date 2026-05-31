@@ -377,9 +377,20 @@ export default function ReactActivityLogs() {
                     </div>
                     <div className="text-xs font-bold text-slate-800 break-words">{log.detail || '—'}</div>
                     <div className="flex items-center gap-3 text-[9px] font-mono text-slate-400 flex-wrap">
-                      <span className="truncate max-w-[130px] inline-block align-bottom" title={log.admin_email}>👤 {log.admin_email}</span>
-                      {log.ip_address && <span>🌐 {log.ip_address}</span>}
-                      <span className="truncate max-w-[120px] inline-block align-bottom">📱 {parseDeviceInfo(log.device_info)}</span>
+                      <span className="truncate max-w-[130px] inline-flex items-center gap-1" title={log.admin_email}>
+                        <i className="ph-bold ph-user text-[10px] opacity-60"></i>
+                        {log.admin_email}
+                      </span>
+                      {log.ip_address && (
+                        <span className="inline-flex items-center gap-1">
+                          <i className="ph-bold ph-globe text-[10px] opacity-60"></i>
+                          {log.ip_address}
+                        </span>
+                      )}
+                      <span className="truncate max-w-[120px] inline-flex items-center gap-1">
+                        <i className="ph-bold ph-device-mobile text-[10px] opacity-60"></i>
+                        {parseDeviceInfo(log.device_info)}
+                      </span>
                     </div>
                   </div>
                 );
