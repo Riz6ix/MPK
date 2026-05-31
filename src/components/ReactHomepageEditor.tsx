@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, logActivity } from '../lib/supabase';
 
 interface HomepageConfig {
   key: string;
@@ -243,6 +243,7 @@ export default function ReactHomepageEditor() {
       setIsEditMode(false);
 
       setMessage({ text: 'Konfigurasi beranda berhasil diperbarui secara dinamis!', type: 'success' });
+      logActivity({ action: 'UPDATE_HOMEPAGE', entity_type: 'homepage_config', detail: 'Konfigurasi beranda diperbarui' });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
       console.error('Error saving homepage config:', err);

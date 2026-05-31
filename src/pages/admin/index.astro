@@ -272,7 +272,7 @@ const resolvedPercent = totalAspirations > 0 ? Math.round((resolvedAspirations /
   })();
 
   // 2. Interactive Sticky Notes (Supabase Database driven with Real-Time)
-  import { supabase } from '../../lib/supabase';
+  import { supabase, logActivity } from '../../lib/supabase';
 
   (function initStickyNotes() {
     const container = document.getElementById('memo-board-container');
@@ -351,12 +351,16 @@ const resolvedPercent = totalAspirations > 0 ? Math.round((resolvedAspirations /
           if (!id) return;
           
           try {
+            const memoToDelete = notes.find(n => n.id === id);
+            const cleanContent = memoToDelete ? `Memo: "${memoToDelete.content.substring(0, 100)}"` : 'Memo';
+            
             const { error } = await supabase
               .from('memos')
               .delete()
               .eq('id', id);
 
             if (error) throw error;
+            logActivity({ action: 'DELETE_MEMO', entity_type: 'memo', entity_id: id, detail: cleanContent });
             // Optimistic update locally
             notes = notes.filter(n => n.id !== id);
             renderNotes();
@@ -381,11 +385,19 @@ const resolvedPercent = totalAspirations > 0 ? Math.round((resolvedAspirations /
           const color = PALETTES[Math.floor(Math.random() * PALETTES.length)];
           
           try {
-            const { error } = await supabase
+            const { data: insertData, error } = await supabase
               .from('memos')
-              .insert([{ content: text.trim(), color }]);
+              .insert([{ content: text.trim(), color }])
+              .select('id')
+              .single();
 
             if (error) throw error;
+            logActivity({
+              action: 'CREATE_MEMO',
+              entity_type: 'memo',
+              entity_id: insertData?.id || null,
+              detail: `Memo: "${text.trim().substring(0, 100)}${text.trim().length > 100 ? '...' : ''}"`
+            });
             fetchMemos(true);
           } catch (err: any) {
             console.error("Gagal menambahkan memo:", err.message);

@@ -13,6 +13,7 @@
     X-XSS-Protection            = "1; mode=block"
     Referrer-Policy             = "strict-origin-when-cross-origin"
     Permissions-Policy          = "camera=(), microphone=(), geolocation=(), payment=()"
+    Content-Security-Policy     = "default-src 'self' https://*.supabase.co https://api.ipify.org; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://unpkg.com; img-src 'self' data: blob: https://*.supabase.co https://ujmpdahlbalttdtkzyax.supabase.co;"
 
 # Admin panel must never be cached by browser or CDN
 [[headers]]

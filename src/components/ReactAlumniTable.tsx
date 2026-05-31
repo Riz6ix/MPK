@@ -421,9 +421,12 @@ export default function ReactAlumniTable() {
       'Hapus alumni ini? Ga bisa balik lagi ya.',
       async () => {
         try {
+          const alumniToDelete = alumni.find(a => a.id === id);
+          const cleanName = alumniToDelete ? alumniToDelete.name : 'Unknown';
           const { error } = await supabase.from('alumni').delete().eq('id', id);
           if (error) throw error;
           setSuccessMessage('Aman, alumni dihapus.');
+          logActivity({ action: 'DELETE_ALUMNI', entity_type: 'alumni', entity_id: id, detail: cleanName });
           await fetchAlumni(true);
         } catch (err: any) {
           setErrorMessage('Gagal menghapus alumni: ' + err.message);
@@ -453,6 +456,7 @@ export default function ReactAlumniTable() {
           const { error: delError } = await supabase.from('alumni').delete().eq('id', member.id);
           if (delError) throw delError;
           setSuccessMessage(`Selesai, ${member.name} diaktifkan kembali.`);
+          logActivity({ action: 'REACTIVATE_ALUMNI', entity_type: 'alumni', entity_id: member.id, detail: `${member.name} diaktifkan kembali` });
           await fetchAlumni(true);
         } catch (err: any) {
           setErrorMessage('Gagal mengaktifkan kembali: ' + err.message);

@@ -116,7 +116,7 @@ export const prerender = false;
 </AdminLayout>
 
 <script>
-  import { supabase } from '../../lib/supabase';
+  import { supabase, logActivity } from '../../lib/supabase';
 
   let aspirations: any[] = [];
   let currentFilter = 'all';
@@ -520,6 +520,12 @@ export const prerender = false;
           if (index !== -1) aspirations[index].status = status;
 
           showToast('success', 'Status aspirasi berhasil diperbarui!');
+          logActivity({
+            action: 'UPDATE_ASPIRATION_STATUS',
+            entity_type: 'aspiration',
+            entity_id: id,
+            detail: `Status diubah ke: ${status}`
+          });
           
           // Sync dropdowns in both layouts by rerendering silently
           renderTable();
@@ -559,6 +565,12 @@ export const prerender = false;
           if (index !== -1) aspirations[index].response = responseText;
 
           showToast('success', 'Aman, respon udah dikirim.');
+          logActivity({
+            action: 'RESPOND_ASPIRATION',
+            entity_type: 'aspiration',
+            entity_id: id,
+            detail: `Tanggapan dikirim: "${responseText.substring(0, 80)}${responseText.length > 80 ? '...' : ''}"`
+          });
           
           // Change button style to green "Tersimpan" temporarily
           targetBtn.textContent = '✓ Tersimpan';
@@ -587,12 +599,22 @@ export const prerender = false;
           'Hapus aspirasi ini? Ga bisa balik lagi ya.',
           async () => {
             try {
+              const aspToDelete = aspirations.find(asp => asp.id === id);
+              const cleanDetail = aspToDelete ? `Aspirasi dari ${aspToDelete.name} (${aspToDelete.class})` : 'Aspirasi';
+              
               const { error } = await supabase
                 .from('aspirations')
                 .delete()
                 .eq('id', id);
 
               if (error) throw error;
+
+              logActivity({
+                action: 'DELETE_ASPIRATION',
+                entity_type: 'aspiration',
+                entity_id: id,
+                detail: cleanDetail
+              });
 
               // Remove from local state
               aspirations = aspirations.filter(asp => asp.id !== id);
