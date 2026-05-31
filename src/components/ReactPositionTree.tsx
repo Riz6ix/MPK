@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, withTimeout, logActivity } from '../lib/supabase';
 
 interface Position {
   id: string;
@@ -19,6 +19,7 @@ export default function ReactPositionTree() {
   const [positions, setPositions] = useState<Position[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -69,31 +70,49 @@ export default function ReactPositionTree() {
 
   useEffect(() => {
     fetchData();
+  }, []);
 
-    // Set up realtime channel
-    const channel = supabase
-      .channel('positions-realtime-sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'positions' },
-        () => {
-          fetchPositionsOnly();
-        }
-      )
-      .subscribe();
+  // Realtime channel dipisah dari initial fetch
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const setupChannel = () => {
+      channel = supabase
+        .channel('positions-realtime-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'positions' }, () => fetchPositionsOnly())
+        .subscribe((status) => {
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            reconnectTimer = setTimeout(() => {
+              if (channel) supabase.removeChannel(channel);
+              setupChannel();
+            }, 5000);
+          }
+        });
+    };
+
+    setupChannel();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (channel) supabase.removeChannel(channel);
     };
   }, []);
 
   const fetchData = async () => {
     setLoading(true);
+    setFetchError(null);
     try {
-      // Ambil data jabatan secara spesifik dan relasi anggota untuk hirarki
+      // Ambil data jabatan secara spesifik, dengan timeout 10 detik untuk mobile
       const [posRes, memRes] = await Promise.all([
-        supabase.from('positions').select('id, title, parent_id, order_index, commission, created_at').order('order_index', { ascending: true }),
-        supabase.from('members').select('id, name, position')
+        withTimeout(
+          supabase.from('positions').select('id, title, parent_id, order_index, commission, created_at').order('order_index', { ascending: true }),
+          10000, 'positions'
+        ),
+        withTimeout(
+          supabase.from('members').select('id, name, position'),
+          10000, 'members'
+        ),
       ]);
 
       if (posRes.error) throw posRes.error;
@@ -102,7 +121,7 @@ export default function ReactPositionTree() {
       if (posRes.data) setPositions(posRes.data);
       if (memRes.data) setMembers(memRes.data);
     } catch (err: any) {
-      setErrorMessage('Gagal memuat data hirarki: ' + err.message);
+      setFetchError(err.message);
     } finally {
       setLoading(false);
     }
@@ -148,7 +167,6 @@ export default function ReactPositionTree() {
 
     try {
       if (editingId) {
-        // Prevent setting a position as its own parent
         if (parentId === editingId) {
           throw new Error('Jabatan tidak bisa memiliki dirinya sendiri sebagai atasan.');
         }
@@ -160,18 +178,22 @@ export default function ReactPositionTree() {
 
         if (error) throw error;
         setSuccessMessage('Aman, jabatan diperbarui.');
+        logActivity({ action: 'UPDATE_POSITION', entity_type: 'position', entity_id: editingId, detail: title.trim() });
       } else {
         // Get max order index for new item
         const sameComm = positions.filter(p => p.commission === commission);
         const maxOrder = sameComm.reduce((max, p) => p.order_index > max ? p.order_index : max, -1);
         payload.order_index = maxOrder + 1;
 
-        const { error } = await supabase
+        const { data: insertData, error } = await supabase
           .from('positions')
-          .insert([payload]);
+          .insert([payload])
+          .select('id')
+          .single();
 
         if (error) throw error;
         setSuccessMessage(`Selesai, jabatan ${title.trim()} ditambahkan.`);
+        logActivity({ action: 'CREATE_POSITION', entity_type: 'position', entity_id: insertData?.id, detail: title.trim() });
       }
 
       handleReset();
@@ -232,6 +254,7 @@ export default function ReactPositionTree() {
       }
 
       setSuccessMessage(`Aman, jabatan ${posToDelete.title} dihapus. Pengurus terkait di-reset ke Anggota.`);
+      logActivity({ action: 'DELETE_POSITION', entity_type: 'position', entity_id: id, detail: posToDelete.title });
       await fetchData();
     } catch (err: any) {
       setErrorMessage('Gagal menghapus jabatan: ' + err.message);
@@ -577,6 +600,17 @@ export default function ReactPositionTree() {
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
             <p className="text-slate-500 text-xs font-medium">Menganyam rantai jabatan...</p>
+          </div>
+        ) : fetchError ? (
+          <div className="flex flex-col items-center justify-center py-16 space-y-4">
+            <i className="ph-duotone ph-wifi-slash text-4xl text-red-300"></i>
+            <div className="text-center">
+              <p className="text-slate-700 text-sm font-bold">Gagal memuat hirarki jabatan</p>
+              <p className="text-slate-400 text-xs font-mono mt-1 max-w-xs">{fetchError}</p>
+            </div>
+            <button onClick={() => fetchData()} className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition flex items-center gap-2">
+              <i className="ph-bold ph-arrow-clockwise"></i> Coba Lagi
+            </button>
           </div>
         ) : (
           <div className="space-y-6">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, withTimeout, logActivity } from '../lib/supabase';
 
 interface ClassItem {
   id: string;
@@ -24,6 +24,7 @@ export default function ReactClassManager() {
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -41,28 +42,33 @@ export default function ReactClassManager() {
 
   useEffect(() => {
     fetchData();
+  }, []);
 
-    // Subscribe to realtime database changes
-    const channel = supabase
-      .channel('classes-members-sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'classes' },
-        () => {
-          fetchClassesOnly();
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'members' },
-        () => {
-          fetchMembersOnly();
-        }
-      )
-      .subscribe();
+  // Realtime channel dipisah dari initial fetch
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const setupChannel = () => {
+      channel = supabase
+        .channel('classes-members-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'classes' }, () => fetchClassesOnly())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, () => fetchMembersOnly())
+        .subscribe((status) => {
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            reconnectTimer = setTimeout(() => {
+              if (channel) supabase.removeChannel(channel);
+              setupChannel();
+            }, 5000);
+          }
+        });
+    };
+
+    setupChannel();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (channel) supabase.removeChannel(channel);
     };
   }, []);
 
@@ -79,11 +85,18 @@ export default function ReactClassManager() {
 
   const fetchData = async () => {
     setLoading(true);
+    setFetchError(null);
     try {
-      // Ambil data kelas secara spesifik beserta profil anggota aktif untuk rekap
+      // Ambil data kelas beserta profil anggota aktif, dengan timeout 10 detik
       const [classRes, memberRes] = await Promise.all([
-        supabase.from('classes').select('id, name, grade, order_index, is_active, created_at, updated_at').order('grade', { ascending: false }).order('order_index', { ascending: true }),
-        supabase.from('members').select('id, name, class, status, position, avatar_url').eq('status', 'Aktif')
+        withTimeout(
+          supabase.from('classes').select('id, name, grade, order_index, is_active, created_at, updated_at').order('grade', { ascending: false }).order('order_index', { ascending: true }),
+          10000, 'classes'
+        ),
+        withTimeout(
+          supabase.from('members').select('id, name, class, status, position, avatar_url').eq('status', 'Aktif'),
+          10000, 'members'
+        ),
       ]);
 
       if (classRes.error) throw classRes.error;
@@ -92,7 +105,7 @@ export default function ReactClassManager() {
       if (classRes.data) setClasses(classRes.data);
       if (memberRes.data) setMembers(memberRes.data);
     } catch (err: any) {
-      setErrorMessage('Gagal mengambil data: ' + err.message);
+      setFetchError(err.message);
     } finally {
       setLoading(false);
     }
@@ -168,12 +181,16 @@ export default function ReactClassManager() {
           .eq('id', editingId);
         if (error) throw error;
         setSuccessMessage(`Aman, kelas ${formattedName} diperbarui.`);
+        logActivity({ action: 'UPDATE_CLASS', entity_type: 'class', entity_id: editingId, detail: formattedName });
       } else {
-        const { error } = await supabase
+        const { data: insertData, error } = await supabase
           .from('classes')
-          .insert([payload]);
+          .insert([payload])
+          .select('id')
+          .single();
         if (error) throw error;
         setSuccessMessage(`Selesai, kelas ${formattedName} ditambahkan.`);
+        logActivity({ action: 'CREATE_CLASS', entity_type: 'class', entity_id: insertData?.id, detail: formattedName });
       }
       handleReset();
       fetchClassesOnly();
@@ -274,6 +291,7 @@ export default function ReactClassManager() {
         if (error) throw error;
 
         setSuccessMessage('Selesai, 31 kelas default udah dibuat.');
+        logActivity({ action: 'SEED_CLASSES', entity_type: 'class', detail: '31 kelas default di-seed ulang' });
         fetchData();
       } catch (err: any) {
         setErrorMessage('Gagal membuat kelas default: ' + err.message);
@@ -344,6 +362,7 @@ export default function ReactClassManager() {
       if (insError) throw insError;
 
       setSuccessMessage(`Selesai, ${newClassesToInsert.length} kelas diimpor dari data anggota.`);
+      logActivity({ action: 'SYNC_CLASSES', entity_type: 'class', detail: `${newClassesToInsert.length} kelas disinkronkan dari data anggota` });
       fetchData();
     } catch (err: any) {
       setErrorMessage('Gagal menyinkronkan kelas dari anggota: ' + err.message);
@@ -616,6 +635,17 @@ export default function ReactClassManager() {
                 <div className="py-20 text-center text-xs font-mono text-slate-400 flex flex-col items-center justify-center gap-3">
                   <div className="w-6 h-6 border-2 border-amber-600/30 border-t-amber-700 rounded-full animate-spin"></div>
                   Memuat basis data sebaran kelas...
+                </div>
+              ) : fetchError ? (
+                <div className="py-16 flex flex-col items-center justify-center space-y-4">
+                  <i className="ph-duotone ph-wifi-slash text-4xl text-red-300"></i>
+                  <div className="text-center">
+                    <p className="text-slate-700 text-sm font-bold">Gagal memuat data</p>
+                    <p className="text-slate-400 text-xs font-mono mt-1 max-w-xs">{fetchError}</p>
+                  </div>
+                  <button onClick={() => fetchData()} className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition flex items-center gap-2">
+                    <i className="ph-bold ph-arrow-clockwise"></i> Coba Lagi
+                  </button>
                 </div>
               ) : filteredClasses.length === 0 ? (
                 <div className="py-16 text-center cozy-paper-card border border-dashed border-cream-300 text-slate-400 font-medium text-xs space-y-3">

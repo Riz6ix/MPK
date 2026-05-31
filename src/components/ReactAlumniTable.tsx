@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, withTimeout, logActivity } from '../lib/supabase';
 
 interface Generation {
   id: string;
@@ -26,6 +26,7 @@ export default function ReactAlumniTable() {
   const [alumni, setAlumni] = useState<Alumni[]>([]);
   const [generations, setGenerations] = useState<Generation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -128,15 +129,33 @@ export default function ReactAlumniTable() {
     }
     
     fetchClasses();
+  }, []);
 
-    const channel = supabase
-      .channel('alumni-realtime-sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'alumni' }, () => {
-        fetchAlumni(true);
-      })
-      .subscribe();
+  // Realtime channel dipisah dari initial fetch
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
-    return () => { supabase.removeChannel(channel); };
+    const setupChannel = () => {
+      channel = supabase
+        .channel('alumni-realtime-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'alumni' }, () => fetchAlumni(true))
+        .subscribe((status) => {
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            reconnectTimer = setTimeout(() => {
+              if (channel) supabase.removeChannel(channel);
+              setupChannel();
+            }, 5000);
+          }
+        });
+    };
+
+    setupChannel();
+
+    return () => {
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -164,18 +183,25 @@ export default function ReactAlumniTable() {
   }, [generations]);
 
   const fetchAlumni = async (silent = false) => {
-    if (!silent) setLoading(true);
-    else setIsRefreshing(true);
+    if (!silent) {
+      setLoading(true);
+      setFetchError(null);
+    } else setIsRefreshing(true);
     try {
-      // Ambil kolom alumni dan relasi angkatan secara eksplisit
-      const { data, error } = await supabase
-        .from('alumni')
-        .select('id, name, position, class, commission, gender, avatar_url, order_index, generation_id, created_at, updated_at, generations(id, name, active_year, graduation_year)')
-        .order('name', { ascending: true });
+      // Ambil kolom alumni dan relasi angkatan secara eksplisit, dengan timeout
+      const { data, error } = await withTimeout(
+        supabase
+          .from('alumni')
+          .select('id, name, position, class, commission, gender, avatar_url, order_index, generation_id, created_at, updated_at, generations(id, name, active_year, graduation_year)')
+          .order('name', { ascending: true }),
+        10000,
+        'alumni'
+      );
       if (error) throw error;
       if (data) setAlumni(data);
     } catch (err: any) {
-      setErrorMessage('Gagal memuat data alumni: ' + err.message);
+      if (!silent) setFetchError(err.message);
+      else setErrorMessage('Gagal memperbarui data alumni: ' + err.message);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -373,10 +399,12 @@ export default function ReactAlumniTable() {
         const { error } = await supabase.from('alumni').update(payload).eq('id', editingId);
         if (error) throw error;
         setSuccessMessage('Aman, data alumni diperbarui.');
+        logActivity({ action: 'UPDATE_ALUMNI', entity_type: 'alumni', entity_id: editingId, detail: cleanName });
       } else {
-        const { error } = await supabase.from('alumni').insert([payload]);
+        const { data: insertData, error } = await supabase.from('alumni').insert([payload]).select('id').single();
         if (error) throw error;
         setSuccessMessage('Selesai, alumni ditambahkan.');
+        logActivity({ action: 'CREATE_ALUMNI', entity_type: 'alumni', entity_id: insertData?.id, detail: cleanName });
       }
       handleReset();
       await fetchAlumni(true);
@@ -760,6 +788,17 @@ export default function ReactAlumniTable() {
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
             <p className="text-slate-500 text-xs font-medium">Memuat data alumni...</p>
+          </div>
+        ) : fetchError ? (
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <i className="ph-duotone ph-wifi-slash text-4xl text-red-300"></i>
+            <div className="text-center">
+              <p className="text-slate-700 text-sm font-bold">Gagal memuat data alumni</p>
+              <p className="text-slate-400 text-xs font-mono mt-1 max-w-xs">{fetchError}</p>
+            </div>
+            <button onClick={() => fetchAlumni()} className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition flex items-center gap-2">
+              <i className="ph-bold ph-arrow-clockwise"></i> Coba Lagi
+            </button>
           </div>
         ) : alumni.length === 0 ? (
           <div className="text-center py-12">

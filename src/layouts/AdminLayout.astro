@@ -119,10 +119,24 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
             <i class="ph-duotone ph-chat-centered-text text-cream-300/30 group-hover:text-cream-500 text-lg transition"></i>
             <span>Kelola Aspirasi</span>
           </a>
+          <a 
+            href="/admin/logs" 
+            class="flex items-center space-x-3.5 px-4 py-3 rounded-xl hover:bg-[#463629] text-cream-200/80 hover:text-white transition-all group"
+            id="nav-logs"
+          >
+            <i class="ph-duotone ph-clipboard-text text-cream-300/30 group-hover:text-cream-500 text-lg transition"></i>
+            <span>Logs</span>
+          </a>
         </nav>
 
         {/* Footer / Account Management */}
         <div class="pt-6 border-t border-[#463629] mt-8 md:mt-0 space-y-4">
+          
+          <!-- Realtime Status Badge -->
+          <div id="realtime-status-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-mono font-bold tracking-wider" style="display:none!important">
+            <span id="realtime-dot" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            <span id="realtime-text" class="text-cream-400/60">Realtime: Menghubungkan...</span>
+          </div>
           
           <!-- Cozy ID Tag: Menampilkan profil admin yang login -->
           <div id="admin-profile-tag" class="hidden p-3 bg-[#4A3B2F]/60 border border-cream-500/10 rounded-xl flex items-center space-x-3 shadow-inner">
@@ -236,9 +250,10 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
       const navAspirations = document.getElementById('nav-aspirations');
       const navClasses = document.getElementById('nav-classes');
       const navHomepage = document.getElementById('nav-homepage');
+      const navLogs = document.getElementById('nav-logs');
 
       // Clear standard styling
-      const links = [navOverview, navMembers, navAlumni, navPositions, navAspirations, navClasses, navHomepage];
+      const links = [navOverview, navMembers, navAlumni, navPositions, navAspirations, navClasses, navHomepage, navLogs];
       links.forEach(link => {
         link?.classList.remove('bg-[#4A3B2F]', 'text-cream-500', 'border-r-4', 'border-cream-500', 'text-white');
         link?.classList.add('text-cream-200/80');
@@ -265,6 +280,9 @@ const { title = "Dashboard Admin Anak MPK SMAN 1 Malingping" } = Astro.props;
       } else if (currentPath.includes('/admin/classes')) {
         navClasses?.classList.add('bg-[#4A3B2F]', 'text-cream-500', 'border-r-4', 'border-cream-500');
         navClasses?.classList.remove('text-cream-200/80');
+      } else if (currentPath.includes('/admin/logs')) {
+        navLogs?.classList.add('bg-[#4A3B2F]', 'text-cream-500', 'border-r-4', 'border-cream-500');
+        navLogs?.classList.remove('text-cream-200/80');
       }
 
       // Cozy Reusable Dialog Logic

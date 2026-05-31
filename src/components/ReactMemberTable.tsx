@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, withTimeout, logActivity } from '../lib/supabase';
 
 interface Member {
   id: string;
@@ -18,6 +18,7 @@ const STYLES_LIST = ['identicon', 'pixel-art', 'bottts', 'adventurer', 'lorelei'
 export default function ReactMemberTable() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null); // Untuk retry button di mobile
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -147,21 +148,40 @@ export default function ReactMemberTable() {
     const randomStyle = STYLES_LIST[Math.floor(Math.random() * STYLES_LIST.length)];
     setActiveStyle(randomStyle);
     setIdenticonSeed(Math.random().toString(36).substring(2, 9));
+  }, []);
 
-    // Set up Supabase Real-Time Channel subscription for members table
-    const channel = supabase
-      .channel('members-realtime-sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'members' },
-        () => {
-          fetchMembers(true); // Silently sync in background on any DB insert/update/delete
-        }
-      )
-      .subscribe();
+  // Realtime channel dipisah dari initial fetch agar mobile tidak terganggu
+  // jika WebSocket carrier-throttled saat pertama load
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const setupChannel = () => {
+      channel = supabase
+        .channel('members-realtime-sync')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'members' },
+          () => {
+            fetchMembers(true);
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            // Auto-reconnect setelah 5 detik jika channel error
+            reconnectTimer = setTimeout(() => {
+              if (channel) supabase.removeChannel(channel);
+              setupChannel();
+            }, 5000);
+          }
+        });
+    };
+
+    setupChannel();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (channel) supabase.removeChannel(channel);
     };
   }, []);
 
@@ -193,20 +213,26 @@ export default function ReactMemberTable() {
   const fetchMembers = async (silent = false) => {
     if (!silent) {
       setLoading(true);
+      setFetchError(null);
     } else {
       setIsRefreshing(true);
     }
     try {
-      // Ambil kolom pengurus secara eksplisit untuk efisiensi transfer data
-      const { data, error } = await supabase
-        .from('members')
-        .select('id, name, position, class, commission, avatar_url, order_index, created_at, updated_at, gender, status, generation')
-        .order('name', { ascending: true });
+      // Ambil kolom pengurus secara eksplisit, dengan timeout 10 detik untuk mobile
+      const { data, error } = await withTimeout(
+        supabase
+          .from('members')
+          .select('id, name, position, class, commission, avatar_url, order_index, created_at, updated_at, gender, status, generation')
+          .order('name', { ascending: true }),
+        10000,
+        'members'
+      );
 
       if (error) throw error;
       if (data) setMembers(data);
     } catch (err: any) {
-      setErrorMessage('Gagal memuat data pengurus: ' + err.message);
+      if (!silent) setFetchError(err.message);
+      else setErrorMessage('Gagal memperbarui data: ' + err.message);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -215,11 +241,15 @@ export default function ReactMemberTable() {
 
   const fetchPositions = async () => {
     try {
-      // Ambil kolom struktur jabatan secara eksplisit
-      const { data, error } = await supabase
-        .from('positions')
-        .select('id, title, parent_id, order_index, commission, created_at')
-        .order('order_index', { ascending: true });
+      // Ambil kolom struktur jabatan secara eksplisit, dengan timeout 10 detik
+      const { data, error } = await withTimeout(
+        supabase
+          .from('positions')
+          .select('id, title, parent_id, order_index, commission, created_at')
+          .order('order_index', { ascending: true }),
+        10000,
+        'positions'
+      );
 
       if (error) throw error;
       if (data) setPositions(data);
@@ -479,13 +509,17 @@ export default function ReactMemberTable() {
         
         if (error) throw error;
         setSuccessMessage('Aman, data anggota diperbarui.');
+        logActivity({ action: 'UPDATE_MEMBER', entity_type: 'member', entity_id: editingId, detail: cleanName });
       } else {
-        const { error } = await supabase
+        const { data: insertData, error } = await supabase
           .from('members')
-          .insert([payload]);
+          .insert([payload])
+          .select('id')
+          .single();
         
         if (error) throw error;
         setSuccessMessage(`Selesai, ${cleanName} ditambahkan.`);
+        logActivity({ action: 'CREATE_MEMBER', entity_type: 'member', entity_id: insertData?.id, detail: cleanName });
       }
 
       handleReset();
@@ -509,6 +543,7 @@ export default function ReactMemberTable() {
           const { error } = await supabase.from('members').delete().eq('id', id);
           if (error) throw error;
           setSuccessMessage(`Selesai, ${memberName} dihapus.`);
+          logActivity({ action: 'DELETE_MEMBER', entity_type: 'member', entity_id: id, detail: memberName });
           await fetchMembers(true);
         } catch (err: any) {
           setErrorMessage('Gagal menghapus anggota: ' + err.message);
@@ -957,6 +992,21 @@ export default function ReactMemberTable() {
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
             <p className="text-slate-500 text-xs font-medium">Memuat data pengurus...</p>
+          </div>
+        ) : fetchError ? (
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <i className="ph-duotone ph-wifi-slash text-4xl text-red-300"></i>
+            <div className="text-center space-y-1">
+              <p className="text-slate-700 text-sm font-bold">Gagal memuat data</p>
+              <p className="text-slate-500 text-xs font-mono max-w-xs">{fetchError}</p>
+            </div>
+            <button
+              onClick={() => fetchMembers()}
+              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition flex items-center gap-2"
+            >
+              <i className="ph-bold ph-arrow-clockwise"></i>
+              Coba Lagi
+            </button>
           </div>
         ) : activeMembers.length === 0 ? (
           <div className="text-center py-12">

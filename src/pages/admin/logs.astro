@@ -1,0 +1,18 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ReactActivityLogs from '../../components/ReactActivityLogs.tsx';
+
+// SSR — tidak di-prerender agar selalu fresh
+export const prerender = false;
+---
+
+<AdminLayout title="Logs Aktivitas — MPK Admin">
+  <div class="space-y-8">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-wider">Audit Logs</h2>
+      <p class="text-xs text-slate-600 font-medium mt-1">Rekam jejak seluruh aktivitas admin — siapa, kapan, dari mana, dan dari perangkat apa.</p>
+    </div>
+
+    <ReactActivityLogs client:load />
+  </div>
+</AdminLayout>
