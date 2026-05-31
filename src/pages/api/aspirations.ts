@@ -1,8 +1,9 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../lib/supabase';
-import { sanitizeInput, hashIp, checkRateLimit } from '../../lib/security';
+import { sanitizeInput, hashIp, checkRateLimit, maskIp } from '../../lib/security';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async (context) => {
+  const { request } = context;
   try {
     // Validate request origin via exact-match allowlist (prevent cross-domain spam)
     const origin = request.headers.get('origin');
@@ -19,7 +20,11 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // 1. Get Client IP and apply Hashed Rate Limiting
-    const clientIp = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    const clientIp = context.clientAddress || 
+                     request.headers.get('x-nf-client-connection-ip') || 
+                     request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
+                     request.headers.get('x-real-ip') || 
+                     '127.0.0.1';
     const ipHash = hashIp(clientIp);
     const rateLimit = checkRateLimit(ipHash);
 
@@ -54,7 +59,7 @@ export const POST: APIRoute = async ({ request }) => {
           name: cleanName,
           class: cleanClass,
           content: cleanContent,
-          ip_hash: ipHash,
+          ip_hash: maskIp(clientIp),
           status: 'Belum Diproses'
         }
       ]);

@@ -50,3 +50,27 @@ export function checkRateLimit(hashedIp: string): { allowed: boolean; remaining:
   track.count += 1;
   return { allowed: true, remaining: MAX_LIMIT - track.count };
 }
+
+export function maskIp(ip: string): string {
+  if (!ip) return '—';
+  if (ip === '127.0.0.1' || ip === '::1') return '127.0.0.x (Local)';
+  
+  // IPv4 masking (e.g. 180.252.12.34 -> 180.252.xxx.xxx)
+  if (ip.includes('.')) {
+    const parts = ip.split('.');
+    if (parts.length === 4) {
+      return `${parts[0]}.${parts[1]}.xxx.xxx`;
+    }
+  }
+  
+  // IPv6 masking (e.g. 2001:db8:85a3:8d3:1319:8a2e:370:7348 -> 2001:db8:85a3:xxxx::)
+  if (ip.includes(':')) {
+    const parts = ip.split(':');
+    if (parts.length >= 3) {
+      return `${parts[0]}:${parts[1]}:${parts[2]}:xxxx::`;
+    }
+  }
+  
+  return ip.substring(0, 10) + '...';
+}
+

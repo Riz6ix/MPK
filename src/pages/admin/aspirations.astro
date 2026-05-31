@@ -14,17 +14,25 @@ export const prerender = false;
         <h2 class="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-wider">Kotak Aspirasi Masuk</h2>
         <p class="text-xs text-slate-600 font-medium mt-1">Pantau, ubah status penanganan, atau hapus aspirasi yang masuk dari murid.</p>
       </div>
-      
-      {/* Filter tab buttons */}
-      <div class="flex flex-wrap items-center gap-1 bg-cream-200/80 border border-cream-300 p-1 rounded-xl w-fit text-xs font-bold text-slate-600 shadow-sm">
-        <button class="px-3 py-1.5 rounded-lg bg-cream-500 text-slate-950 font-bold transition active-filter cursor-pointer" data-filter="all">Semua</button>
-        <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Belum Diproses">Belum Diproses</button>
-        <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Sedang Ditinjau">Sedang Ditinjau</button>
-        <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Selesai">Selesai</button>
-        <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Anomali">Anomali</button>
-        <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Pending">Pending</button>
-        <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Birokrasi">Birokrasi</button>
+      <div class="flex items-center gap-2 self-start sm:self-center">
+        <button 
+          id="export-csv-btn" 
+          class="px-4 py-2 bg-slate-900 hover:bg-slate-850 text-white rounded-xl text-xs font-bold cursor-pointer transition flex items-center gap-1.5 shadow-md active:scale-[0.98] select-none"
+        >
+          <i class="ph-bold ph-download-simple"></i> Export CSV
+        </button>
       </div>
+    </div>
+
+    {/* Filter row */}
+    <div class="flex flex-wrap items-center gap-1 bg-cream-200/80 border border-cream-300 p-1 rounded-xl w-fit text-xs font-bold text-slate-600 shadow-sm">
+      <button class="px-3 py-1.5 rounded-lg bg-cream-500 text-slate-950 font-bold transition active-filter cursor-pointer" data-filter="all" id="filter-all">Semua</button>
+      <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Belum Diproses" id="filter-belum">Belum Diproses</button>
+      <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Sedang Ditinjau" id="filter-ditinjau">Sedang Ditinjau</button>
+      <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Selesai" id="filter-selesai">Selesai</button>
+      <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Anomali" id="filter-anomali">Anomali</button>
+      <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Pending" id="filter-pending">Pending</button>
+      <button class="px-3 py-1.5 rounded-lg hover:text-slate-800 transition cursor-pointer" data-filter="Birokrasi" id="filter-birokrasi">Birokrasi</button>
     </div>
 
     {/* Alerts box */}
@@ -270,7 +278,7 @@ export const prerender = false;
     if (tbodyEl) tbodyEl.innerHTML = '';
     if (mobileCardsEl) mobileCardsEl.innerHTML = '';
 
-    paginatedItems.forEach((asp) => {
+    paginatedItems.forEach((asp, idx) => {
       // Date Format
       const date = new Date(asp.created_at).toLocaleDateString('id-ID', {
         day: '2-digit',
@@ -293,6 +301,20 @@ export const prerender = false;
       const escapedFull = escapeHtmlAttr(rawContent);
       const escapedTruncated = escapeHtmlAttr(truncated);
 
+      // Calculate sequence number (stable sequential number where #1 is the oldest global)
+      const globalIdx = aspirations.findIndex(a => a.id === asp.id);
+      const aspNumber = globalIdx !== -1 ? (aspirations.length - globalIdx) : (totalItems - (startIndex + idx));
+      
+      // Handle both new masked IPs and legacy SHA-256 hashes safely
+      let cleanIpHash = '—';
+      if (asp.ip_hash) {
+        if (asp.ip_hash.length === 64) {
+          cleanIpHash = asp.ip_hash.substring(0, 8) + ' (Legacy)';
+        } else {
+          cleanIpHash = asp.ip_hash;
+        }
+      }
+
       // A. Populate Desktop Row
       if (tbodyEl) {
         const row = document.createElement('tr');
@@ -300,7 +322,9 @@ export const prerender = false;
         row.innerHTML = `
           <td class="py-4 px-2 text-slate-500 font-mono font-bold text-xs">${date}</td>
           <td class="py-4 px-2">
-            <div class="font-black text-slate-900">${cleanName}</div>
+            <div class="font-black text-slate-900">
+              <span class="text-amber-800 mr-1.5 font-mono font-bold">#${aspNumber}</span>${cleanName}
+            </div>
             <div class="text-[10px] text-slate-500 font-mono font-bold uppercase mt-0.5 tracking-wider">${asp.class}</div>
             ${asp.response ? `
               <span class="inline-flex items-center gap-1 text-[8.5px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded mt-1.5">
@@ -323,7 +347,7 @@ export const prerender = false;
             </div>
             
             <!-- Tanggapan Admin Box -->
-            <div class="mt-3 space-y-1 bg-[#FAF6F0] border border-cream-300/40 rounded-xl p-2.5">
+            <div class="mt-3 space-y-2 bg-[#FAF6F0] border border-cream-300/40 rounded-xl p-2.5">
               <div class="flex items-center justify-between mb-1">
                 <label class="text-[9px] font-bold text-cream-700 uppercase tracking-wider block font-mono flex items-center gap-1">
                   <i class="ph-duotone ph-chat-centered-text text-amber-600"></i> Tanggapan Resmi MPK
@@ -338,6 +362,25 @@ export const prerender = false;
                   </span>
                 `}
               </div>
+
+              <!-- Quick Response Templates -->
+              <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                <button 
+                  type="button"
+                  class="quick-template-btn px-2 py-0.5 bg-white hover:bg-cream-100 border border-cream-300 text-[8.5px] text-slate-700 font-bold rounded-lg transition active:scale-[0.98] cursor-pointer flex items-center gap-1"
+                  data-text="Terima kasih atas masukannya. Aspirasi ini telah kami catat dan akan segera kami koordinasikan dengan pihak terkait."
+                >
+                  <i class="ph-bold ph-chat-circle-text text-slate-500"></i> Terima Kasih
+                </button>
+                <button 
+                  type="button"
+                  class="quick-template-btn px-2 py-0.5 bg-white hover:bg-cream-100 border border-cream-300 text-[8.5px] text-slate-700 font-bold rounded-lg transition active:scale-[0.98] cursor-pointer flex items-center gap-1"
+                  data-text="Aspirasi telah kami terima dan akan segera kami sampaikan langsung kepada Pembina OSIS / Kesiswaan SMAN 1 Malingping."
+                >
+                  <i class="ph-bold ph-graduation-cap text-slate-500"></i> Rujukan Kesiswaan
+                </button>
+              </div>
+
               <div class="flex items-center gap-2">
                 <textarea 
                   data-id="${asp.id}" 
@@ -355,7 +398,7 @@ export const prerender = false;
             </div>
           </td>
           <td class="py-4 px-2">
-            <code class="text-[10px] text-cream-600 bg-cream-100 border border-cream-300/40 px-2 py-1 rounded font-mono">${asp.ip_hash.substring(0, 8)}</code>
+            <code class="text-[10px] text-cream-600 bg-cream-100/80 border border-cream-300/40 px-2 py-1 rounded font-mono">${cleanIpHash}</code>
           </td>
           <td class="py-4 px-2">
             <select 
@@ -390,7 +433,9 @@ export const prerender = false;
         card.innerHTML = `
           <div class="flex justify-between items-start border-b border-cream-200/50 pb-3">
             <div>
-              <div class="font-black text-sm text-slate-900">${cleanName}</div>
+              <div class="font-black text-sm text-slate-900">
+                <span class="text-amber-800 mr-1.5 font-mono font-bold">#${aspNumber}</span>${cleanName}
+              </div>
               <div class="flex items-center gap-2 mt-1">
                 <span class="text-[9px] text-slate-500 font-mono font-bold uppercase tracking-wider">${asp.class}</span>
                 ${asp.response ? `
@@ -422,7 +467,7 @@ export const prerender = false;
           <div class="grid grid-cols-2 gap-4 items-end text-xs">
             <div class="space-y-1">
               <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono block">Hulu IP</label>
-              <code class="text-[10px] text-cream-750 bg-cream-100/80 border border-cream-300/60 px-3 py-2 rounded-xl font-mono block w-full text-center">${asp.ip_hash.substring(0, 8)}</code>
+              <code class="text-[10px] text-cream-750 bg-cream-100/80 border border-cream-300/60 px-3 py-2 rounded-xl font-mono block w-full text-center">${cleanIpHash}</code>
             </div>
             <div class="space-y-1">
               <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono block">Status Penanganan</label>
@@ -456,6 +501,25 @@ export const prerender = false;
                 </span>
               `}
             </div>
+
+            <!-- Quick Response Templates (Mobile) -->
+            <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
+              <button 
+                type="button"
+                class="quick-template-btn px-2 py-0.5 bg-white hover:bg-cream-100 border border-cream-300 text-[8.5px] text-slate-700 font-bold rounded-lg transition active:scale-[0.98] cursor-pointer flex items-center gap-1"
+                data-text="Terima kasih atas masukannya. Aspirasi ini telah kami catat dan akan segera kami koordinasikan dengan pihak terkait."
+              >
+                <i class="ph-bold ph-chat-circle-text text-slate-500"></i> Terima Kasih
+              </button>
+              <button 
+                type="button"
+                class="quick-template-btn px-2 py-0.5 bg-white hover:bg-cream-100 border border-cream-300 text-[8.5px] text-slate-700 font-bold rounded-lg transition active:scale-[0.98] cursor-pointer flex items-center gap-1"
+                data-text="Aspirasi telah kami terima dan akan segera kami sampaikan langsung kepada Pembina OSIS / Kesiswaan SMAN 1 Malingping."
+              >
+                <i class="ph-bold ph-graduation-cap text-slate-500"></i> Rujukan Kesiswaan
+              </button>
+            </div>
+
             <textarea 
               data-id="${asp.id}" 
               class="response-textarea w-full bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-cream-500 focus:ring-1 focus:ring-cream-500/10 transition duration-150 resize-y leading-relaxed" 
@@ -635,6 +699,112 @@ export const prerender = false;
         );
       });
     });
+
+    // Add event listeners to quick template buttons across all layouts
+    wrapperEl.querySelectorAll('.quick-template-btn').forEach((btn) => {
+      btn.addEventListener('click', (e: any) => {
+        const text = e.currentTarget.getAttribute('data-text');
+        const container = e.currentTarget.closest('.bg-\\[\\#FAF6F0\\]') || e.currentTarget.closest('.space-y-2\\.5');
+        if (!container) return;
+        const textarea = container.querySelector('.response-textarea') as HTMLTextAreaElement | null;
+        if (textarea) {
+          textarea.value = text;
+          textarea.focus();
+        }
+      });
+    });
+
+    // Update filter counts badge dynamically
+    updateFilterCounters();
+  }
+
+  function updateFilterCounters() {
+    const counts = {
+      all: aspirations.length,
+      'Belum Diproses': aspirations.filter(asp => asp.status === 'Belum Diproses').length,
+      'Sedang Ditinjau': aspirations.filter(asp => asp.status === 'Sedang Ditinjau').length,
+      'Selesai': aspirations.filter(asp => asp.status === 'Selesai').length,
+      'Anomali': aspirations.filter(asp => asp.status === 'Anomali').length,
+      'Pending': aspirations.filter(asp => asp.status === 'Pending').length,
+      'Birokrasi': aspirations.filter(asp => asp.status === 'Birokrasi').length,
+    };
+
+    const filters = [
+      { id: 'filter-all', label: 'Semua', count: counts.all, val: 'all' },
+      { id: 'filter-belum', label: 'Belum Diproses', count: counts['Belum Diproses'], val: 'Belum Diproses' },
+      { id: 'filter-ditinjau', label: 'Sedang Ditinjau', count: counts['Sedang Ditinjau'], val: 'Sedang Ditinjau' },
+      { id: 'filter-selesai', label: 'Selesai', count: counts['Selesai'], val: 'Selesai' },
+      { id: 'filter-anomali', label: 'Anomali', count: counts['Anomali'], val: 'Anomali' },
+      { id: 'filter-pending', label: 'Pending', count: counts['Pending'], val: 'Pending' },
+      { id: 'filter-birokrasi', label: 'Birokrasi', count: counts['Birokrasi'], val: 'Birokrasi' },
+    ];
+
+    filters.forEach(f => {
+      const el = document.getElementById(f.id);
+      if (el) {
+        const isActive = currentFilter === f.val;
+        const badgeClass = isActive 
+          ? 'bg-slate-950/20 text-slate-950' 
+          : 'bg-cream-300 text-slate-700';
+        el.innerHTML = `${f.label} <span class="ml-1 px-1.5 py-0.5 text-[9px] rounded-full font-mono font-bold ${badgeClass}">${f.count}</span>`;
+      }
+    });
+  }
+
+  function exportAspirationsCSV() {
+    if (aspirations.length === 0) {
+      showToast('error', 'Tidak ada data untuk diexport.');
+      return;
+    }
+
+    // CSV Headers
+    const headers = ['No', 'Tanggal', 'Nama', 'Kelas', 'Isi Aspirasi', 'Hulu IP', 'Status', 'Tanggapan'];
+    
+    // Sort chronologically (oldest first) so #1 is indeed the oldest
+    const sorted = [...aspirations].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+    const csvRows = [
+      headers.join(','),
+      ...sorted.map((asp, idx) => {
+        const date = new Date(asp.created_at).toISOString();
+        const name = asp.name || 'Anonim';
+        const className = asp.class || '';
+        const content = (asp.content || '').replace(/"/g, '""');
+        const ipHash = asp.ip_hash || '';
+        const status = asp.status || 'Belum Diproses';
+        const response = (asp.response || '').replace(/"/g, '""');
+
+        return [
+          idx + 1,
+          `"${date}"`,
+          `"${name}"`,
+          `"${className}"`,
+          `"${content}"`,
+          `"${ipHash}"`,
+          `"${status}"`,
+          `"${response}"`
+        ].join(',');
+      })
+    ];
+
+    const csvContent = '\uFEFF' + csvRows.join('\n'); // Add BOM for Excel UTF-8 support
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `aspirasi_siswa_mpk_${new Date().toISOString().substring(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('success', 'File CSV berhasil diexport!');
+    
+    logActivity({
+      action: 'EXPORT_ASPIRATIONS',
+      entity_type: 'aspiration',
+      detail: `Mengekspor ${aspirations.length} aspirasi ke CSV`
+    });
   }
 
   // Search input handler
@@ -658,7 +828,7 @@ export const prerender = false;
     renderTable();
   });
 
-  // Filter click handlers
+  // Filter click handlers (using e.currentTarget to prevent badge span clicks from breaking)
   document.querySelectorAll('[data-filter]').forEach(button => {
     button.addEventListener('click', (e: any) => {
       // Remove active class
@@ -668,12 +838,17 @@ export const prerender = false;
       });
 
       // Add active class
-      e.target.classList.add('bg-cream-500', 'text-slate-950', 'font-bold');
-      e.target.classList.remove('hover:text-slate-800');
+      e.currentTarget.classList.add('bg-cream-500', 'text-slate-950', 'font-bold');
+      e.currentTarget.classList.remove('hover:text-slate-800');
 
-      currentFilter = e.target.getAttribute('data-filter');
+      currentFilter = e.currentTarget.getAttribute('data-filter');
       currentPage = 1; // Reset page on category filter change
       renderTable();
     });
+  });
+
+  // Export CSV button handler
+  document.getElementById('export-csv-btn')?.addEventListener('click', () => {
+    exportAspirationsCSV();
   });
 </script>
