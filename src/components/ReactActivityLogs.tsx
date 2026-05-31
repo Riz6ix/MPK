@@ -137,7 +137,7 @@ export default function ReactActivityLogs() {
 
   const [filterAction, setFilterAction] = useState('');
   const [filterEmail, setFilterEmail] = useState('');
-  const [isLive, setIsLive] = useState(false);
+  const [isLive, setIsLive] = useState(true);
 
   const fetchLogs = useCallback(async (silent = false) => {
     if (!silent) {
