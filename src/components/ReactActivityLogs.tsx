@@ -52,9 +52,7 @@ function parseDeviceInfo(ua: string | null): string {
   return ua.substring(0, 30) + '…';
 }
 
-// ─── Custom Action Filter Dropdown ─────────────────────────────────────────
-// Pakai custom dropdown biar bisa dikontrol full stylenya (bukan <select> native
-// yang warnanya nurutin OS, bukan tema web).
+// ─── Custom Action Dropdown — tema krem, bukan <select> native ─────────────
 function ActionDropdown({
   value,
   onChange,
@@ -80,7 +78,7 @@ function ActionDropdown({
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="w-full sm:w-auto flex items-center justify-between gap-2 bg-white border border-cream-300 rounded-xl px-3.5 py-2.5 text-slate-800 text-xs font-bold focus:outline-none focus:border-cream-500 transition cursor-pointer shadow-sm active:scale-[0.99] leading-normal min-w-[140px]"
+        className="w-full sm:w-auto flex items-center justify-between gap-2 bg-white border border-cream-300 rounded-xl px-4 py-2.5 text-slate-800 text-xs font-bold focus:outline-none focus:border-cream-500 transition cursor-pointer shadow-sm active:scale-[0.99] leading-normal min-w-[140px]"
       >
         <span className="truncate">{selected}</span>
         <i className={`ph-bold ${open ? 'ph-caret-up' : 'ph-caret-down'} text-slate-400 text-[10px] shrink-0`}></i>
@@ -88,15 +86,11 @@ function ActionDropdown({
 
       {open && (
         <div className="absolute right-0 sm:left-0 mt-1.5 w-52 bg-[#fdf8f3] border border-cream-300 rounded-2xl shadow-xl z-50 overflow-hidden">
-          {/* Header */}
           <div className="px-3.5 pt-3 pb-1.5">
-            <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400">
-              Filter Aksi
-            </p>
+            <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400">Filter Aksi</p>
           </div>
 
           <div className="max-h-64 overflow-y-auto divide-y divide-cream-100/60 pb-1.5">
-            {/* Semua Aksi */}
             <div
               onClick={() => { onChange(''); setOpen(false); }}
               className={`flex items-center justify-between px-3.5 py-2.5 cursor-pointer transition-colors text-xs font-bold ${
@@ -231,76 +225,57 @@ export default function ReactActivityLogs() {
   };
 
   return (
-    <div className="space-y-5">
-
-      {/* ── Header Card ── */}
-      <div className="cozy-paper-card border border-cream-300 shadow-md p-4 sm:p-5">
-
-        {/* Baris 1: Judul + badge count */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="min-w-0">
-            <h3 className="text-base font-black text-slate-900 uppercase tracking-wide flex items-center gap-2 leading-tight">
-              <i className="ph-duotone ph-clipboard-text text-amber-700 text-xl shrink-0"></i>
-              <span>Riwayat Aktivitas Admin</span>
+    <div className="space-y-6">
+      {/* Header & Controls */}
+      <div className="cozy-paper-card p-5 border border-cream-300 shadow-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-base font-black text-slate-900 uppercase tracking-wide flex items-center gap-2">
+              <i className="ph-duotone ph-clipboard-text text-amber-700 text-xl"></i>
+              Riwayat Aktivitas Admin
             </h3>
-            <p className="text-[10px] font-mono text-slate-400 mt-0.5">
-              {totalCount} log · hal. {page + 1}/{Math.max(1, totalPages)}
+            <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+              {totalCount} log tercatat · halaman {page + 1} dari {Math.max(1, totalPages)}
             </p>
           </div>
-
-          {/* Live + Refresh + Export — compact, satu baris */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Live toggle */}
             <button
-              onClick={() => setIsLive(p => !p)}
-              title={isLive ? 'Matikan live update' : 'Aktifkan live update'}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition cursor-pointer ${
+              onClick={() => setIsLive(prev => !prev)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
                 isLive
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                  : 'bg-cream-50 border-cream-300 text-slate-500 hover:border-amber-400 hover:text-amber-700'
+                  : 'bg-cream-50 border-cream-300 text-slate-600 hover:border-amber-400'
               }`}
             >
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
-              <span className="hidden sm:inline">{isLive ? 'Live' : 'Live'}</span>
+              <span className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
+              {isLive ? 'Live' : 'Live Off'}
             </button>
-
-            {/* Refresh */}
             <button
               onClick={() => fetchLogs()}
-              title="Refresh data"
-              className="p-2 bg-cream-100 hover:bg-cream-200 border border-cream-300 text-slate-600 hover:text-slate-800 rounded-xl text-sm transition cursor-pointer"
+              className="px-3 py-1.5 bg-cream-100 hover:bg-cream-200 border border-cream-300 text-slate-700 rounded-xl text-xs font-bold cursor-pointer transition"
             >
-              <i className="ph-bold ph-arrow-clockwise"></i>
+              <i className="ph-bold ph-arrow-clockwise mr-1"></i>Refresh
             </button>
-
-            {/* Export CSV */}
             <button
               onClick={exportCSV}
               disabled={logs.length === 0}
-              title="Export ke CSV"
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[11px] font-bold cursor-pointer transition disabled:opacity-40"
+              className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold cursor-pointer transition disabled:opacity-50 flex items-center gap-1.5"
             >
-              <i className="ph-bold ph-download-simple text-xs"></i>
-              <span className="hidden sm:inline">CSV</span>
+              <i className="ph-bold ph-download-simple"></i> Export CSV
             </button>
           </div>
         </div>
 
-        {/* Baris 2: Filter toolbar */}
-        <div className="flex flex-col sm:flex-row gap-2">
-          {/* Search email */}
-          <div className="relative flex-1">
-            <i className="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-            <input
-              type="text"
-              placeholder="Cari email admin..."
-              value={filterEmail}
-              onChange={e => { setFilterEmail(e.target.value); setPage(0); }}
-              className="w-full bg-white border border-cream-300 rounded-xl pl-8 pr-3 py-2.5 text-slate-800 text-xs font-medium focus:outline-none focus:border-cream-500 transition leading-normal"
-            />
-          </div>
-
-          {/* Custom Action Dropdown — tema krem */}
+        {/* Filters */}
+        <div className="mt-4 flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Filter email admin..."
+            value={filterEmail}
+            onChange={e => { setFilterEmail(e.target.value); setPage(0); }}
+            className="flex-1 bg-white border border-cream-300 rounded-xl px-4 py-2.5 text-slate-800 text-xs focus:outline-none focus:border-cream-500 transition font-medium leading-normal"
+          />
           <ActionDropdown
             value={filterAction}
             onChange={(v) => { setFilterAction(v); setPage(0); }}
@@ -308,41 +283,30 @@ export default function ReactActivityLogs() {
         </div>
       </div>
 
-      {/* ── Log Table Card ── */}
+      {/* Log Table */}
       <div className="cozy-paper-card border border-cream-300 shadow-md overflow-hidden">
-
-        {/* Loading */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-14 gap-3">
+          <div className="flex flex-col items-center justify-center py-16 space-y-3">
             <div className="w-6 h-6 border-2 border-amber-600/30 border-t-amber-700 rounded-full animate-spin"></div>
-            <p className="text-slate-400 text-xs font-mono">Lagi narik data...</p>
+            <p className="text-slate-400 text-xs font-mono">Memuat log aktivitas...</p>
           </div>
-
         ) : fetchError ? (
-          <div className="flex flex-col items-center justify-center py-14 gap-4 px-6">
+          <div className="flex flex-col items-center justify-center py-16 space-y-4">
             <i className="ph-duotone ph-wifi-slash text-4xl text-red-300"></i>
             <div className="text-center">
-              <p className="text-slate-700 text-sm font-bold">Gagal muat log</p>
-              <p className="text-slate-400 text-xs font-mono mt-1 max-w-xs break-words">{fetchError}</p>
+              <p className="text-slate-700 text-sm font-bold">Gagal memuat log</p>
+              <p className="text-slate-400 text-xs font-mono mt-1 max-w-xs">{fetchError}</p>
             </div>
-            <button
-              onClick={() => fetchLogs()}
-              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition flex items-center gap-2"
-            >
+            <button onClick={() => fetchLogs()} className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition flex items-center gap-2">
               <i className="ph-bold ph-arrow-clockwise"></i> Coba Lagi
             </button>
           </div>
-
         ) : logs.length === 0 ? (
-          /* ── Empty State — h-auto + padding cukup ── */
-          <div className="flex flex-col items-center justify-center py-14 pb-10 gap-3 px-6">
+          <div className="flex flex-col items-center justify-center py-16 space-y-3">
             <i className="ph-duotone ph-clipboard-text text-5xl text-cream-300"></i>
-            <p className="text-slate-600 text-sm font-bold">Masih sepi.</p>
-            <p className="text-slate-400 text-xs text-center leading-relaxed max-w-xs">
-              Belum ada pergerakan apa-apa dari admin.
-            </p>
+            <p className="text-slate-500 text-sm font-medium">Belum ada log aktivitas.</p>
+            <p className="text-slate-400 text-xs font-mono">Log akan otomatis muncul setelah ada operasi admin.</p>
           </div>
-
         ) : (
           <>
             {/* Desktop Table */}
@@ -354,17 +318,13 @@ export default function ReactActivityLogs() {
                     <th className="py-3 px-4">Admin</th>
                     <th className="py-3 px-4">Aksi</th>
                     <th className="py-3 px-4">Detail</th>
-                    <th className="py-3 px-4">IP</th>
+                    <th className="py-3 px-4">IP Address</th>
                     <th className="py-3 px-4">Device</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-cream-100">
                   {logs.map(log => {
-                    const meta = ACTION_LABELS[log.action] ?? {
-                      label: log.action,
-                      color: 'text-slate-600 bg-slate-50 border-slate-200',
-                      icon: 'ph-activity',
-                    };
+                    const meta = ACTION_LABELS[log.action] ?? { label: log.action, color: 'text-slate-600 bg-slate-50 border-slate-200', icon: 'ph-activity' };
                     return (
                       <tr key={log.id} className="hover:bg-cream-50/60 transition">
                         <td className="py-3 px-4 font-mono text-slate-500 whitespace-nowrap text-[10px]">
@@ -405,14 +365,10 @@ export default function ReactActivityLogs() {
             {/* Mobile Card List */}
             <div className="md:hidden divide-y divide-cream-100">
               {logs.map(log => {
-                const meta = ACTION_LABELS[log.action] ?? {
-                  label: log.action,
-                  color: 'text-slate-600 bg-slate-50 border-slate-200',
-                  icon: 'ph-activity',
-                };
+                const meta = ACTION_LABELS[log.action] ?? { label: log.action, color: 'text-slate-600 bg-slate-50 border-slate-200', icon: 'ph-activity' };
                 return (
                   <div key={log.id} className="p-4 space-y-2">
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center justify-between gap-2">
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-bold font-mono ${meta.color}`}>
                         <i className={`ph-bold ${meta.icon}`}></i>
                         {meta.label}
@@ -421,7 +377,7 @@ export default function ReactActivityLogs() {
                     </div>
                     <div className="text-xs font-bold text-slate-800">{log.detail || '—'}</div>
                     <div className="flex items-center gap-3 text-[9px] font-mono text-slate-400 flex-wrap">
-                      <span>👤 <span className="truncate max-w-[180px] inline-block align-bottom">{log.admin_email}</span></span>
+                      <span title={log.admin_email}>👤 {log.admin_email}</span>
                       {log.ip_address && <span>🌐 {log.ip_address}</span>}
                       <span>📱 {parseDeviceInfo(log.device_info)}</span>
                     </div>
@@ -441,7 +397,7 @@ export default function ReactActivityLogs() {
                   ← Sebelumnya
                 </button>
                 <span className="text-[10px] font-mono text-slate-500">
-                  {page + 1} / {totalPages}
+                  Halaman {page + 1} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
