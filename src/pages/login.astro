@@ -1,10 +1,33 @@
 ---
 import '../styles/global.css';
+import { supabase } from '../lib/supabase';
+
 export const prerender = false; // SSR agar query string ?error= selalu diproses server-side
 
-// Bersihkan session cookies secara tuntas di sisi server saat mengakses gerbang login
-Astro.cookies.delete('sb-access-token', { path: '/' });
-Astro.cookies.delete('sb-refresh-token', { path: '/' });
+// Ambil session cookies
+const accessToken = Astro.cookies.get('sb-access-token')?.value;
+const isLogout = Astro.url.searchParams.get('logout') === 'true' || Astro.url.searchParams.get('message') === 'Berhasil keluar sesi';
+
+if (isLogout) {
+  // Hanya bersihkan session jika memang melakukan logout secara eksplisit
+  Astro.cookies.delete('sb-access-token', { path: '/' });
+  Astro.cookies.delete('sb-refresh-token', { path: '/' });
+} else if (accessToken) {
+  // Jika sudah punya token, verifikasi ke Supabase
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+    if (user && !error) {
+      // Jika token aktif valid, langsung redirect ke admin (tidak perlu login lagi)
+      return Astro.redirect('/admin');
+    }
+  } catch (err) {
+    console.warn('[login] Gagal auto-redirect:', err);
+  }
+  
+  // Jika token kedaluwarsa/tidak valid, bersihkan cookie
+  Astro.cookies.delete('sb-access-token', { path: '/' });
+  Astro.cookies.delete('sb-refresh-token', { path: '/' });
+}
 ---
 
 <!DOCTYPE html>
