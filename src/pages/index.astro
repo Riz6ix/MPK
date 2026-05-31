@@ -1046,5 +1046,160 @@ const sortedGenerations = Object.keys(demisionerByGen).sort((a, b) => b.localeCo
         }, 80);
       }
     });
+
+    // Premium Momentum Drag/Swipe Slider for Aspiration Board Marquees
+    function initMarqueeMomentum(trackSelector: string, baseSpeed: number) {
+      const track = document.querySelector(trackSelector) as HTMLElement | null;
+      if (!track) return;
+
+      // Disable standard CSS animation to let JavaScript momentum take over
+      track.style.animation = 'none';
+
+      let currentX = 0;
+      let dragX = 0;
+      let isDragging = false;
+      let isHovered = false;
+      let startX = 0;
+      let lastX = 0;
+      let lastTime = 0;
+      let userVelocity = 0;
+      let activeSpeed = baseSpeed;
+
+      let W = track.scrollWidth;
+      let blockW = W / 3;
+
+      function updateDimensions() {
+        if (!track) return;
+        W = track.scrollWidth;
+        blockW = W / 3;
+      }
+
+      window.addEventListener('resize', updateDimensions);
+
+      // Drag Handlers
+      function startDrag(clientX: number) {
+        isDragging = true;
+        startX = clientX;
+        dragX = currentX;
+        lastX = clientX;
+        lastTime = performance.now();
+        userVelocity = 0;
+        track!.style.cursor = 'grabbing';
+      }
+
+      function moveDrag(clientX: number) {
+        if (!isDragging) return;
+        const deltaX = clientX - startX;
+        currentX = dragX + deltaX;
+
+        // Wrap currentX during active dragging
+        if (currentX < -blockW) {
+          currentX += blockW;
+          dragX += blockW;
+        } else if (currentX > 0) {
+          currentX -= blockW;
+          dragX -= blockW;
+        }
+
+        const now = performance.now();
+        const elapsed = now - lastTime;
+        if (elapsed > 0) {
+          userVelocity = (clientX - lastX) / elapsed * 16.666; // standard frame speed
+        }
+        lastX = clientX;
+        lastTime = now;
+      }
+
+      function endDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        track!.style.cursor = 'grab';
+        
+        // Cap maximum swipe velocity
+        const maxVel = 35;
+        if (userVelocity > maxVel) userVelocity = maxVel;
+        if (userVelocity < -maxVel) userVelocity = -maxVel;
+      }
+
+      // Event Listeners
+      track.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startDrag(e.clientX);
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          moveDrag(e.clientX);
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        endDrag();
+      });
+
+      track.addEventListener('mouseenter', () => {
+        isHovered = true;
+      });
+
+      track.addEventListener('mouseleave', () => {
+        isHovered = false;
+        endDrag();
+      });
+
+      // Touch Events (Mobiles)
+      track.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 0) {
+          startDrag(e.touches[0].clientX);
+        }
+      }, { passive: true });
+
+      track.addEventListener('touchmove', (e) => {
+        if (isDragging && e.touches.length > 0) {
+          moveDrag(e.touches[0].clientX);
+        }
+      }, { passive: true });
+
+      track.addEventListener('touchend', () => {
+        endDrag();
+      });
+
+      track.addEventListener('dragstart', (e) => e.preventDefault());
+      track.style.cursor = 'grab';
+
+      // Animation Loop
+      function update() {
+        if (!isDragging) {
+          // Smooth deceleration when hovered, otherwise smooth acceleration back to baseSpeed
+          const targetAutoSpeed = isHovered ? 0 : baseSpeed;
+          activeSpeed = activeSpeed * 0.9 + targetAutoSpeed * 0.1;
+
+          currentX += activeSpeed + userVelocity;
+          userVelocity *= 0.95; // Inertia friction "ngerem"
+
+          // Wrap seamlessly
+          if (currentX < -blockW) {
+            currentX += blockW;
+          } else if (currentX > 0) {
+            currentX -= blockW;
+          }
+        }
+
+        track!.style.transform = `translate3d(${currentX}px, 0, 0)`;
+        requestAnimationFrame(update);
+      }
+
+      // Delay start to allow reliable scrollWidth calculations
+      setTimeout(() => {
+        updateDimensions();
+        if (baseSpeed > 0) {
+          currentX = -blockW;
+        }
+        requestAnimationFrame(update);
+      }, 600);
+    }
+
+    // Initialize both tracks
+    initMarqueeMomentum('.marquee-track-left', -0.8);
+    initMarqueeMomentum('.marquee-track-right', 0.8);
   </script>
 </Layout>
